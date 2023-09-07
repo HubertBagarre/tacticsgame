@@ -150,5 +150,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2a55daaf8adcb84192c23bb3cf3f120, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  position: {x: 0, y: 0}
   neighbors: []
-  unit: {fileID: 0}
+  currentUnit: {fileID: 0}
+  modelRenderer: {fileID: 5935183296807465691}
+  defaultMat: {fileID: 2100000, guid: 35f88edf3851c9b44bfd57ff363c8bf6, type: 2}
+  selectableMat: {fileID: 2100000, guid: e3bd85f4b2d20fd4f99caffc811fe899, type: 2}
+  selectedMat: {fileID: 2100000, guid: 3fddec1670a946f4f9f94d222426a5a7, type: 2}
+  unselectableMat: {fileID: 2100000, guid: 317868c7db5d55346afb50823e09b1c5, type: 2}

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -9,6 +10,9 @@ public class TileManager : MonoBehaviour
 {
     [SerializeField] private List<Tile> tiles = new List<Tile>();
     [SerializeField] private List<Unit> units = new List<Unit>();
+
+    public List<Tile> AllTiles => tiles.ToList();
+    public List<Unit> AllUnits => units.ToList();
 
     public void SetTiles(List<Tile> list)
     {

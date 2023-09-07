@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Data Container for Tile Info
@@ -11,6 +13,21 @@ public class Tile : MonoBehaviour
     [SerializeField] private Tile[] neighbors; //0 is top, then clockwise
 
     [SerializeField] private Unit currentUnit;
+
+    [Header("Visual")] [SerializeField] private Renderer modelRenderer;
+
+    [SerializeField] private Material defaultMat;
+    [SerializeField] private Material selectableMat;
+    [SerializeField] private Material selectedMat;
+    [SerializeField] private Material unselectableMat;
+
+    public enum Appearance
+    {
+        Unselected,
+        Selectable,
+        Selected,
+        Unselectable,
+    }
 
     public void InitPosition(int x,int y)
     {
@@ -40,5 +57,20 @@ public class Tile : MonoBehaviour
     public Tile[] GetNeighbors(bool includeDiag = false)
     {
         return includeDiag ? neighbors : new[] {neighbors[0], neighbors[2], neighbors[4], neighbors[6]};
+    }
+
+    
+    public void SetMat(Appearance appearance)
+    {
+        Material mat = appearance switch
+        {
+            Appearance.Unselected => defaultMat,
+            Appearance.Selectable => selectableMat,
+            Appearance.Selected => selectedMat,
+            Appearance.Unselectable => unselectableMat,
+            _ => defaultMat
+        };
+
+        modelRenderer.material = mat;
     }
 }
