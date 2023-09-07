@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 //TODO - Change to level generator
 /// <summary>
@@ -19,12 +20,13 @@ public class TileGenerator : MonoBehaviour
     [SerializeField] private Vector2 tileSpacing;
 
     [Header("Unit Parameters")]
+    [SerializeField] private Unit unitPrefab;
     [SerializeField] private List<PlacedUnit> placedUnits;
 
     [Serializable]
     private class PlacedUnit
     {
-        public Unit unit;
+        public UnitStatsSO so;
         public Vector2Int position;
         public int team;
     }
@@ -88,10 +90,10 @@ public class TileGenerator : MonoBehaviour
         foreach (var placedUnit in placedUnits)
         {
             var tile = grid[placedUnit.position.x, placedUnit.position.y];
-            var unit = Instantiate(placedUnit.unit,tile.transform.position,Quaternion.identity,transform);
+            var unit = Instantiate(unitPrefab,tile.transform.position,Quaternion.identity,transform);
 
-            unit.name = placedUnit.unit.name;
-            unit.InitUnit(tile,placedUnit.team);
+            unit.name = placedUnit.so.name;
+            unit.InitUnit(tile,placedUnit.team,placedUnit.so);
             
             units.Add(unit);
         }
