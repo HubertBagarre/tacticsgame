@@ -7,8 +7,8 @@ using UnityEngine;
 /// </summary>
 public class TileManager : MonoBehaviour
 {
-    private List<Tile> tiles = new List<Tile>();
-    private List<Unit> units = new List<Unit>();
+    [SerializeField] private List<Tile> tiles = new List<Tile>();
+    [SerializeField] private List<Unit> units = new List<Unit>();
 
     public void SetTiles(List<Tile> list)
     {

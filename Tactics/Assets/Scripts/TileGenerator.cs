@@ -26,6 +26,7 @@ public class TileGenerator : MonoBehaviour
     {
         public Unit unit;
         public Vector2Int position;
+        public int team;
     }
     
     [Header("Lists")]
@@ -90,7 +91,7 @@ public class TileGenerator : MonoBehaviour
             var unit = Instantiate(placedUnit.unit,tile.transform.position,Quaternion.identity,transform);
 
             unit.name = placedUnit.unit.name;
-            unit.SetTile(tile);
+            unit.InitUnit(tile,placedUnit.team);
             
             units.Add(unit);
         }
