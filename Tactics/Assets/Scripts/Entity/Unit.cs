@@ -1,8 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
-   public Tile tile;
+   [field:SerializeField] public Tile Tile { get; private set; }
+
+   public void SetTile(Tile tile)
+   {
+      Tile = tile;
+      tile.SetUnit(this);
+   }
+
 }

@@ -1,21 +1,48 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//TODO - Change to level generator
+/// <summary>
+/// Generates level
+/// = instantiate tiles, link neighbors
+/// = instantiate units
+/// </summary>
 public class TileGenerator : MonoBehaviour
 {
+    [Header("Dependencies")]
+    [SerializeField] private TileManager tileManager;
+    
+    [Header("Tile Parameters")]
     [SerializeField] private Tile tilePrefab;
     [SerializeField] private Vector2Int gridSize;
     [SerializeField] private Vector2 tileSpacing;
-    [SerializeField] private List<Tile> tiles;
-    private Tile[,] grid;
 
-    [ContextMenu("Generate Grid")]
-    public void GenerateGrid()
+    [Header("Unit Parameters")]
+    [SerializeField] private List<PlacedUnit> placedUnits;
+
+    [Serializable]
+    private class PlacedUnit
     {
-        ClearTiles();
+        public Unit unit;
+        public Vector2Int position;
+    }
+    
+    [Header("Lists")]
+    [SerializeField] private List<Tile> tiles;
+    [SerializeField] private List<Unit> units;
+    private Tile[,] grid;
+    
+
+    [ContextMenu("Generate Level")]
+    public void GenerateLevel()
+    {
+        ClearList(tiles);
+        ClearList(units);
+        
         tiles = new List<Tile>();
+        units = new List<Unit>();
+        
         grid = new Tile[gridSize.x,gridSize.y];
         
         for (int y = 0; y < gridSize.y; y++)
@@ -54,28 +81,43 @@ public class TileGenerator : MonoBehaviour
             
             tile.InitNeighbors(neighbors);
         }
-    }
-    
-    private void ClearTiles()
-    {
-        if (tiles == null) return;
-        if (tiles.Count <= 0)
+
+        tileManager.SetTiles(tiles);
+        
+        foreach (var placedUnit in placedUnits)
         {
-            tiles.Clear();
+            var tile = grid[placedUnit.position.x, placedUnit.position.y];
+            var unit = Instantiate(placedUnit.unit,tile.transform.position,Quaternion.identity,transform);
+
+            unit.name = placedUnit.unit.name;
+            unit.SetTile(tile);
+            
+            units.Add(unit);
+        }
+
+        tileManager.SetUnits(units);
+    }
+
+    private void ClearList<T>(List<T> list) where T : MonoBehaviour
+    {
+        if (list == null) return;
+        if (list.Count <= 0)
+        {
+            list.Clear();
             return;
         }
 
-        int count = tiles.Count;
+        int count = list.Count;
         for (int i = 0; i < count; i++)
         {
 #if UNITY_EDITOR
-            DestroyImmediate(tiles[0].gameObject);
+            DestroyImmediate(list[0].gameObject);
 #else
-            Destroy(tiles[0]);
+            Destroy(list[0]);
 #endif
-            tiles.RemoveAt(0);
+            list.RemoveAt(0);
         }
 
-        tiles.Clear();
+        list.Clear();
     }
 }

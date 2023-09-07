@@ -1,8 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
+/// <summary>
+/// Data Container for Tile Info
+/// (tile position, adjacent Tiles, current Unit)
+/// </summary>
 public class Tile : MonoBehaviour
 {
     [SerializeField] private Vector2Int position;
@@ -24,7 +25,6 @@ public class Tile : MonoBehaviour
     public void SetUnit(Unit unit)
     {
         currentUnit = unit;
-        //probably some callbacks
     }
     
     public bool HasUnit()

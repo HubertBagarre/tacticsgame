@@ -2,17 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Handles Tiles
+/// </summary>
 public class TileManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private List<Tile> tiles = new List<Tile>();
+    private List<Unit> units = new List<Unit>();
+
+    public void SetTiles(List<Tile> list)
     {
-        
+        tiles = list;
+        Debug.Log($"Set {tiles.Count} tiles");
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetUnits(List<Unit> list)
     {
-        
+        units = list;
+        Debug.Log($"Set {units.Count} units");
     }
 }
