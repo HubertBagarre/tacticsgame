@@ -8207,6 +8207,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17263b99948f0624f8d52613e3b183d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cam: {fileID: 330585545}
+  entityLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  worldLayers:
+    serializedVersion: 2
+    m_Bits: 128
   tiles:
   - {fileID: 1217186112}
   - {fileID: 2140417386}
@@ -8275,6 +8282,8 @@ MonoBehaviour:
   units:
   - {fileID: 1865053005}
   - {fileID: 1020417792}
+  <SelectedTile>k__BackingField: {fileID: 0}
+  <SelectedUnit>k__BackingField: {fileID: 0}
 --- !u!1 &1497852901
 GameObject:
   m_ObjectHideFlags: 0
@@ -8614,15 +8623,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9a07d9d077c6454995f3c15cfdba1a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 330585545}
-  entityLayers:
-    serializedVersion: 2
-    m_Bits: 256
-  worldLayers:
-    serializedVersion: 2
-    m_Bits: 128
-  <SelectedTile>k__BackingField: {fileID: 0}
-  <SelectedUnit>k__BackingField: {fileID: 0}
 --- !u!114 &1528645690
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8657,7 +8657,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1528645689}
         m_TargetAssemblyTypeName: InputManager, Assembly-CSharp
-        m_MethodName: LeftClickEvent
+        m_MethodName: InvokeLeftClickEvent
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8673,7 +8673,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1528645689}
         m_TargetAssemblyTypeName: InputManager, Assembly-CSharp
-        m_MethodName: RightClickEvent
+        m_MethodName: InvokeRightClickEvent
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

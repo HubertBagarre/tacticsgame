@@ -9,6 +9,8 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
+        tileManager.ConnectInputs();
+        
         Run();
     }
 
