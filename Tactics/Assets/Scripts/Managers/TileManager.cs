@@ -39,11 +39,31 @@ public class TileManager : MonoBehaviour
 
     public void ConnectInputs()
     {
-        InputManager.LeftClickEvent += UpdateTargets;
-        InputManager.RightClickEvent += UpdateTargets;
+        InputManager.LeftClickEvent += DebugTile;
+        InputManager.RightClickEvent += DebugUnit;
+
+        void DebugTile()
+        {
+            Debug.Log($"Clicked {GetClickTile()}");
+        }
+        
+        void DebugUnit()
+        {
+            Debug.Log($"Clicked {GetClickUnit()}");
+        }
     }
     
-    private void UpdateTargets()
+    public Tile GetClickTile()
+    {
+        return UpdateTargets().tile;
+    }
+
+    public Unit GetClickUnit()
+    {
+        return UpdateTargets().unit;
+    }
+    
+    private (Tile tile,Unit unit) UpdateTargets()
     {
         CastCamRay(out var unitHit, out var tileHit);
         
@@ -64,6 +84,8 @@ public class TileManager : MonoBehaviour
         {
             SelectedUnit = null;
         }
+
+        return (SelectedTile, SelectedUnit);
     }
 
     private void CastCamRay(out RaycastHit entityHit, out RaycastHit worldHit)
