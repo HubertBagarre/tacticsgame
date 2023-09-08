@@ -1,8 +1,8 @@
 {
-    "name": "New Controls",
+    "name": "Controls",
     "maps": [
         {
-            "name": "New action map",
+            "name": "InGame",
             "id": "b229b792-0fc2-4286-baee-839109188070",
             "actions": [
                 {
@@ -15,9 +15,18 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "MouseClick",
+                    "name": "MouseLeftClick",
                     "type": "Button",
                     "id": "d8922dfa-73a7-40dc-aba0-998e06907042",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "MouseRightClick",
+                    "type": "Button",
+                    "id": "c5ebc30f-6415-4177-9b87-8d518c32407a",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -43,7 +52,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "MouseClick",
+                    "action": "MouseLeftClick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "37580b21-e699-4938-830a-cfb5440426d0",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MouseRightClick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
