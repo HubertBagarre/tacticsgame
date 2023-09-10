@@ -1,17 +1,26 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
     [field: SerializeField] private TileManager tileManager;
+    [field: SerializeField] private UnitManager unitManager;
 
     private void Start()
     {
-        tileManager.ConnectInputs();
-        
+        InputManager.LeftClickEvent += DebugTile;
+        InputManager.RightClickEvent += DebugUnit;
+
         Run();
+        
+        void DebugTile()
+        {
+            Debug.Log($"Clicked {tileManager.GetClickTile()}",this);
+        }
+        
+        void DebugUnit()
+        {
+            Debug.Log($"Clicked {unitManager.GetClickUnit()}",this);
+        }
     }
 
     public void Run()

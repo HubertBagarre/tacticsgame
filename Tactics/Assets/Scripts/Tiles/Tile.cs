@@ -10,7 +10,7 @@ public class Tile : MonoBehaviour
 {
     [SerializeField] private Vector2Int position;
     public Vector2Int Position => position;
-    [SerializeField] private Tile[] neighbors; //0 is top, then clockwise
+    [SerializeField] private Tile[] neighbors; //0 is top (x,y+1), then clockwise
 
     [SerializeField] private Unit currentUnit;
 

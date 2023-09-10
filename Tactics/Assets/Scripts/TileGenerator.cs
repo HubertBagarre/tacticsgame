@@ -13,6 +13,7 @@ public class TileGenerator : MonoBehaviour
 {
     [Header("Dependencies")]
     [SerializeField] private TileManager tileManager;
+    [SerializeField] private UnitManager unitManager;
     
     [Header("Tile Parameters")]
     [SerializeField] private Tile tilePrefab;
@@ -98,7 +99,7 @@ public class TileGenerator : MonoBehaviour
             units.Add(unit);
         }
 
-        tileManager.SetUnits(units);
+        unitManager.SetUnits(units);
     }
 
     private void ClearList<T>(List<T> list) where T : MonoBehaviour
