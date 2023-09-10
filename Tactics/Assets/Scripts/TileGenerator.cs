@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 //TODO - Change to level generator
 /// <summary>
@@ -75,12 +74,12 @@ public class TileGenerator : MonoBehaviour
             bool left = x == 0;
             
             if(!top) neighbors[0] = grid[x,y + 1];
-            if(!right && !top) neighbors[1] = grid[x + 1,y + 1];
-            if(!right) neighbors[2] = grid[x + 1,y];
-            if(!right && !bot) neighbors[3] = grid[x + 1,y - 1];
-            if(!bot) neighbors[4] = grid[x,y - 1];
-            if(!left && !bot) neighbors[5] = grid[x - 1,y - 1];
-            if(!left) neighbors[6] = grid[x - 1,y];
+            if(!right) neighbors[1] = grid[x + 1,y];
+            if(!bot) neighbors[2] = grid[x,y - 1];
+            if(!left) neighbors[3] = grid[x - 1,y];
+            if(!right && !top) neighbors[4] = grid[x + 1,y + 1];
+            if(!right && !bot) neighbors[5] = grid[x + 1,y - 1];
+            if(!left && !bot) neighbors[6] = grid[x - 1,y - 1];
             if(!left && !top) neighbors[7] = grid[x - 1,y + 1];
             
             tile.InitNeighbors(neighbors);

@@ -1,6 +1,5 @@
-using System;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// Data Container for Tile Info
@@ -8,19 +7,27 @@ using UnityEngine.UI;
 /// </summary>
 public class Tile : MonoBehaviour
 {
+    //identification
     [SerializeField] private Vector2Int position;
-    [field: SerializeField] public bool Walkable { get; private set; }
     public Vector2Int Position => position;
-    [SerializeField] private Tile[] neighbors; //0 is top (x,y+1), then clockwise
-
+    
     [SerializeField] private Unit currentUnit;
+    
+    //pathing
+    [field: SerializeField] public bool Walkable { get; private set; }
+    [SerializeField] private Tile[] neighbors; //0 is top (x,y+1), then clockwise, adjacent before diag
+    public int PathRing { get; private set; }
 
+    //viusal
     [Header("Visual")] [SerializeField] private Renderer modelRenderer;
 
     [SerializeField] private Material defaultMat;
     [SerializeField] private Material selectableMat;
     [SerializeField] private Material selectedMat;
     [SerializeField] private Material unselectableMat;
+    
+    [field:Header("Debug")]
+    [field:SerializeField] public TextMeshProUGUI DebugText { get; private set; }
 
     public enum Appearance
     {
@@ -65,9 +72,21 @@ public class Tile : MonoBehaviour
         return currentUnit;
     }
 
-    public Tile[] GetNeighbors(bool includeDiag = false)
+    public Tile[] GetDirectNeighbors(bool includeDiag = false)
     {
-        return includeDiag ? neighbors : new[] {neighbors[0], neighbors[2], neighbors[4], neighbors[6]};
+        return includeDiag ? neighbors : new[] {neighbors[0], neighbors[1], neighbors[2], neighbors[3]};
+    }
+
+    public Tile[] GetNeighbors(int range, bool includeDiag = false)
+    {
+        //TODO Implement GetNeighbors method
+
+        return range switch
+        {
+            <= 0 => new[] {this},
+            1 => GetDirectNeighbors(),
+            _ => GetDirectNeighbors()
+        };
     }
 
 
@@ -83,5 +102,11 @@ public class Tile : MonoBehaviour
         };
 
         modelRenderer.material = mat;
+    }
+
+    public void SetPathRing(int value)
+    {
+        PathRing = value;
+        DebugText.text = $"{PathRing}";
     }
 }

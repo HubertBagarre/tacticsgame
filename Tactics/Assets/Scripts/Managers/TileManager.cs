@@ -21,7 +21,6 @@ public class TileManager : MonoBehaviour
     public void SetTiles(List<Tile> list)
     {
         tiles = list;
-        Debug.Log($"Set {tiles.Count} tiles");
     }
 
     public Tile GetClickTile()
@@ -33,17 +32,18 @@ public class TileManager : MonoBehaviour
     
     public void ClearSelectableTiles()
     {
-        foreach (var tile in SelectableTiles)
+        SelectableTiles.Clear();
+        
+        foreach (var tile in tiles)
         {
             tile.SetAppearance(Tile.Appearance.Default);
+            tile.SetPathRing(0);
         }
-        SelectableTiles.Clear();
+        
     }
 
-    public void SetSelectableTiles(Tile origin,int range,bool includeDiag,Func<Tile,bool> extraCondition = null)
+    public void SetSelectableTilesForMovement(Tile origin,int range,bool includeDiag,Func<Tile,bool> extraCondition = null)
     {
-        Debug.Log($"Setting Selectable Tiles (range = {range})");
-
         ClearSelectableTiles();
 
         extraCondition ??= _ => true;
@@ -51,6 +51,8 @@ public class TileManager : MonoBehaviour
         SelectableTiles.Add(origin);
         var justAdded = new List<Tile>() {origin};
         var iteration = 0;
+        
+        origin.SetPathRing(iteration);
         
         AddNeighbors();
         
@@ -63,21 +65,44 @@ public class TileManager : MonoBehaviour
         {
             if(iteration >= range) return;
             
-            var neighbors = justAdded.SelectMany(tile => tile.GetNeighbors(includeDiag)).ToList();
+            var neighbors = justAdded.SelectMany(tile => tile.GetDirectNeighbors(includeDiag)).Distinct().ToList();
 
             var validTiles = neighbors
                 .Where(tile => tile != null)
                 .Where(tile => !SelectableTiles.Contains(tile))
                 .Where(extraCondition)
                 .ToList();
-            
-            
+
             SelectableTiles.AddRange(validTiles);
             justAdded = validTiles;
             
             iteration++;
             
+            foreach (var addedTile in justAdded)
+            {
+                addedTile.SetPathRing(iteration);
+            }
+            
             AddNeighbors();
         }
+    }
+
+    public List<Tile> GetPathFromSelectableTiles(Tile destination)
+    {
+        if (!SelectableTiles.Contains(destination)) return null;
+
+        var path = new List<Tile>() {destination};
+        var lastAdded = destination;
+        
+        for (int i = destination.PathRing - 1; i >= 1; i--)
+        {
+            lastAdded = lastAdded.GetDirectNeighbors().FirstOrDefault(tile => tile.PathRing == i);
+            if(lastAdded == null) break;
+            path.Add(lastAdded);
+        }
+
+        path.Reverse();
+        
+        return path;
     }
 }

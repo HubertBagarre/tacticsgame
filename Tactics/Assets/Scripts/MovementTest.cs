@@ -23,11 +23,13 @@ public class MovementTest : MonoBehaviour
         if(unitToMove == null) return;
         if(unitToMove.Tile == null) return;
         
-        tileManager.SetSelectableTiles(unitToMove.Tile,unitToMove.Movement,false,unitToMove.Stats.WalkableTileSelector);
+        tileManager.SetSelectableTilesForMovement(unitToMove.Tile,unitToMove.Movement,false,unitToMove.Stats.WalkableTileSelector);
     }
 
     private void DeselectTiles()
     {
+        Debug.Log("Clearing Selectables");
+        
         tileManager.ClearSelectableTiles();
     }
     
@@ -37,9 +39,11 @@ public class MovementTest : MonoBehaviour
         
         if(!tileManager.SelectableTiles.Contains(destination)) return;
 
-        DeselectTiles();
+        var path = tileManager.GetPathFromSelectableTiles(destination);
         
-        unitManager.MoveUnit(unitToMove,destination);
+        DeselectTiles();
+
+        unitManager.MoveUnit(unitToMove,path);
     }
     
 }

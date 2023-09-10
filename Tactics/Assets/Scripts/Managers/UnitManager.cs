@@ -30,13 +30,13 @@ public class UnitManager : MonoBehaviour
         return unitHit.transform != null ? unitHit.transform.GetComponent<Unit>() : null;;
     }
 
-    public void MoveUnit(Unit unit,Tile destination)
+    public void MoveUnit(Unit unit,List<Tile> path)
     {
-        Debug.Log($"Moving unit {unit} to {destination}");
+        Debug.Log($"Moving unit {unit} to {path.LastOrDefault()}");
         
-        if(unit == null) return;
-        if(destination == null) return;
-        if(destination.HasUnit()) return;
+        if(unit == null) return; //does the unit exist ?
+        if(!path.Any()) return; // checks for valid path
+        if(path.Any(tile => tile.HasUnit())) return; //does the path have any unit on it ?
         
         if(unit.Tile != null) unit.Tile.RemoveUnit();
 
@@ -44,12 +44,15 @@ public class UnitManager : MonoBehaviour
         
         IEnumerator MoveAnimationRoutine()
         {
-            yield return null;
+            foreach (var tile in path)
+            {
+                yield return null;
 
-            unit.transform.position = destination.transform.position;
-            
-            destination.SetUnit(unit);
-            unit.SetTile(destination);
+                unit.transform.position = tile.transform.position;
+                
+                tile.SetUnit(unit);
+                unit.SetTile(tile);
+            }
         }
     }
 }

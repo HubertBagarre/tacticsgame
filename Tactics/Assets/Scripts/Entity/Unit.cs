@@ -22,7 +22,11 @@ public class Unit : MonoBehaviour
 
    public void SetTile(Tile tile)
    {
+      Tile.RemoveUnit();
+      
       Tile = tile;
+      
+      Tile.SetUnit(this);
    }
 
 }
