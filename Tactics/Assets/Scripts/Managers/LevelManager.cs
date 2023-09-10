@@ -17,11 +17,16 @@ public class LevelManager : MonoBehaviour
             tile.SetAppearance(Tile.Appearance.Default);
         }
         
-        EventManager.Trigger(new StartLevelEvent());
+        EventManager.Trigger(new StartBattleEvent());
     }
 }
 
-public class StartLevelEvent
+public class StartBattleEvent
+{
+    
+}
+
+public class EndBattleEvent
 {
     
 }

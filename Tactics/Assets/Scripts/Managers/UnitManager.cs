@@ -7,7 +7,7 @@ using UnityEngine;
 /// Handles Unit Management
 ///
 /// Lists all units
-/// Unit movement
+/// Unit movement 
 /// Unit abilities
 /// </summary>
 public class UnitManager : MonoBehaviour

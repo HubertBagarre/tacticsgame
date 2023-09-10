@@ -14,7 +14,7 @@ public class Tile : MonoBehaviour
     [SerializeField] private Unit currentUnit;
     
     //pathing
-    [field: SerializeField] public bool Walkable { get; private set; }
+    [field: SerializeField] public bool IsWalkable { get; private set; }
     [SerializeField] private Tile[] neighbors; //0 is top (x,y+1), then clockwise, adjacent before diag
     public int PathRing { get; private set; }
 
@@ -49,7 +49,7 @@ public class Tile : MonoBehaviour
 
     public void SetWalkable(bool value)
     {
-        Walkable = value;
+        IsWalkable = value;
     }
 
     public void RemoveUnit()
