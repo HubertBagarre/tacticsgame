@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d941316ac0761124bb2116ed7d0deafb, type: 3}
   m_Name: TestUnit
   m_EditorClassIdentifier: 
-  movement: 3
+  <Movement>k__BackingField: 3
+  <Speed>k__BackingField: 100

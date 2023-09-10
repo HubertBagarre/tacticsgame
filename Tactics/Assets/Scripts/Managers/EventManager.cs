@@ -1,0 +1,68 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EventManager : MonoBehaviour
+{
+    private static EventManager Instance;
+    
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Debug.LogWarning($"{Instance} is already an instance of {typeof(EventManager)}",Instance);
+            Destroy(this);
+            return;
+        }
+
+        Instance = this;
+    }
+
+    private readonly Dictionary<Type, List<Delegate>> m_events = new();
+
+    public delegate void EventCallback<in T>(T data);
+
+    public static void AddListener<T>(EventCallback<T> callback)
+    {
+        if (Instance.m_events.TryGetValue(typeof(T), out var listeners))
+        {
+            if (!listeners.Contains(callback))
+            {
+                listeners.Add(callback);
+            }
+        }
+        else
+        {
+            listeners = new List<Delegate> { callback };
+            Instance.m_events.Add(typeof(T), listeners);
+        }
+    }
+
+    public static void RemoveListener<T>(EventCallback<T> callback)
+    {
+        if (!Instance.m_events.TryGetValue(typeof(T), out var listeners)) return;
+
+        if (listeners.Contains(callback)) listeners.Remove(callback);
+    }
+
+    public static void RemoveListeners<T>()
+    {
+        if (!Instance.m_events.TryGetValue(typeof(T), out var listeners)) return;
+
+        Instance.m_events.Remove(typeof(T));
+    }
+
+    public static void Trigger<T>(T triggeredKey)
+    {
+        if (!Instance.m_events.TryGetValue(typeof(T), out var listeners))
+        {
+            return;
+        }
+
+        foreach (var listener in listeners.ToArray())
+        {
+            listener.DynamicInvoke(triggeredKey);
+        }
+    }
+}   

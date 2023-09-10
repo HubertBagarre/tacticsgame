@@ -20,7 +20,6 @@ public class UnitManager : MonoBehaviour
     public void SetUnits(List<Unit> list)
     {
         units = list;
-        Debug.Log($"Set {units.Count} units");
     }
 
     public Unit GetClickUnit()

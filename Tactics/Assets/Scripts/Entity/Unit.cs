@@ -7,7 +7,10 @@ public class Unit : MonoBehaviour
    [field:SerializeField] public UnitStatsSO Stats { get; private set; }
 
    [field:Header("Current Stats")]
+   [field:SerializeField] public bool Active { get; private set; }
    [field:SerializeField] public int Movement { get; private set; }
+   [field:SerializeField] public int Speed { get; private set; }
+   public float DecayRate => Speed / 100f;
 
    public void InitUnit(Tile tile,int team,UnitStatsSO so)
    {
@@ -15,7 +18,10 @@ public class Unit : MonoBehaviour
       Team = team;
       Stats = so;
 
-      Movement = so.movement;
+      Movement = so.BaseMovement;
+      Speed = so.BaseSpeed;
+
+      Active = true;
 
       tile.SetUnit(this);
    }
@@ -28,5 +34,5 @@ public class Unit : MonoBehaviour
       
       Tile.SetUnit(this);
    }
-
+   
 }

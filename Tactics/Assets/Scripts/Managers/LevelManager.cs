@@ -16,5 +16,12 @@ public class LevelManager : MonoBehaviour
         {
             tile.SetAppearance(Tile.Appearance.Default);
         }
+        
+        EventManager.Trigger(new StartLevelEvent());
     }
+}
+
+public class StartLevelEvent
+{
+    
 }
