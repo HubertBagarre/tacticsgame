@@ -8,6 +8,7 @@ public class TurnManager : MonoBehaviour
 {
     [Header("Dependencies")]
     [SerializeField] private UnitManager unitManager;
+    [SerializeField] private TileManager tileManager;
 
     [Header("UI Buttons")]
     [SerializeField] private Button endTurnButton;
@@ -90,7 +91,7 @@ public class TurnManager : MonoBehaviour
     {
         unitTurn = true;
         
-        Debug.Log($"{unit}'s Turn");
+        unit.StartTurn();
         
         EventManager.Trigger(new StartUnitTurnEvent(unit));
     }
@@ -108,7 +109,7 @@ public class TurnManager : MonoBehaviour
 
 public class StartUnitTurnEvent
 {
-    public Unit Unit { get; private set; }
+    public Unit Unit { get;}
 
     public StartUnitTurnEvent(Unit unit)
     {

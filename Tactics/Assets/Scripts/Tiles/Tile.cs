@@ -1,3 +1,4 @@
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ public class Tile : MonoBehaviour
     //pathing
     [field: SerializeField] public bool IsWalkable { get; private set; }
     [SerializeField] private Tile[] neighbors; //0 is top (x,y+1), then clockwise, adjacent before diag
-    public int PathRing { get; private set; }
+    [field:SerializeField] public int PathRing { get; private set; }
 
     //viusal
     [Header("Visual")] [SerializeField] private Renderer modelRenderer;
@@ -74,7 +75,9 @@ public class Tile : MonoBehaviour
 
     public Tile[] GetDirectNeighbors(bool includeDiag = false)
     {
-        return includeDiag ? neighbors : new[] {neighbors[0], neighbors[1], neighbors[2], neighbors[3]};
+        var tiles = includeDiag ? neighbors : new[] {neighbors[0], neighbors[1], neighbors[2], neighbors[3]};
+        
+        return tiles.Where(tile => tile != null).ToArray();
     }
 
     public Tile[] GetNeighbors(int range, bool includeDiag = false)
