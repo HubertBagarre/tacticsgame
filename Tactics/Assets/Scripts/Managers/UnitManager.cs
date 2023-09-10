@@ -15,8 +15,6 @@ public class UnitManager : MonoBehaviour
     [Header("Settings")] [SerializeField] protected LayerMask entityLayers;
 
     [Header("Debug")] [SerializeField] private List<Unit> units = new List<Unit>();
-    [field: SerializeField] public Unit SelectedUnit { get; private set; }
-
     public List<Unit> AllUnits => units.ToList();
 
     public void SetUnits(List<Unit> list)
@@ -29,9 +27,7 @@ public class UnitManager : MonoBehaviour
     {
         InputManager.CastCamRay(out var unitHit, entityLayers);
 
-        SelectedUnit = unitHit.transform != null ? unitHit.transform.GetComponent<Unit>() : null;
-
-        return SelectedUnit;
+        return unitHit.transform != null ? unitHit.transform.GetComponent<Unit>() : null;;
     }
 
     public void MoveUnit(Unit unit,Tile destination)

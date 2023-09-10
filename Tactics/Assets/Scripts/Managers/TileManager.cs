@@ -15,8 +15,6 @@ public class TileManager : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private List<Tile> tiles = new List<Tile>();
     
-    [field:SerializeField] public Tile SelectedTile { get; private set; }
-    
     public List<Tile> AllTiles => tiles.ToList();
     
     public void SetTiles(List<Tile> list)
@@ -29,8 +27,6 @@ public class TileManager : MonoBehaviour
     {
         InputManager.CastCamRay(out var tileHit, worldLayers);
         
-        SelectedTile = tileHit.transform != null ? tileHit.transform.GetComponent<Tile>() : null;
-        
-        return SelectedTile;
+        return tileHit.transform != null ? tileHit.transform.GetComponent<Tile>() : null;
     }
 }
