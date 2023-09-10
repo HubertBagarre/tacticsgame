@@ -87,6 +87,11 @@ public class TileGenerator : MonoBehaviour
         }
 
         tileManager.SetTiles(tiles);
+
+        foreach (var tile in tiles)
+        {
+            tile.SetWalkable(true);
+        }
         
         foreach (var placedUnit in placedUnits)
         {
