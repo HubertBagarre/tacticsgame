@@ -7,20 +7,7 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
-        InputManager.LeftClickEvent += DebugTile;
-        InputManager.RightClickEvent += DebugUnit;
-
         Run();
-        
-        void DebugTile()
-        {
-            Debug.Log($"Clicked {tileManager.GetClickTile()}",this);
-        }
-        
-        void DebugUnit()
-        {
-            Debug.Log($"Clicked {unitManager.GetClickUnit()}",this);
-        }
     }
 
     public void Run()
