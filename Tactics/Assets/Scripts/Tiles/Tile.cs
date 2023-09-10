@@ -24,7 +24,7 @@ public class Tile : MonoBehaviour
 
     public enum Appearance
     {
-        Unselected,
+        Default,
         Selectable,
         Selected,
         Unselectable,
@@ -43,6 +43,11 @@ public class Tile : MonoBehaviour
     public void SetWalkable(bool value)
     {
         Walkable = value;
+    }
+
+    public void RemoveUnit()
+    {
+        currentUnit = null;
     }
 
     public void SetUnit(Unit unit)
@@ -66,11 +71,11 @@ public class Tile : MonoBehaviour
     }
 
 
-    public void SetMat(Appearance appearance)
+    public void SetAppearance(Appearance appearance)
     {
         Material mat = appearance switch
         {
-            Appearance.Unselected => defaultMat,
+            Appearance.Default => defaultMat,
             Appearance.Selectable => selectableMat,
             Appearance.Selected => selectedMat,
             Appearance.Unselectable => unselectableMat,

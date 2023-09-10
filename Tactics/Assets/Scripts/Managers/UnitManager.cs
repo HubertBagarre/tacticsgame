@@ -38,6 +38,8 @@ public class UnitManager : MonoBehaviour
         if(destination == null) return;
         if(destination.HasUnit()) return;
         
+        if(unit.Tile != null) unit.Tile.RemoveUnit();
+
         StartCoroutine(MoveAnimationRoutine());
         
         IEnumerator MoveAnimationRoutine()
@@ -45,6 +47,9 @@ public class UnitManager : MonoBehaviour
             yield return null;
 
             unit.transform.position = destination.transform.position;
+            
+            destination.SetUnit(unit);
+            unit.SetTile(destination);
         }
     }
 }

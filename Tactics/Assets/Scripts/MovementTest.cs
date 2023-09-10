@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ public class MovementTest : MonoBehaviour
     [SerializeField] private TileManager tileManager;
 
     private Unit unitToMove;
-    
+
     private void Start()
     {
         InputManager.RightClickEvent += SelectUnit;
@@ -18,11 +19,27 @@ public class MovementTest : MonoBehaviour
     private void SelectUnit()
     {
         unitToMove = unitManager.GetClickUnit();
+        
+        if(unitToMove == null) return;
+        if(unitToMove.Tile == null) return;
+        
+        tileManager.SetSelectableTiles(unitToMove.Tile,unitToMove.Movement,false,unitToMove.Stats.WalkableTileSelector);
+    }
+
+    private void DeselectTiles()
+    {
+        tileManager.ClearSelectableTiles();
     }
     
     private void MoveUnit()
     {
-        unitManager.MoveUnit(unitToMove,tileManager.GetClickTile());
+        var destination = tileManager.GetClickTile();
+        
+        if(!tileManager.SelectableTiles.Contains(destination)) return;
+
+        DeselectTiles();
+        
+        unitManager.MoveUnit(unitToMove,destination);
     }
     
 }

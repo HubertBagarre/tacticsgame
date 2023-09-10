@@ -14,7 +14,7 @@ public class LevelManager : MonoBehaviour
     {
         foreach (var tile in tileManager.AllTiles)
         {
-            tile.SetMat(Tile.Appearance.Unselected);
+            tile.SetAppearance(Tile.Appearance.Default);
         }
     }
 }
