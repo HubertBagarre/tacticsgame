@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Battle;
 
 [CreateAssetMenu(menuName = "Unit")]
 public class UnitStatsSO : ScriptableObject

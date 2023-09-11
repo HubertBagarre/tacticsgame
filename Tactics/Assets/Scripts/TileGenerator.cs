@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Battle;
 
 //TODO - Change to level generator
 /// <summary>

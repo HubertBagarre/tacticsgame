@@ -1,32 +1,32 @@
 using UnityEngine;
 
-public class LevelManager : MonoBehaviour
+namespace Battle
 {
-    [field: SerializeField] private TileManager tileManager;
-    [field: SerializeField] private UnitManager unitManager;
-
-    private void Start()
+    public class LevelManager : MonoBehaviour
     {
-        Run();
-    }
+        [field: SerializeField] private TileManager tileManager;
+        [field: SerializeField] private UnitManager unitManager;
 
-    public void Run()
-    {
-        foreach (var tile in tileManager.AllTiles)
+        private void Start()
         {
-            tile.SetAppearance(Tile.Appearance.Default);
+            Run();
         }
+
+        public void Run()
+        {
+            foreach (var tile in tileManager.AllTiles)
+            {
+                tile.SetAppearance(Tile.Appearance.Default);
+            }
         
-        EventManager.Trigger(new StartBattleEvent());
+            EventManager.Trigger(new StartLevelEvent());
+        }
     }
 }
 
-public class StartBattleEvent
+public class StartLevelEvent
 {
     
 }
 
-public class EndBattleEvent
-{
-    
-}
+

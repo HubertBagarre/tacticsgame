@@ -1,31 +1,34 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-/// <summary>
-/// Handles Unit Management
-///
-/// Lists all units
-/// Unit movement 
-/// Unit abilities
-/// </summary>
-public class UnitManager : MonoBehaviour
+namespace Battle
 {
-    [Header("Settings")] [SerializeField] protected LayerMask entityLayers;
-
-    [Header("Debug")] [SerializeField] private List<Unit> units = new List<Unit>();
-    public List<Unit> AllUnits => units.ToList();
-
-    public void SetUnits(List<Unit> list)
+    /// <summary>
+    /// Handles Unit Management
+    ///
+    /// Lists all units
+    /// Unit movement 
+    /// Unit abilities
+    /// </summary>
+    public class UnitManager : MonoBehaviour
     {
-        units = list;
-    }
+        [Header("Settings")] [SerializeField] protected LayerMask entityLayers;
 
-    public Unit GetClickUnit()
-    {
-        InputManager.CastCamRay(out var unitHit, entityLayers);
+        [Header("Debug")] [SerializeField] private List<Unit> units = new List<Unit>();
+        public List<Unit> AllUnits => units.ToList();
 
-        return unitHit.transform != null ? unitHit.transform.GetComponent<Unit>() : null;;
+        public void SetUnits(List<Unit> list)
+        {
+            units = list;
+        }
+
+        public Unit GetClickUnit()
+        {
+            InputManager.CastCamRay(out var unitHit, entityLayers);
+
+            return unitHit.transform != null ? unitHit.transform.GetComponent<Unit>() : null;
+            ;
+        }
     }
 }
