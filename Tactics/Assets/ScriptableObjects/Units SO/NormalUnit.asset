@@ -12,5 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d941316ac0761124bb2116ed7d0deafb, type: 3}
   m_Name: NormalUnit
   m_EditorClassIdentifier: 
-  <Movement>k__BackingField: 3
-  <Speed>k__BackingField: 100
+  <Portrait>k__BackingField: {fileID: 21300000, guid: 86f5515ea3cedf8428cf0070e79dd782,
+    type: 3}
+  <BaseMovement>k__BackingField: 3
+  <Initiative>k__BackingField: 10
+  <BaseSpeed>k__BackingField: 100

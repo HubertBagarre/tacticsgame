@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d941316ac0761124bb2116ed7d0deafb, type: 3}
   m_Name: FastUnit
   m_EditorClassIdentifier: 
+  <Portrait>k__BackingField: {fileID: 21300000, guid: 00a0faf89c6574b4c9254d4f223bc99b,
+    type: 3}
   <BaseMovement>k__BackingField: 3
-  <Initiative>k__BackingField: 1000
+  <Initiative>k__BackingField: 1
   <BaseSpeed>k__BackingField: 200

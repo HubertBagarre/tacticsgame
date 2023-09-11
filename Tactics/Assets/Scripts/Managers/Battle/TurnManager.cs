@@ -9,11 +9,11 @@ namespace Battle
 
     public class TurnManager : MonoBehaviour
     {
-        [Header("Dependencies")] [SerializeField]
-        private UnitManager unitManager;
-
-        [SerializeField] private TileManager tileManager;
-
+        [field: Header("Settings")]
+        [field: SerializeField]
+        public int ResetTurnValue { get; private set; } = 999;
+        [field:SerializeField] public Sprite EndTurnImage { get; private set; }
+        
         [Header("UI Buttons")] [SerializeField]
         private Button endTurnButton;
         
@@ -21,9 +21,14 @@ namespace Battle
         [field: SerializeField]
         public BattleEntity CurrentEntityTurn { get; private set; }
 
+        private BattleEntity roundEntity;
+
         [field: SerializeField] public int CurrentRound { get; private set; }
 
         private List<BattleEntity> entitiesInBattle = new List<BattleEntity>();
+
+        private UpdateTurnValuesEvent updateTurnValuesEvent =>
+            new UpdateTurnValuesEvent(entitiesInBattle.OrderBy(entity => entity.TurnValue).ToList(),roundEntity);
 
         public void Start()
         {
@@ -34,28 +39,27 @@ namespace Battle
         {
             EventManager.AddListener<StartLevelEvent>(StartBattle);
             EventManager.AddListener<EndEntityTurnEvent>(NextUnitTurn);
+            EventManager.AddListener<EntityJoinBattleEvent>(AddEntityToBattle);
 
             endTurnButton.onClick.AddListener(EndUnitTurn);
         }
 
-        private void StartBattle(StartLevelEvent _)
+        private void StartBattle(StartLevelEvent ctx)
         {
             Debug.Log("Starting Level");
 
             entitiesInBattle.Clear();
 
-            var roundEntity = new RoundEntity(this, 100, 1000);
-            entitiesInBattle.Add(roundEntity);
+            roundEntity = new RoundEntity(this, 100);
+            EventManager.Trigger(new EntityJoinBattleEvent(roundEntity));
             
             // TODO - add units at start of battle based on level
-            entitiesInBattle.AddRange(unitManager.AllUnits);
 
-            foreach (var unit in entitiesInBattle)
+            foreach (var battleEntity in ctx.StartingEntities)
             {
-                unit.ResetTurnValue(true);
-                Debug.Log($"Unit {unit} turn value : {unit.TurnValue} (decay rate : {unit.DecayRate})");
+                EventManager.Trigger(new EntityJoinBattleEvent(battleEntity));
             }
-
+            
             CurrentRound = 0;
 
             EventManager.Trigger(new StartBattleEvent());
@@ -109,18 +113,16 @@ namespace Battle
 
         private void DecayTurnValues(float decayValue)
         {
-            var activeUnits = entitiesInBattle;
-
-            foreach (var unit in activeUnits)
+            foreach (var entity in entitiesInBattle)
             {
-                unit.DecayTurnValue(decayValue);
+                entity.DecayTurnValue(decayValue);
             }
+            
+            EventManager.Trigger(updateTurnValuesEvent);
         }
 
         private void StartEntityTurn(BattleEntity unit)
         {
-            Debug.Log($"Starting {unit}'s turn");
-
             CurrentEntityTurn = unit;
 
             CurrentEntityTurn.StartTurn();
@@ -130,11 +132,9 @@ namespace Battle
         
         private void EndUnitTurn()
         {
-            Debug.Log($"Ending {CurrentEntityTurn}'s turn");
-            
             CurrentEntityTurn.EndTurn();
 
-            CurrentEntityTurn.ResetTurnValue();
+            CurrentEntityTurn.ResetTurnValue(ResetTurnValue);
 
             EventManager.Trigger(new EndEntityTurnEvent(CurrentEntityTurn));
         }
@@ -147,25 +147,41 @@ namespace Battle
 
             StartEntityTurn(nextUnit);
         }
+
+        private void AddEntityToBattle(EntityJoinBattleEvent ctx)
+        {
+            var entity = ctx.Entity;
+            
+            entitiesInBattle.Add(entity);
+            
+            entity.ResetTurnValue(-1);
+            
+            EventManager.Trigger(updateTurnValuesEvent);
+        }
     }
 
     public class RoundEntity : BattleEntity
     {
+        public Sprite Portrait { get; }
         public int Speed { get;}
         public float DecayRate => Speed / 100f;
         public float TurnValue { get; private set; }
+        private float turnResetValue;
         private TurnManager tm;
 
-        public RoundEntity(TurnManager turnManager,int speed, float turnValue)
+        public RoundEntity(TurnManager turnManager,int speed)
         {
             tm = turnManager;
+            Portrait = tm.EndTurnImage;
+            turnResetValue = tm.ResetTurnValue;
+            
             Speed = speed;
-            TurnValue = turnValue;
+            TurnValue = tm.ResetTurnValue;
         }
         
-        public void ResetTurnValue(bool _ = false)
+        public void ResetTurnValue(float _)
         {
-            TurnValue = 1000;
+            TurnValue = turnResetValue;
         }
 
         public void DecayTurnValue(float amount)
@@ -232,6 +248,38 @@ namespace Battle.BattleEvents
         public EndEntityTurnEvent(BattleEntity entity)
         {
             Entity = entity;
+        }
+    }
+
+    public class EntityJoinBattleEvent
+    {
+        public BattleEntity Entity { get; }
+        
+        public EntityJoinBattleEvent(BattleEntity entity)
+        {
+            Entity = entity;
+        }
+    }
+    
+    public class EntityLeaveBattleEvent
+    {
+        public BattleEntity Entity { get; }
+        
+        public EntityLeaveBattleEvent(BattleEntity entity)
+        {
+            Entity = entity;
+        }
+    }
+
+    public class UpdateTurnValuesEvent
+    {
+        public List<BattleEntity> EntityTurnOrder { get; }
+        public int RoundEndIndex { get; }
+
+        public UpdateTurnValuesEvent(List<BattleEntity> entityTurnOrder, BattleEntity roundEndEntity)
+        {
+            EntityTurnOrder = entityTurnOrder;
+            RoundEndIndex = entityTurnOrder.IndexOf(roundEndEntity);
         }
     }
 }

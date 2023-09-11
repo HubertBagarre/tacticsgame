@@ -30,6 +30,8 @@ namespace Battle
         public float DecayRate => Speed / 100f;
         [field:SerializeField] public float TurnValue { get; protected set; }
 
+        public Sprite Portrait => Stats.Portrait;
+
         private StartUnitTurnEvent startUnitTurnEvent => new (this);
         private EndUnitTurnEvent endUnitTurnEvent => new (this);
 
@@ -108,9 +110,9 @@ namespace Battle
             }
         }
 
-        public void ResetTurnValue(bool useInitiative = false)
+        public void ResetTurnValue(float value)
         {
-            TurnValue = useInitiative ? Stats.Initiative : 1000;
+            TurnValue = value < 0 ? Stats.Initiative : value;
         }
 
         public void DecayTurnValue(float amount)
