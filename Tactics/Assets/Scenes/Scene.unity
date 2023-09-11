@@ -1166,6 +1166,7 @@ MonoBehaviour:
   battleEntityTimelinePrefab: {fileID: 8208835791797979481, guid: a98e4692f99d9344bafa11b222490fef,
     type: 3}
   battleTimelineParent: {fileID: 1528372972}
+  endTurnButton: {fileID: 344935526}
 --- !u!1 &810971050
 GameObject:
   m_ObjectHideFlags: 0

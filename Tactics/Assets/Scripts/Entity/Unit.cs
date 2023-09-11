@@ -33,10 +33,7 @@ namespace Battle
         [field: SerializeField] public bool CanTakeTurn { get; protected set; } = true;
         
         public Sprite Portrait => Stats.Portrait;
-
-        private StartUnitTurnEvent startUnitTurnEvent => new (this);
-        private EndUnitTurnEvent endUnitTurnEvent => new (this);
-
+        
         public void InitUnit(Tile tile, int team, UnitStatsSO so)
         {
             Tile = tile;
@@ -57,7 +54,7 @@ namespace Battle
 
             //apply effects
             
-            EventManager.Trigger(startUnitTurnEvent);
+            EventManager.Trigger(new StartUnitTurnEvent(this));
 
             if (IsPlayerControlled)
             {
@@ -69,7 +66,7 @@ namespace Battle
 
         public void EndTurn()
         {
-            EventManager.Trigger(endUnitTurnEvent);
+            EventManager.Trigger(new EndUnitTurnEvent(this));
         }
 
         public void SetTile(Tile tile)

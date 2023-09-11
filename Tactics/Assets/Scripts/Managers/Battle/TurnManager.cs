@@ -39,7 +39,6 @@ namespace Battle
         {
             EventManager.AddListener<StartLevelEvent>(StartBattle);
             EventManager.AddListener<EndEntityTurnEvent>(NextUnitTurn);
-            EventManager.AddListener<EntityJoinBattleEvent>(AddEntityToBattle);
 
             endTurnButton.onClick.AddListener(EndUnitTurn);
         }
@@ -51,13 +50,13 @@ namespace Battle
             entitiesInBattle.Clear();
 
             endRoundEntity = new EndRoundEntity(this, 100);
-            EventManager.Trigger(new EntityJoinBattleEvent(endRoundEntity,false));
+            AddEntityToBattle(endRoundEntity,false);
 
             // TODO - add units at start of battle based on level
 
             foreach (var battleEntity in ctx.StartingEntities)
             {
-                EventManager.Trigger(new EntityJoinBattleEvent(battleEntity,false));
+                AddEntityToBattle(battleEntity,true);
             }
             
             CurrentRound = 0;
@@ -106,9 +105,9 @@ namespace Battle
         {
             CurrentEntityTurn = unit;
 
-            CurrentEntityTurn.StartTurn();
-
             EventManager.Trigger(new StartEntityTurnEvent(CurrentEntityTurn));
+            
+            CurrentEntityTurn.StartTurn();
         }
         
         private void EndUnitTurn()
@@ -131,19 +130,22 @@ namespace Battle
             StartEntityTurn(nextUnit);
         }
         
-        private void AddEntityToBattle(EntityJoinBattleEvent ctx)
+        private void AddEntityToBattle(BattleEntity entity,bool createPreview)
         {
-            var entity = ctx.Entity;
-            
             entitiesInBattle.Add(entity);
-            
             entity.ResetTurnValue(-1);
+
+            EventManager.Trigger(new EntityJoinBattleEvent(entity,false));
+            
+            if (createPreview)
+            {
+                var previewEntity = new PreviewEntity(this,entity);
+                entitiesInBattle.Add(previewEntity);
+                
+                EventManager.Trigger(new EntityJoinBattleEvent(previewEntity,true));
+            }
             
             EventManager.Trigger(updateTurnValuesEvent);
-            
-            if(ctx.Preview) return;
-            var previewEntity = new PreviewEntity(this,entity);
-            EventManager.Trigger(new EntityJoinBattleEvent(previewEntity,true));
         }
     }
 
