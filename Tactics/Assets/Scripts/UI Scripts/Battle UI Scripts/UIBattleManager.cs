@@ -26,15 +26,17 @@ public class UIBattleManager : MonoBehaviour
         EventManager.AddListener<StartEntityTurnEvent>(DisablePlayerButtons);
         EventManager.AddListener<StartUnitTurnEvent>(EnablePlayerButtons);
         EventManager.AddListener<EndUnitTurnEvent>(DisablePlayerButtons);
+        
+        EnablePlayerButtons(false);
     }
 
 
-    private void DisablePlayerButtons(StartEntityTurnEvent ctx)
+    private void DisablePlayerButtons(StartEntityTurnEvent _)
     {
         EnablePlayerButtons(false);
     }
     
-    private void DisablePlayerButtons(EndUnitTurnEvent ctx)
+    private void DisablePlayerButtons(EndUnitTurnEvent _)
     {
         EnablePlayerButtons(false);
     }

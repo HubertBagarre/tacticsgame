@@ -1146,7 +1146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c4f78bf4080da5448536342aa85fb5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <ResetTurnValue>k__BackingField: 999
+  <ResetTurnValue>k__BackingField: 100
   <EndTurnImage>k__BackingField: {fileID: 21300000, guid: aa5c888f407855d438d655aa2d6b478f,
     type: 3}
   endTurnButton: {fileID: 344935526}

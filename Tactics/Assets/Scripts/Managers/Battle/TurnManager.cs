@@ -40,7 +40,7 @@ namespace Battle
             EventManager.AddListener<StartLevelEvent>(StartBattle);
             EventManager.AddListener<EndEntityTurnEvent>(NextUnitTurn);
 
-            endTurnButton.onClick.AddListener(EndUnitTurn);
+            endTurnButton.onClick.AddListener(EndCurrentEntityTurn);
         }
 
         private void StartBattle(StartLevelEvent ctx)
@@ -110,7 +110,7 @@ namespace Battle
             CurrentEntityTurn.StartTurn();
         }
         
-        private void EndUnitTurn()
+        public void EndCurrentEntityTurn()
         {
             CurrentEntityTurn.EndTurn();
             
@@ -194,6 +194,8 @@ namespace Battle
             
             Speed = speed;
             DistanceFromTurnStart = tm.ResetTurnValue;
+            
+            EventManager.AddListener<EndEntityTurnEvent>(EndRound);
         }
         
         public void ResetTurnValue(float _)
@@ -208,11 +210,15 @@ namespace Battle
 
         public void StartTurn()
         {
-            
+            tm.EndCurrentEntityTurn();
         }
 
-        public void EndTurn()
+        public void EndTurn() { }
+
+        private void EndRound(EndEntityTurnEvent ctx)
         {
+            if(ctx.Entity != this) return;
+            
             tm.EndRound();
         }
     }
