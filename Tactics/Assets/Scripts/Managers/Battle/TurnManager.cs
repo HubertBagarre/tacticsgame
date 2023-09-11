@@ -21,14 +21,14 @@ namespace Battle
         [field: SerializeField]
         public BattleEntity CurrentEntityTurn { get; private set; }
 
-        private BattleEntity roundEntity;
+        private EndRoundEntity endRoundEntity;
 
         [field: SerializeField] public int CurrentRound { get; private set; }
 
         private List<BattleEntity> entitiesInBattle = new List<BattleEntity>();
 
         private UpdateTurnValuesEvent updateTurnValuesEvent =>
-            new UpdateTurnValuesEvent(entitiesInBattle.OrderBy(entity => entity.TurnValue).ToList(),roundEntity);
+            new UpdateTurnValuesEvent(entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList(),endRoundEntity);
 
         public void Start()
         {
@@ -50,14 +50,14 @@ namespace Battle
 
             entitiesInBattle.Clear();
 
-            roundEntity = new RoundEntity(this, 100);
-            EventManager.Trigger(new EntityJoinBattleEvent(roundEntity));
-            
+            endRoundEntity = new EndRoundEntity(this, 100);
+            EventManager.Trigger(new EntityJoinBattleEvent(endRoundEntity,false));
+
             // TODO - add units at start of battle based on level
 
             foreach (var battleEntity in ctx.StartingEntities)
             {
-                EventManager.Trigger(new EntityJoinBattleEvent(battleEntity));
+                EventManager.Trigger(new EntityJoinBattleEvent(battleEntity,false));
             }
             
             CurrentRound = 0;
@@ -91,26 +91,7 @@ namespace Battle
 
             NextRound();
         }
-
-        public (BattleEntity entity, float decayTime) GetNextUnitToPlay()
-        {
-            var activeUnits = entitiesInBattle;
-            var fastestUnit = activeUnits.First();
-            var timeForDecay = fastestUnit.TurnValue / fastestUnit.DecayRate;
-            var smallestTimeForDecay = timeForDecay;
-
-            foreach (var unit in activeUnits)
-            {
-                timeForDecay = unit.TurnValue / unit.DecayRate;
-
-                if (!(timeForDecay < smallestTimeForDecay)) continue;
-                fastestUnit = unit;
-                smallestTimeForDecay = timeForDecay;
-            }
-
-            return (fastestUnit, smallestTimeForDecay);
-        }
-
+        
         private void DecayTurnValues(float decayValue)
         {
             foreach (var entity in entitiesInBattle)
@@ -133,21 +114,23 @@ namespace Battle
         private void EndUnitTurn()
         {
             CurrentEntityTurn.EndTurn();
-
+            
             CurrentEntityTurn.ResetTurnValue(ResetTurnValue);
-
+            
             EventManager.Trigger(new EndEntityTurnEvent(CurrentEntityTurn));
         }
 
         private void NextUnitTurn(EndEntityTurnEvent _)
         {
-            var (nextUnit, decayValue) = GetNextUnitToPlay();
-
-            DecayTurnValues(decayValue);
-
+            var nextUnit = entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList().First();
+            
+            DecayTurnValues(nextUnit.TurnOrder);
+            
+            EventManager.Trigger(updateTurnValuesEvent);
+            
             StartEntityTurn(nextUnit);
         }
-
+        
         private void AddEntityToBattle(EntityJoinBattleEvent ctx)
         {
             var entity = ctx.Entity;
@@ -157,36 +140,68 @@ namespace Battle
             entity.ResetTurnValue(-1);
             
             EventManager.Trigger(updateTurnValuesEvent);
+            
+            if(ctx.Preview) return;
+            var previewEntity = new PreviewEntity(this,entity);
+            EventManager.Trigger(new EntityJoinBattleEvent(previewEntity,true));
         }
     }
 
-    public class RoundEntity : BattleEntity
+    public class PreviewEntity : BattleEntity
+    {
+        public Sprite Portrait => associatedEntity.Portrait;
+        public int Speed => associatedEntity.Speed;
+        public float DistanceFromTurnStart => associatedEntity.DistanceFromTurnStart + tm.ResetTurnValue;
+        public bool CanTakeTurn => false;
+
+        private TurnManager tm;
+        private BattleEntity associatedEntity;
+
+        public PreviewEntity(TurnManager turnManager,BattleEntity entity)
+        {
+            tm = turnManager;
+            associatedEntity = entity;
+        }
+        public void ResetTurnValue(float value) { }
+
+        public void DecayTurnValue(float amount) { }
+        public void StartTurn() { }
+        public void EndTurn() { }
+
+        public override string ToString()
+        {
+            return $"{associatedEntity} (Preview)";
+        }
+    }
+
+    public class EndRoundEntity : BattleEntity
     {
         public Sprite Portrait { get; }
         public int Speed { get;}
         public float DecayRate => Speed / 100f;
-        public float TurnValue { get; private set; }
+        public float DistanceFromTurnStart { get; private set; }
+        public bool CanTakeTurn => true;
         private float turnResetValue;
         private TurnManager tm;
 
-        public RoundEntity(TurnManager turnManager,int speed)
+        public EndRoundEntity(TurnManager turnManager,int speed)
         {
             tm = turnManager;
             Portrait = tm.EndTurnImage;
             turnResetValue = tm.ResetTurnValue;
             
             Speed = speed;
-            TurnValue = tm.ResetTurnValue;
+            DistanceFromTurnStart = tm.ResetTurnValue;
         }
         
         public void ResetTurnValue(float _)
         {
-            TurnValue = turnResetValue;
+            DistanceFromTurnStart = turnResetValue;
         }
 
         public void DecayTurnValue(float amount)
         {
-            TurnValue -= amount * DecayRate;
+            DistanceFromTurnStart -= amount * DecayRate;
         }
 
         public void StartTurn()
@@ -254,10 +269,12 @@ namespace Battle.BattleEvents
     public class EntityJoinBattleEvent
     {
         public BattleEntity Entity { get; }
+        public bool Preview { get; }
         
-        public EntityJoinBattleEvent(BattleEntity entity)
+        public EntityJoinBattleEvent(BattleEntity entity,bool preview)
         {
             Entity = entity;
+            Preview = preview;
         }
     }
     

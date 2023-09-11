@@ -17,8 +17,8 @@ public class UIBattleEntityTimeline : MonoBehaviour
     {
         AssociatedEntity = entity;
         
-        portraitImage.sprite = entity.Portrait;
-        turnValueText.text = $"{AssociatedEntity.TurnValue}";
+        portraitImage.sprite = AssociatedEntity.Portrait;
+        turnValueText.text = $"{AssociatedEntity.DistanceFromTurnStart}";
 
         EventManager.AddListener<UpdateTurnValuesEvent>(UpdateTurnValue);
         
@@ -35,11 +35,20 @@ public class UIBattleEntityTimeline : MonoBehaviour
         obj.SetActive(value);
     }
 
+    public void SetPreview(bool value)
+    {
+        var col = portraitImage.color;
+        col.a = value ? 0.7f : 1f;
+        portraitImage.color = col;
+    }
+    
     private void UpdateTurnValue(UpdateTurnValuesEvent ctx)
     {
-        turnValueText.text = $"{(int)AssociatedEntity.TurnValue}";
+        portraitImage.sprite = AssociatedEntity.Portrait;
         
-        turnValueObj.SetActive(AssociatedEntity.TurnValue > 0);
+        turnValueText.text = $"{(int)AssociatedEntity.TurnOrder}";
+        
+        turnValueObj.SetActive(AssociatedEntity.DistanceFromTurnStart > 0);
     }
 
 }

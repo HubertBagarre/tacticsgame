@@ -28,8 +28,10 @@ namespace Battle
         [field: SerializeField] public int MovementLeft { get; private set; }
         [field:SerializeField] public int Speed { get; protected set; }
         public float DecayRate => Speed / 100f;
-        [field:SerializeField] public float TurnValue { get; protected set; }
+        [field:SerializeField] public float DistanceFromTurnStart { get; protected set; }
 
+        [field: SerializeField] public bool CanTakeTurn { get; protected set; } = true;
+        
         public Sprite Portrait => Stats.Portrait;
 
         private StartUnitTurnEvent startUnitTurnEvent => new (this);
@@ -112,12 +114,12 @@ namespace Battle
 
         public void ResetTurnValue(float value)
         {
-            TurnValue = value < 0 ? Stats.Initiative : value;
+            DistanceFromTurnStart = value < 0 ? Stats.Initiative : value;
         }
 
         public void DecayTurnValue(float amount)
         {
-            TurnValue -= amount * DecayRate;
+            DistanceFromTurnStart -= amount * DecayRate;
         }
     }
 }

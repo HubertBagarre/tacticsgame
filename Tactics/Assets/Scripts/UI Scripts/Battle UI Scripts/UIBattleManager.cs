@@ -8,8 +8,7 @@ public class UIBattleManager : MonoBehaviour
     [SerializeField] private UIBattleEntityTimeline battleEntityTimelinePrefab;
     [SerializeField] private Transform battleTimelineParent;
 
-    private Dictionary<BattleEntity, UIBattleEntityTimeline> uibattleTimelineDict =
-        new Dictionary<BattleEntity, UIBattleEntityTimeline>();
+    private Dictionary<BattleEntity, UIBattleEntityTimeline> uibattleTimelineDict = new ();
 
     private void Start()
     {
@@ -23,10 +22,12 @@ public class UIBattleManager : MonoBehaviour
         var entity = ctx.Entity;
 
         var ui = Instantiate(battleEntityTimelinePrefab, battleTimelineParent);
-        
+
         uibattleTimelineDict.Add(entity,ui);
         
         ui.ConnectToEntity(entity);
+        
+        ui.SetPreview(ctx.Preview);
     }
 
     private void RemoveBattleEntityTimelineUI(EntityLeaveBattleEvent ctx)
@@ -56,12 +57,8 @@ public class UIBattleManager : MonoBehaviour
             
             ui.transform.SetSiblingIndex(0);
 
+            //ui.Show(true);
             ui.Show(i <= roundIndex);
-        }
-        
-        foreach (var entity in order)
-        {
-            
         }
     }
 }
