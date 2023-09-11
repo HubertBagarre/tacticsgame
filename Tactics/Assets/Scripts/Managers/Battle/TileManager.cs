@@ -154,15 +154,12 @@ namespace Battle
         public List<Tile> GetPathFromSelectableTiles(Tile destination)
         {
             if (!SelectableTiles.Contains(destination)) return null;
-
-            Debug.Log($"Getting path to {destination}");
-
+            
             var path = new List<Tile>() {destination};
             var lastAdded = destination;
 
             for (int i = destination.PathRing - 1; i >= 1; i--)
             {
-                Debug.Log($"last added : {lastAdded}", lastAdded);
                 lastAdded = lastAdded.GetDirectNeighbors().FirstOrDefault(tile => tile.PathRing == i);
                 if (lastAdded == null) break;
                 path.Add(lastAdded);

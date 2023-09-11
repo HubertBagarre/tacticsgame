@@ -7,7 +7,7 @@ namespace Battle
 {
     using UnitEvents;
     
-    public class Unit : MonoBehaviour
+    public class Unit : MonoBehaviour, BattleEntity
     {
         [field: SerializeField] public Tile Tile { get; private set; }
         [field: SerializeField] public int Team { get; private set; } //0 is player
@@ -26,9 +26,12 @@ namespace Battle
         public int Movement { get; private set; }
 
         [field: SerializeField] public int MovementLeft { get; private set; }
-        [field: SerializeField] public int Speed { get; private set; }
+        [field:SerializeField] public int Speed { get; protected set; }
         public float DecayRate => Speed / 100f;
-        public float TurnValue { get; private set; }
+        [field:SerializeField] public float TurnValue { get; protected set; }
+
+        private StartUnitTurnEvent startUnitTurnEvent => new (this);
+        private EndUnitTurnEvent endUnitTurnEvent => new (this);
 
         public void InitUnit(Tile tile, int team, UnitStatsSO so)
         {
@@ -49,6 +52,8 @@ namespace Battle
             MovementLeft = Movement;
 
             //apply effects
+            
+            EventManager.Trigger(startUnitTurnEvent);
 
             if (IsPlayerControlled)
             {
@@ -56,6 +61,11 @@ namespace Battle
             }
 
             // TODO - AI Logic if AI Turn
+        }
+
+        public void EndTurn()
+        {
+            EventManager.Trigger(endUnitTurnEvent);
         }
 
         public void SetTile(Tile tile)
@@ -70,9 +80,7 @@ namespace Battle
         public void MoveUnit(List<Tile> path)
         {
             var unit = this;
-
-            Debug.Log($"Moving unit {unit} to {path.LastOrDefault()}");
-
+            
             if (unit == null) return; //does the unit exist ?
             if (!path.Any()) return; // checks for valid path
             if (path.Any(tile => tile.HasUnit())) return; //does the path have any unit on it ?
@@ -114,6 +122,26 @@ namespace Battle
 
 namespace Battle.UnitEvents
 {
+    public class StartUnitTurnEvent
+    {
+        public Unit Unit { get; }
+
+        public StartUnitTurnEvent(Unit unit)
+        {
+            Unit = unit;
+        }
+    }
+
+    public class EndUnitTurnEvent
+    {
+        public Unit Unit { get; }
+
+        public EndUnitTurnEvent(Unit unit)
+        {
+            Unit = unit;
+        }
+    }
+    
     public class UnitMovementStartEvent
     {
         public Unit Unit { get; }
