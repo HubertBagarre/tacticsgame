@@ -61,8 +61,6 @@ public class PlayerUnitBehaviourSO : UnitBehaviourSO
     
     private void RemoveMouseInputs(EndPlayerControlEvent _)
     {
-        Debug.Log("Removed Mouse Inputs");
-            
         InputManager.LeftClickEvent -= MoveUnitOnClick;
     }
     
@@ -77,7 +75,6 @@ public class PlayerUnitBehaviourSO : UnitBehaviourSO
 
         SetSelectableTilesForMovement(unit.Tile, unit.MovementLeft, false, unit.Stats.WalkableTileSelector);
         
-        Debug.Log("Added Mouse Inputs");
         InputManager.LeftClickEvent += MoveUnitOnClick;
     }
     
