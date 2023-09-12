@@ -1,5 +1,10 @@
 using UnityEngine;
 
+/// <summary>
+/// A BattleEntity is defined by having a place on the timeline, they include : Units (player controlled and ai), Unit Preview and Round End Entity
+///
+/// 
+/// </summary>
 public interface BattleEntity
 {
     public Sprite Portrait { get; }

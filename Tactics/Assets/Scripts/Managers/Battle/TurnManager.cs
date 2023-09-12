@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -38,7 +39,6 @@ namespace Battle
         private void AddCallbacks()
         {
             EventManager.AddListener<StartLevelEvent>(StartBattle);
-            EventManager.AddListener<EndEntityTurnEvent>(NextUnitTurn);
 
             endTurnButton.onClick.AddListener(EndCurrentEntityTurn);
         }
@@ -63,30 +63,40 @@ namespace Battle
 
             EventManager.Trigger(new StartBattleEvent());
 
+            EventManager.AddListener<RoundStartEvent>(StartEntityTurnAtRoundStart,true);
+            
             NextRound();
+            
+            void StartEntityTurnAtRoundStart(RoundStartEvent ctx)
+            {
+                Debug.Log("Called at 1st round start event");
+                
+                NextUnitTurn();
+            }
         }
-
+        
         private void NextRound()
         {
             CurrentRound++;
 
-            StartRound();
+            StartCoroutine(NextRoundAnimationsRoutine());
+
+            IEnumerator NextRoundAnimationsRoutine()
+            {
+                yield return new WaitForSeconds(1f);
+                
+                StartRound();
+            }
         }
 
         private void StartRound()
         {
-            Debug.Log($"Starting Round {CurrentRound}");
-
-            EventManager.Trigger(new StartRoundEvent(CurrentRound));
-
-            NextUnitTurn(null);
+            EventManager.Trigger(new RoundStartEvent(CurrentRound));
         }
-
+        
         public void EndRound()
         {
-            Debug.Log($"Ending Round {CurrentRound}");
-
-            EventManager.Trigger(new EndRoundEvent(CurrentRound));
+            EventManager.Trigger(new RoundEndEvent(CurrentRound));
 
             NextRound();
         }
@@ -104,7 +114,7 @@ namespace Battle
         private void StartEntityTurn(BattleEntity unit)
         {
             CurrentEntityTurn = unit;
-
+            
             EventManager.Trigger(new StartEntityTurnEvent(CurrentEntityTurn));
             
             CurrentEntityTurn.StartTurn();
@@ -112,14 +122,16 @@ namespace Battle
         
         public void EndCurrentEntityTurn()
         {
-            CurrentEntityTurn.EndTurn();
-            
             CurrentEntityTurn.ResetTurnValue(ResetTurnValue);
             
             EventManager.Trigger(new EndEntityTurnEvent(CurrentEntityTurn));
+            
+            CurrentEntityTurn.EndTurn();
+            
+            NextUnitTurn();
         }
 
-        private void NextUnitTurn(EndEntityTurnEvent _)
+        private void NextUnitTurn()
         {
             var nextUnit = entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList().First();
             
@@ -154,7 +166,6 @@ namespace Battle
         public Sprite Portrait => associatedEntity.Portrait;
         public int Speed => associatedEntity.Speed;
         public float DistanceFromTurnStart => associatedEntity.DistanceFromTurnStart + tm.ResetTurnValue;
-        public bool CanTakeTurn => false;
 
         private TurnManager tm;
         private BattleEntity associatedEntity;
@@ -182,25 +193,21 @@ namespace Battle
         public int Speed { get;}
         public float DecayRate => Speed / 100f;
         public float DistanceFromTurnStart { get; private set; }
-        public bool CanTakeTurn => true;
-        private float turnResetValue;
+        private float TurnResetValue => tm.ResetTurnValue;
         private TurnManager tm;
 
         public EndRoundEntity(TurnManager turnManager,int speed)
         {
             tm = turnManager;
             Portrait = tm.EndTurnImage;
-            turnResetValue = tm.ResetTurnValue;
-            
+
             Speed = speed;
-            DistanceFromTurnStart = tm.ResetTurnValue;
-            
-            EventManager.AddListener<EndEntityTurnEvent>(EndRound);
+            DistanceFromTurnStart = TurnResetValue;
         }
         
         public void ResetTurnValue(float _)
         {
-            DistanceFromTurnStart = turnResetValue;
+            DistanceFromTurnStart = TurnResetValue;
         }
 
         public void DecayTurnValue(float amount)
@@ -210,17 +217,19 @@ namespace Battle
 
         public void StartTurn()
         {
-            tm.EndCurrentEntityTurn();
+            EventManager.AddListener<RoundStartEvent>(EndThisUnitTurn,true);
+            
+            tm.EndRound(); // End Current Round and Start next round
+            
+            //End turn
+
+            void EndThisUnitTurn(RoundStartEvent ctx)
+            {
+                tm.EndCurrentEntityTurn();
+            }
         }
 
         public void EndTurn() { }
-
-        private void EndRound(EndEntityTurnEvent ctx)
-        {
-            if(ctx.Entity != this) return;
-            
-            tm.EndRound();
-        }
     }
 }
 
@@ -234,21 +243,21 @@ namespace Battle.BattleEvents
     {
     }
 
-    public class StartRoundEvent
+    public class RoundStartEvent
     {
         public int Round { get; }
 
-        public StartRoundEvent(int round)
+        public RoundStartEvent(int round)
         {
             Round = round;
         }
     }
 
-    public class EndRoundEvent
+    public class RoundEndEvent
     {
         public int Round { get; }
 
-        public EndRoundEvent(int round)
+        public RoundEndEvent(int round)
         {
             Round = round;
         }

@@ -30,8 +30,6 @@ namespace Battle
         public float DecayRate => Speed / 100f;
         [field:SerializeField] public float DistanceFromTurnStart { get; protected set; }
 
-        [field: SerializeField] public bool CanTakeTurn { get; protected set; } = true;
-        
         public Sprite Portrait => Stats.Portrait;
         
         public void InitUnit(Tile tile, int team, UnitStatsSO so)
