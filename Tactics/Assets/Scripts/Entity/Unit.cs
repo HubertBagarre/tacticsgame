@@ -82,34 +82,31 @@ namespace Battle
             Tile.SetUnit(this);
         }
 
-        public void MoveUnit(List<Tile> path)
+        public void MoveUnit(List<Tile> path) //PATH DOESN'T INCLUDE STARTING TILE
         {
-            var unit = this;
-            
-            if (unit == null) return; //does the unit exist ?
             if (!path.Any()) return; // checks for valid path
             if (path.Any(tile => tile.HasUnit())) return; //does the path have any unit on it ?
 
-            if (unit.Tile != null) unit.Tile.RemoveUnit();
+            if (Tile != null) Tile.RemoveUnit();
 
             StartCoroutine(MoveAnimationRoutine());
 
             IEnumerator MoveAnimationRoutine()
             {
-                EventManager.Trigger(new UnitMovementStartEvent(unit));
+                EventManager.Trigger(new UnitMovementStartEvent(this));
 
                 foreach (var tile in path)
                 {
                     yield return null;
 
-                    unit.transform.position = tile.transform.position;
-
-                    unit.MovementLeft--;
-                    tile.SetUnit(unit);
-                    unit.SetTile(tile);
+                    transform.position = tile.transform.position;
+                    
+                    MovementLeft--;
+                    tile.SetUnit(this);
+                    SetTile(tile);
                 }
 
-                EventManager.Trigger(new UnitMovementEndEvent(unit));
+                EventManager.Trigger(new UnitMovementEndEvent(this));
             }
         }
 

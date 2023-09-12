@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using Battle;
 using UnityEngine;
 
@@ -25,6 +23,7 @@ public abstract class UnitBehaviourSO : ScriptableObject
     }
 
     public abstract void InitBehaviour(Unit unit);
+    public abstract void ShowBehaviourPreview(Unit unit); // when you hover on timeline
     
     public abstract void RunBehaviour(Unit unit);
 }

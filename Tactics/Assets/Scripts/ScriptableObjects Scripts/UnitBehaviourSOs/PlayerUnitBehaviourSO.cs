@@ -10,17 +10,22 @@ using UnityEngine;
 public class PlayerUnitBehaviourSO : UnitBehaviourSO
 {
     private List<Tile> selectableTilesForMovement = new List<Tile>();
+    private Unit controlledUnit;
     
     public override void InitBehaviour(Unit unit)
     {
+        controlledUnit = unit;
+        
         EventManager.AddListener<EndUnitTurnEvent>(EndPlayerControl);
         
         EventManager.AddListener<UnitMovementStartEvent>(ClearSelectableTilesOnMovementStart);
-        EventManager.AddListener<UnitMovementEndEvent>(UpdateAvailableUnitMovementTilesAfterMovementEnd);
+        
         
         void EndPlayerControl(EndUnitTurnEvent ctx)
         {
             if (ctx.Unit != unit) return;
+            
+            EventManager.RemoveListener<UnitMovementEndEvent>(UpdateAvailableUnitMovementTilesAfterMovementEnd);
             
             EventManager.Trigger(new EndPlayerControlEvent());
         }
@@ -29,18 +34,36 @@ public class PlayerUnitBehaviourSO : UnitBehaviourSO
         {
             ResetTilesAppearance();
         }
+    }
+
+    public override void ShowBehaviourPreview(Unit unit)
+    {
         
-        void UpdateAvailableUnitMovementTilesAfterMovementEnd(UnitMovementEndEvent ctx)
-        {
-            UpdateAvailableUnitMovementTiles(ctx.Unit);
-        }
     }
 
     public override void RunBehaviour(Unit unit)
     {
         UpdateAvailableUnitMovementTiles(unit);
         
+        EventManager.AddListener<EndPlayerControlEvent>(RemoveMouseInputs,true);
+        
         EventManager.Trigger(new StartPlayerControlEvent());
+    }
+    
+    private void MoveUnitOnClick()
+    {
+        if (!TryMoveUnit(controlledUnit)) return;
+        
+        EventManager.AddListener<UnitMovementEndEvent>(UpdateAvailableUnitMovementTilesAfterMovementEnd,true);
+            
+        RemoveMouseInputs(null);
+    }
+    
+    private void RemoveMouseInputs(EndPlayerControlEvent _)
+    {
+        Debug.Log("Removed Mouse Inputs");
+            
+        InputManager.LeftClickEvent -= MoveUnitOnClick;
     }
     
     private void UpdateAvailableUnitMovementTiles(Unit unit)
@@ -53,15 +76,16 @@ public class PlayerUnitBehaviourSO : UnitBehaviourSO
         if (unit.MovementLeft <= 0) return;
 
         SetSelectableTilesForMovement(unit.Tile, unit.MovementLeft, false, unit.Stats.WalkableTileSelector);
-
+        
+        Debug.Log("Added Mouse Inputs");
         InputManager.LeftClickEvent += MoveUnitOnClick;
-
-        void MoveUnitOnClick()
-        {
-            MoveUnit(unit);
-
-            InputManager.LeftClickEvent -= MoveUnitOnClick;
-        }
+    }
+    
+    private void UpdateAvailableUnitMovementTilesAfterMovementEnd(UnitMovementEndEvent ctx)
+    {
+        if (ctx.Unit != controlledUnit) return;
+            
+        UpdateAvailableUnitMovementTiles(ctx.Unit);
     }
     
     private void ResetTilesAppearance()
@@ -115,17 +139,19 @@ public class PlayerUnitBehaviourSO : UnitBehaviourSO
         }
     }
     
-    private void MoveUnit(Unit unit)
+    private bool TryMoveUnit(Unit unit)
     {
         var destination = tileM.GetClickTile();
 
-        if (!selectableTilesForMovement.Contains(destination)) return;
+        if (!selectableTilesForMovement.Contains(destination)) return false;
 
         var path = GetPathFromSelectableTiles(destination);
 
         ResetTilesAppearance();
 
         unit.MoveUnit(path);
+
+        return true;
     }
     
     private List<Tile> GetPathFromSelectableTiles(Tile destination)
