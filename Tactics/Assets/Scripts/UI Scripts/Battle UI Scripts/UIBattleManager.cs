@@ -1,19 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Battle.BattleEvents;
-using Battle.UnitEvents;
+using Battle.UIEvents;
 using UnityEngine.UI;
 
 public class UIBattleManager : MonoBehaviour
 {
-    [Header("Battle Timeline")]
-    [SerializeField] private UIBattleEntityTimeline battleEntityTimelinePrefab;
+    [Header("Battle Timeline")] [SerializeField]
+    private UIBattleEntityTimeline battleEntityTimelinePrefab;
+
     [SerializeField] private Transform battleTimelineParent;
 
-    [Header("Player Controls")] 
-    [SerializeField] private Button endTurnButton;
+    [Header("Player Controls")] [SerializeField]
+    private Button endTurnButton;
 
-    private Dictionary<BattleEntity, UIBattleEntityTimeline> uibattleTimelineDict = new ();
+    private Dictionary<BattleEntity, UIBattleEntityTimeline> uibattleTimelineDict = new();
 
     private void Start()
     {
@@ -21,46 +22,40 @@ public class UIBattleManager : MonoBehaviour
         EventManager.AddListener<EntityJoinBattleEvent>(InstantiateBattleEntityTimelineUI);
         EventManager.AddListener<EntityLeaveBattleEvent>(RemoveBattleEntityTimelineUI);
         EventManager.AddListener<UpdateTurnValuesEvent>(ReorderBattleEntityTimeline);
-        
+
         //Player Buttons events
-        EventManager.AddListener<StartEntityTurnEvent>(DisablePlayerButtons);
-        EventManager.AddListener<StartUnitTurnEvent>(EnablePlayerButtons);
-        EventManager.AddListener<EndUnitTurnEvent>(DisablePlayerButtons);
-        
+        EventManager.AddListener<StartPlayerControlEvent>(ShowPlayerButtonsOnPlayerTurnStart);
+        EventManager.AddListener<EndPlayerControlEvent>(HidePlayerButtonsOnPlayerTurnEnd);
+
         EnablePlayerButtons(false);
     }
 
 
-    private void DisablePlayerButtons(StartEntityTurnEvent _)
+    private void ShowPlayerButtonsOnPlayerTurnStart(StartPlayerControlEvent ctx)
+    {
+        EnablePlayerButtons(true);
+    }
+
+    private void HidePlayerButtonsOnPlayerTurnEnd(EndPlayerControlEvent ctx)
     {
         EnablePlayerButtons(false);
-    }
-    
-    private void DisablePlayerButtons(EndUnitTurnEvent _)
-    {
-        EnablePlayerButtons(false);
-    }
-    
-    private void EnablePlayerButtons(StartUnitTurnEvent ctx)
-    {
-        EnablePlayerButtons(ctx.Unit.IsPlayerControlled);
     }
     
     private void EnablePlayerButtons(bool value)
     {
         endTurnButton.interactable = value;
     }
-    
+
     private void InstantiateBattleEntityTimelineUI(EntityJoinBattleEvent ctx)
     {
         var entity = ctx.Entity;
 
         var ui = Instantiate(battleEntityTimelinePrefab, battleTimelineParent);
 
-        uibattleTimelineDict.Add(entity,ui);
-        
+        uibattleTimelineDict.Add(entity, ui);
+
         ui.ConnectToEntity(entity);
-        
+
         ui.SetPreview(ctx.Preview);
     }
 
@@ -71,11 +66,11 @@ public class UIBattleManager : MonoBehaviour
         if (!uibattleTimelineDict.ContainsKey(entity)) return;
 
         var ui = uibattleTimelineDict[entity];
-        
+
         uibattleTimelineDict.Remove(entity);
-        
+
         ui.Disconnect();
-        
+
         Destroy(ui.gameObject);
     }
 
@@ -88,11 +83,10 @@ public class UIBattleManager : MonoBehaviour
         {
             var entity = order[i];
             var ui = uibattleTimelineDict[entity];
-            
+
             ui.transform.SetSiblingIndex(0);
-            
+
             ui.Show(i <= roundIndex);
         }
     }
 }
-

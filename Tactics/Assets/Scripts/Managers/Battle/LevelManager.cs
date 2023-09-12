@@ -25,6 +25,9 @@ namespace Battle
             {
                 tile.SetAppearance(Tile.Appearance.Default);
             }
+            
+            UnitBehaviourSO.SetTileManager(tileManager);
+            UnitBehaviourSO.SetUnitManager(unitManager);
         }
 
         public void Run()

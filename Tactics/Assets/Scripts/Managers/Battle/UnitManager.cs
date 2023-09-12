@@ -28,7 +28,6 @@ namespace Battle
             InputManager.CastCamRay(out var unitHit, entityLayers);
 
             return unitHit.transform != null ? unitHit.transform.GetComponent<Unit>() : null;
-            ;
         }
     }
 }

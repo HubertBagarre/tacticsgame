@@ -25,7 +25,6 @@ namespace Battle
 
         private void Start()
         {
-            EventManager.AddListener<StartUnitTurnEvent>(UpdateAvailableUnitMovementTilesAfterTurnStart);
             EventManager.AddListener<EndUnitTurnEvent>(ClearSelectableTilesOnTurnEnd);
 
             EventManager.AddListener<UnitMovementEndEvent>(UpdateAvailableUnitMovementTilesAfterMovementEnd);
@@ -64,22 +63,16 @@ namespace Battle
                 tile.SetPathRing(0);
             }
         }
-
-        private void UpdateAvailableUnitMovementTilesAfterTurnStart(StartUnitTurnEvent ctx)
-        {
-            UpdateAvailableUnitMovementTiles(ctx.Unit);
-        }
-
+        
         private void UpdateAvailableUnitMovementTilesAfterMovementEnd(UnitMovementEndEvent ctx)
         {
             UpdateAvailableUnitMovementTiles(ctx.Unit);
         }
 
-        private void UpdateAvailableUnitMovementTiles(Unit unit)
+        public void UpdateAvailableUnitMovementTiles(Unit unit)
         {
             ClearSelectableTiles();
-
-            if (!unit.IsPlayerControlled) return;
+            
             if (!unit.CanMove) return;
             if (unit.MovementLeft <= 0) return;
 

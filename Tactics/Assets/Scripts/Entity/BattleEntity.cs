@@ -13,6 +13,7 @@ public interface BattleEntity
     public float DistanceFromTurnStart { get; }
 
     public float TurnOrder => DistanceFromTurnStart / (Speed/100f);
+    public void InitEntityForBattle();
     
     public void ResetTurnValue(float value);
     public void DecayTurnValue(float amount);

@@ -16,12 +16,13 @@ namespace Battle
         [field: Header("Current Flags")]
         [field: SerializeField]
         public bool IsActive { get; private set; }
-
-        public bool IsPlayerControlled { get; private set; } = true;
-
+        
         [field: SerializeField] public bool CanMove { get; private set; } = true;
 
         [field: Header("Current Stats")]
+        [field: SerializeField]
+        public UnitBehaviourSO Behaviour { get; private set; }
+        
         [field: SerializeField]
         public int Movement { get; private set; }
 
@@ -40,12 +41,22 @@ namespace Battle
 
             Movement = so.BaseMovement;
             Speed = so.BaseSpeed;
+            Behaviour = so.Behaviour;
 
             IsActive = true;
 
             tile.SetUnit(this);
         }
 
+        public void InitEntityForBattle()
+        {
+            Movement = Stats.BaseMovement;
+            Speed = Stats.BaseSpeed;
+            Behaviour = Stats.Behaviour;
+            
+            Behaviour.InitBehaviour(this);
+        }
+        
         public void StartTurn()
         {
             MovementLeft = Movement;
@@ -53,13 +64,8 @@ namespace Battle
             //apply effects
             
             EventManager.Trigger(new StartUnitTurnEvent(this));
-
-            if (IsPlayerControlled)
-            {
-                return;
-            }
-
-            // TODO - AI Logic if AI Turn
+            
+            Behaviour.RunBehaviour(this);
         }
 
         public void EndTurn()

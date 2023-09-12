@@ -8,7 +8,7 @@ namespace Battle
 {
     using BattleEvents;
 
-    public class TurnManager : MonoBehaviour
+    public class BattleManager : MonoBehaviour
     {
         [field: Header("Settings")]
         [field: SerializeField]
@@ -28,8 +28,7 @@ namespace Battle
 
         private List<BattleEntity> entitiesInBattle = new List<BattleEntity>();
 
-        private UpdateTurnValuesEvent updateTurnValuesEvent =>
-            new UpdateTurnValuesEvent(entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList(),endRoundEntity);
+        private UpdateTurnValuesEvent updateTurnValuesEvent => new (entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList(),endRoundEntity);
 
         public void Start()
         {
@@ -46,7 +45,7 @@ namespace Battle
         private void StartBattle(StartLevelEvent ctx)
         {
             Debug.Log("Starting Level");
-
+            
             entitiesInBattle.Clear();
 
             endRoundEntity = new EndRoundEntity(this, 100);
@@ -60,6 +59,8 @@ namespace Battle
             }
             
             CurrentRound = 0;
+            
+            UnitBehaviourSO.SetTurnManager(this);
 
             EventManager.Trigger(new StartBattleEvent());
 
@@ -69,8 +70,6 @@ namespace Battle
             
             void StartEntityTurnAtRoundStart(RoundStartEvent ctx)
             {
-                Debug.Log("Called at 1st round start event");
-                
                 NextUnitTurn();
             }
         }
@@ -144,6 +143,8 @@ namespace Battle
         
         private void AddEntityToBattle(BattleEntity entity,bool createPreview)
         {
+            entity.InitEntityForBattle();
+            
             entitiesInBattle.Add(entity);
             entity.ResetTurnValue(-1);
 
@@ -167,16 +168,17 @@ namespace Battle
         public int Speed => associatedEntity.Speed;
         public float DistanceFromTurnStart => associatedEntity.DistanceFromTurnStart + tm.ResetTurnValue;
 
-        private TurnManager tm;
+        private BattleManager tm;
         private BattleEntity associatedEntity;
 
-        public PreviewEntity(TurnManager turnManager,BattleEntity entity)
+        public PreviewEntity(BattleManager battleManager,BattleEntity entity)
         {
-            tm = turnManager;
+            tm = battleManager;
             associatedEntity = entity;
         }
-        public void ResetTurnValue(float value) { }
 
+        public void InitEntityForBattle() { }
+        public void ResetTurnValue(float value) { }
         public void DecayTurnValue(float amount) { }
         public void StartTurn() { }
         public void EndTurn() { }
@@ -194,17 +196,19 @@ namespace Battle
         public float DecayRate => Speed / 100f;
         public float DistanceFromTurnStart { get; private set; }
         private float TurnResetValue => tm.ResetTurnValue;
-        private TurnManager tm;
+        private BattleManager tm;
 
-        public EndRoundEntity(TurnManager turnManager,int speed)
+        public EndRoundEntity(BattleManager battleManager,int speed)
         {
-            tm = turnManager;
+            tm = battleManager;
             Portrait = tm.EndTurnImage;
 
             Speed = speed;
             DistanceFromTurnStart = TurnResetValue;
         }
-        
+
+        public void InitEntityForBattle() { }
+
         public void ResetTurnValue(float _)
         {
             DistanceFromTurnStart = TurnResetValue;
