@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -12,9 +13,11 @@ namespace Battle
         [field: SerializeField] private UnitManager unitManager;
         [field: SerializeField] private TileGenerator generator;
 
-        private void Start()
+        private IEnumerator Start()
         {
             Setup();
+
+            yield return null;
             
             Run();
         }
