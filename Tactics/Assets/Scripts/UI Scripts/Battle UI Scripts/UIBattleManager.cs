@@ -30,6 +30,7 @@ namespace Battle
         [SerializeField] private Button confirmTileSelectionButton;
         [SerializeField] private Button cancelTileSelectionButton;
         [SerializeField] private TextMeshProUGUI selectionsLeftText;
+        private UnitAbilityInstance currentAbilityInTargetSelection;
         
         private Dictionary<BattleEntity, UIBattleEntityTimeline> uibattleTimelineDict = new();
 
@@ -122,16 +123,33 @@ namespace Battle
 
         private void ShowAbilityTargetSelectionOnTargetSelectionStart(StartAbilitySelectionEvent ctx)
         {
-            var expectedSelections = ctx.Ability.ExpectedSelections;
+            currentAbilityInTargetSelection = ctx.Ability;
 
-            selectionsLeftText.text = $"Select {expectedSelections} Target{(expectedSelections > 0 ? "s":"")}"; //Select 66 Targets
+            currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated += UpdateAbilitySelectionLeftText;
+            currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated += UpdateConfirmAbilityTargetSelectionButton;
+
+            UpdateAbilitySelectionLeftText(0);
+            UpdateConfirmAbilityTargetSelectionButton(0);
             
             ShowAbilityTargetSelection(!ctx.Ability.SO.IsInstantCast);
+        }
+
+        private void UpdateConfirmAbilityTargetSelectionButton(int _)
+        {
+            confirmTileSelectionButton.interactable = currentAbilityInTargetSelection.SelectionsLeft == 0 || currentAbilityInTargetSelection.ExpectedSelections == 0;
+        }
+
+        private void UpdateAbilitySelectionLeftText(int _)
+        {
+            selectionsLeftText.text = $"Select {currentAbilityInTargetSelection.SelectionsLeft} Target{(currentAbilityInTargetSelection.SelectionsLeft > 0 ? "s":"")}"; //Select 66 Targets
         }
 
         private void HideAbilityTargetSelectionOnTargetSelectionEnd(EndAbilitySelectionEvent ctx)
         {
             ShowAbilityTargetSelection(false);
+            
+            currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated -= UpdateAbilitySelectionLeftText;
+            currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated -= UpdateConfirmAbilityTargetSelectionButton;
             
             //TODO- Clear selection
         }
@@ -185,7 +203,7 @@ namespace Battle
         private void InstantiateBattleEntityTimelineUI(EntityJoinBattleEvent ctx)
         {
             var entity = ctx.Entity;
-
+            
             var ui = Instantiate(battleEntityTimelinePrefab, battleTimelineParent);
 
             uibattleTimelineDict.Add(entity, ui);

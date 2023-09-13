@@ -6,6 +6,7 @@ using UnityEngine;
 namespace Battle
 {
     using AbilityEvent;
+    using InputEvent;
     
     public class AbilityManager : MonoBehaviour
     {
@@ -24,6 +25,7 @@ namespace Battle
             EventManager.AddListener<EndAbilitySelectionEvent>(TryCastAbility,true);
             
             // add listener on click to add tile to ability instance
+            EventManager.AddListener<ClickTileEvent>(SelectTile);
             
             if (ability.SO.IsInstantCast)
             {
@@ -33,9 +35,24 @@ namespace Battle
 
             void TryCastAbility(EndAbilitySelectionEvent selectionEvent)
             {
-                if(selectionEvent.Canceled) return;
+                EventManager.RemoveListener<ClickTileEvent>(SelectTile);
+
+                if (selectionEvent.Canceled)
+                {
+                    ability.ClearTileSelection();
+                    return;
+                }
                 
                 ability.CastAbility(caster);
+            }
+
+            void SelectTile(ClickTileEvent clickEvent)
+            {
+                var tile = clickEvent.Tile;
+                
+                if(tile == null) return;
+
+                ability.AddTileToSelection(tile);
             }
         }
     }

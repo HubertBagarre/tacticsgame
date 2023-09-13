@@ -7,6 +7,7 @@ public class UIUnitAbilityButton : MonoBehaviour
 {
     [field: SerializeField] public Button Button { get; private set; }
     [SerializeField] private Image abilityImage;
+    // TODO - Cooldown text here
     
     [SerializeField] private GameObject[] ultimateChargesGo;
     [SerializeField] private GameObject[] ultimateChargesFillerGo;

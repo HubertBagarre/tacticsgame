@@ -9,7 +9,7 @@ namespace Battle.ScriptableObjects
     {
         protected override void AbilityEffect(Unit caster, Tile[] targetTiles)
         {
-            Debug.Log("Ping");
+            Debug.Log($"Ping on {targetTiles[0]} and {targetTiles[1]}");
             
             EventManager.Trigger(new EndAbilityCastEvent());
         }

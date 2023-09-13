@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,6 +5,7 @@ using UnityEngine;
 namespace Battle
 {
     using UnitEvents;
+    using InputEvent;
 
     /// <summary>
     /// Handles Tiles
@@ -22,11 +22,18 @@ namespace Battle
         
         private void Start()
         {
+            InputManager.LeftClickEvent += ClickTile;
+            
             EventManager.AddListener<EndUnitTurnEvent>(ClearSelectableTilesOnTurnEnd);
             
             void ClearSelectableTilesOnTurnEnd(EndUnitTurnEvent _)
             {
                 ResetTileAppearance();
+            }
+
+            void ClickTile()
+            {
+                EventManager.Trigger(new ClickTileEvent(GetClickTile()));
             }
         }
 
@@ -49,6 +56,19 @@ namespace Battle
                 tile.SetAppearance(Tile.Appearance.Default);
                 tile.SetPathRing(0);
             }
+        }
+    }
+}
+
+namespace Battle.InputEvent
+{
+    public class ClickTileEvent
+    {
+        public Tile Tile { get; }
+
+        public ClickTileEvent(Tile tile)
+        {
+            Tile = tile;
         }
     }
 }

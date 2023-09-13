@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -17,6 +18,7 @@ namespace Battle
 
         [Header("Debug")] [SerializeField] private List<Unit> units = new List<Unit>();
         public List<Unit> AllUnits => units.ToList();
+        
 
         public void SetUnits(List<Unit> list)
         {
@@ -28,6 +30,19 @@ namespace Battle
             InputManager.CastCamRay(out var unitHit, entityLayers);
 
             return unitHit.transform != null ? unitHit.transform.GetComponent<Unit>() : null;
+        }
+    }
+}
+
+namespace Battle.InputEvent
+{
+    public class ClickUnitEvent
+    {
+        public Unit Unit { get; }
+
+        public ClickUnitEvent(Unit unit)
+        {
+            Unit = unit;
         }
     }
 }

@@ -41,34 +41,52 @@ namespace Battle
     {
         public UnitAbilitySO SO { get; }
         public int ExpectedSelections => SO.ExpectedSelections;
-        public int currentCooldown;
+        public int SelectionsLeft => SO.ExpectedSelections - CurrentSelectionCount;
+        public int CurrentCooldown { get; private set; }
         public int CurrentSelectionCount => currentSelectedTiles.Count;
 
         private List<Tile> currentSelectedTiles = new ();
 
+        public event Action<int> OnCurrentSelectedTilesUpdated;
+        public event Action<int> OnCurrentCooldownUpdated;
+
         public UnitAbilityInstance(UnitAbilitySO unitAbilitySo)
         {
             SO = unitAbilitySo;
-            currentCooldown = 0;
+            CurrentCooldown = 0;
             currentSelectedTiles.Clear();
         }
 
         public void CastAbility(Unit caster)
         {
             SO.CastAbility(caster,currentSelectedTiles.ToArray());
+
+            ClearTileSelection();
         }
 
         public void ClearTileSelection()
         {
+            foreach (var tile in currentSelectedTiles)
+            {
+                tile.SetAppearance(Tile.Appearance.Default);
+            }
+            
             currentSelectedTiles.Clear();
+            OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
         }
 
         public void AddTileToSelection(Tile tile)
         {
-            if(currentSelectedTiles.Contains(tile)) return;
+            if (currentSelectedTiles.Contains(tile))
+            {
+                RemoveTileFromSelection(tile);
+                return;
+            }
             currentSelectedTiles.Add(tile);
             
-            // probably update ui or smt (callback ?)
+            tile.SetAppearance(Tile.Appearance.Selected);
+            
+            OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
             
             if(CurrentSelectionCount > SO.ExpectedSelections) RemoveTileFromSelection(currentSelectedTiles[0]);
         }
@@ -78,7 +96,9 @@ namespace Battle
             if(!currentSelectedTiles.Contains(tile)) return;
             currentSelectedTiles.Remove(tile);
             
-            // probably update ui or smt (callback ?)
+            tile.SetAppearance(Tile.Appearance.Default);
+            
+            OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
         }
     }
 }
