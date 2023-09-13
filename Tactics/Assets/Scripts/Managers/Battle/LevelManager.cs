@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace Battle
 {
+    using ScriptableObjects;
+    
     public class LevelManager : MonoBehaviour
     {
         [field: SerializeField] private TileManager tileManager;

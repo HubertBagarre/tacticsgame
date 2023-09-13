@@ -6,6 +6,7 @@ using UnityEngine;
 namespace Battle
 {
     using UnitEvents;
+    using ScriptableObjects;
     
     public class Unit : MonoBehaviour, BattleEntity
     {

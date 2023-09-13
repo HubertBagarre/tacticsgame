@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Battle;
+using Battle.ScriptableObjects;
 
 //TODO - Change to level generator
 /// <summary>

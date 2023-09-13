@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Battle
 {
-    using BattleEvents;
     using UnitEvents;
 
     /// <summary>

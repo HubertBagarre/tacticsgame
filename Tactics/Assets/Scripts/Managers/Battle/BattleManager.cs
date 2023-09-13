@@ -7,6 +7,7 @@ using UnityEngine.UI;
 namespace Battle
 {
     using BattleEvents;
+    using ScriptableObjects;
 
     public class BattleManager : MonoBehaviour
     {
