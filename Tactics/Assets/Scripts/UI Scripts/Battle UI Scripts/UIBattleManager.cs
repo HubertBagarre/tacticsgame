@@ -33,7 +33,7 @@ namespace Battle
         private UnitAbilityInstance currentAbilityInTargetSelection;
         
         private Dictionary<BattleEntity, UIBattleEntityTimeline> uibattleTimelineDict = new();
-
+        
         private void Start()
         {
             AddCallbacks();
@@ -50,13 +50,11 @@ namespace Battle
             EventManager.AddListener<EntityLeaveBattleEvent>(RemoveBattleEntityTimelineUI);
             EventManager.AddListener<UpdateTurnValuesEvent>(ReorderBattleEntityTimeline);
 
-            //Player Buttons events
+            //Player Abilities Buttons events
             EventManager.AddListener<StartPlayerControlEvent>(ShowPlayerButtonsOnPlayerTurnStart);
             EventManager.AddListener<EndPlayerControlEvent>(HidePlayerButtonsOnPlayerTurnEnd);
-
             EventManager.AddListener<StartAbilityCastEvent>(HideAbilityButtonsOnAbilityCast);
 
-            //TODO - Move Player Movement Here (?)
             EventManager.AddListener<StartUnitMovementSelectionEvent>(ShowWalkableTiles);
 
             AbilityManager.OnUpdatedCastingAbility += UpdateAbilityTargetSelection;
@@ -94,6 +92,17 @@ namespace Battle
             EnableEndTurnButton(false);
 
             HideUnitAbilitiesButton();
+            
+            if(ctx.Ability.SO.EndUnitTurnAfterCast) return;
+                
+            EventManager.AddListener<EndAbilityCastEvent>(ShowAbilityButtonsAfterAbilityCast,true);
+            
+            void ShowAbilityButtonsAfterAbilityCast(EndAbilityCastEvent endAbilityCastEvent)
+            {
+                EnableEndTurnButton(true);
+
+                ShowUnitAbilitiesButton(ctx.Caster);
+            }
         }
 
         private void EnableEndTurnButton(bool value)
@@ -103,6 +112,8 @@ namespace Battle
 
         private void ShowWalkableTiles(StartUnitMovementSelectionEvent ctx)
         {
+            Debug.Log("Showing Walkable Tiles");
+            
             foreach (var tile in ctx.SelectableTiles)
             {
                 tile.SetAppearance(Tile.Appearance.Selectable);

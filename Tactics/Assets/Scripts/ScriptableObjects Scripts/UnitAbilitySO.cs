@@ -30,8 +30,6 @@ namespace Battle
 
         protected void EndAbility()
         {
-            Debug.Log($"Cast ended.");
-            
             EventManager.Trigger(new EndAbilityCastEvent(this));
         }
         
@@ -72,6 +70,8 @@ namespace Battle
 
         public void ClearTileSelection()
         {
+            Debug.Log("Clearing Tiles");
+            
             foreach (var tile in currentSelectedTiles)
             {
                 tile.SetAppearance(Tile.Appearance.Default);
