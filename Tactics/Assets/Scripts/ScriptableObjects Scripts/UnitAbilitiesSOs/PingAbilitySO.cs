@@ -7,11 +7,11 @@ namespace Battle.ScriptableObjects
     [CreateAssetMenu(menuName = "Battle Scriptables/Unit Ability/Ping")]
     public class PingAbilitySO : UnitAbilitySO
     {
-        protected override void AbilityEffect(Unit[] targetUnits, Tile[] targetTiles)
+        protected override void AbilityEffect(Unit caster, Tile[] targetTiles)
         {
             Debug.Log("Ping");
             
-            EventManager.Trigger(new EndAbilityCast());
+            EventManager.Trigger(new EndAbilityCastEvent());
         }
     }
 }

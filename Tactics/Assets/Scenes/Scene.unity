@@ -577,6 +577,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 586197423522455952, guid: ff46836e02f007843b920ec7d9bb90fe,
+        type: 3}
+      propertyPath: battleTimelineParent
+      value: 
+      objectReference: {fileID: 1528372972}
     - target: {fileID: 640498079530213922, guid: ff46836e02f007843b920ec7d9bb90fe,
         type: 3}
       propertyPath: m_Name

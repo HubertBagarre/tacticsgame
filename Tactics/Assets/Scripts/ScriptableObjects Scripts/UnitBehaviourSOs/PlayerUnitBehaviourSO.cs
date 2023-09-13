@@ -21,8 +21,7 @@ namespace Battle.ScriptableObjects
             EventManager.AddListener<EndUnitTurnEvent>(EndPlayerControl);
 
             EventManager.AddListener<UnitMovementStartEvent>(ClearSelectableTilesOnMovementStart);
-
-
+            
             void EndPlayerControl(EndUnitTurnEvent ctx)
             {
                 if (ctx.Unit != unit) return;
@@ -44,11 +43,13 @@ namespace Battle.ScriptableObjects
 
         public override void RunBehaviour(Unit unit)
         {
-            UpdateAvailableUnitMovementTiles(unit);
+            //UpdateAvailableUnitMovementTiles(unit);
 
-            EventManager.AddListener<EndPlayerControlEvent>(RemoveMouseInputs, true);
+            //EventManager.AddListener<EndPlayerControlEvent>(RemoveMouseInputs, true);
 
             EventManager.Trigger(new StartPlayerControlEvent(unit));
+            
+            //EventManager.Trigger(new StartUnitMovementSelectionEvent(unit));
         }
 
         private void RemoveMouseInputs(EndPlayerControlEvent _)
@@ -197,5 +198,20 @@ namespace Battle.UIEvents
 
     public class EndPlayerControlEvent
     {
+    }
+
+    public class StartUnitMovementSelectionEvent
+    {
+        public Unit Unit { get; }
+
+        public StartUnitMovementSelectionEvent(Unit unit)
+        {
+            Unit = unit;
+        }
+    }
+
+    public class EndUnitMovementSelectionEvent
+    {
+        
     }
 }

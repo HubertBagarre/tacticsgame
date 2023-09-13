@@ -58,7 +58,6 @@ GameObject:
   m_Component:
   - component: {fileID: 9213153565027173641}
   - component: {fileID: 4749299947456972236}
-  - component: {fileID: 657379903884889709}
   m_Layer: 0
   m_Name: Battle Manager
   m_TagString: Untagged
@@ -98,25 +97,6 @@ MonoBehaviour:
     type: 3}
   endTurnButton: {fileID: 0}
   <CurrentRound>k__BackingField: 0
---- !u!114 &657379903884889709
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4029277281268939806}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1429f5d7638f784c88b4bff717fca37, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  battleEntityTimelinePrefab: {fileID: 8208835791797979481, guid: a98e4692f99d9344bafa11b222490fef,
-    type: 3}
-  battleTimelineParent: {fileID: 0}
-  endTurnButton: {fileID: 0}
-  abilityButtonPrefab: {fileID: 8884394064699142754, guid: d1ff55a559b96b648b0f03978671bc35,
-    type: 3}
-  abilityButtonParent: {fileID: 0}
 --- !u!1 &4772703318550892208
 GameObject:
   m_ObjectHideFlags: 0

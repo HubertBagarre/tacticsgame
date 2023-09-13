@@ -15,25 +15,21 @@ namespace Battle
         [field: SerializeField] public UnitStatsSO Stats { get; private set; }
 
         [field: Header("Current Flags")]
-        [field: SerializeField]
-        public bool IsActive { get; private set; }
-        
+        [field: SerializeField] public bool IsActive { get; private set; }
         [field: SerializeField] public bool CanMove { get; private set; } = true;
 
         [field: Header("Current Stats")]
-        [field: SerializeField]
-        public UnitBehaviourSO Behaviour { get; private set; }
-        
-        [field: SerializeField]
-        public int Movement { get; private set; }
+        [field: SerializeField] public UnitBehaviourSO Behaviour { get; private set; }
+        [field: SerializeField] public int Movement { get; private set; }
 
         [field: SerializeField] public int MovementLeft { get; private set; }
         [field:SerializeField] public int Speed { get; protected set; }
         public float DecayRate => Speed / 100f;
         [field:SerializeField] public float DistanceFromTurnStart { get; protected set; }
-
         public Sprite Portrait => Stats.Portrait;
-        
+
+        public List<UnitAbilityInstance> AbilityInstances { get; } = new ();
+
         public void InitUnit(Tile tile, int team, UnitStatsSO so)
         {
             Tile = tile;
@@ -45,7 +41,9 @@ namespace Battle
             Behaviour = so.Behaviour;
 
             IsActive = true;
-
+            
+            AbilityInstances.Clear();
+            
             tile.SetUnit(this);
         }
 
@@ -54,6 +52,12 @@ namespace Battle
             Movement = Stats.BaseMovement;
             Speed = Stats.BaseSpeed;
             Behaviour = Stats.Behaviour;
+
+            AbilityInstances.Clear();
+            foreach (var ability in Stats.Abilities)
+            {
+                AbilityInstances.Add(ability.CreateInstance());
+            }
             
             Behaviour.InitBehaviour(this);
         }

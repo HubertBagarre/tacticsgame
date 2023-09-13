@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e47b55f978106c549a6398743d9e0290, type: 3}
-  m_Name: Ping
+  m_Script: {fileID: 11500000, guid: 8a5b631573d45e548a53ada32ff5a809, type: 3}
+  m_Name: PlayerMovementAbility
   m_EditorClassIdentifier: 
   <Sprite>k__BackingField: {fileID: 0}
-  <Name>k__BackingField: 
-  <Description>k__BackingField: 
-  <ExpectedSelections>k__BackingField: 2
+  <Name>k__BackingField: Movement
+  <Description>k__BackingField: MovesTheUnit
+  <ExpectedSelections>k__BackingField: 0
   <Cooldown>k__BackingField: 0
   <IsInstantCast>k__BackingField: 0

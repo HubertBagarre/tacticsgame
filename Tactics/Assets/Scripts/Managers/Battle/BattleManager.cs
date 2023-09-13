@@ -16,6 +16,7 @@ namespace Battle
         public int ResetTurnValue { get; private set; } = 999;
         [field:SerializeField] public Sprite EndTurnImage { get; private set; }
         
+        // TODO - Set callback in uibattlemanager (probably call event with battle manager in args)
         [Header("UI Buttons")] [SerializeField]
         private Button endTurnButton;
         

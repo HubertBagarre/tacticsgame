@@ -19,8 +19,24 @@ namespace Battle
         private void StartAbilitySelection(StartAbilitySelectionEvent ctx)
         {
             var ability = ctx.Ability;
+            var caster = ctx.Caster;
             
-            Debug.Log($"Starting Selection for {ability}");
+            EventManager.AddListener<EndAbilitySelectionEvent>(TryCastAbility,true);
+            
+            // add listener on click to add tile to ability instance
+            
+            if (ability.SO.IsInstantCast)
+            {
+                EventManager.Trigger(new EndAbilitySelectionEvent(false));
+                return;
+            }
+
+            void TryCastAbility(EndAbilitySelectionEvent selectionEvent)
+            {
+                if(selectionEvent.Canceled) return;
+                
+                ability.CastAbility(caster);
+            }
         }
     }
 }
@@ -31,11 +47,13 @@ namespace Battle.AbilityEvent
 {
     public class StartAbilitySelectionEvent
     {
-        public UnitAbilitySO Ability { get; }
+        public UnitAbilityInstance Ability { get; }
+        public Unit Caster { get; }
 
-        public StartAbilitySelectionEvent(UnitAbilitySO ability)
+        public StartAbilitySelectionEvent(UnitAbilityInstance ability,Unit caster)
         {
             Ability = ability;
+            Caster = caster;
         }
     }
 
@@ -49,7 +67,7 @@ namespace Battle.AbilityEvent
         }
     }
     
-    public class StartAbilityCast{}
+    public class StartAbilityCastEvent{}
     
-    public class EndAbilityCast{}
+    public class EndAbilityCastEvent{}
 }
