@@ -4,15 +4,21 @@ using Battle.BattleEvents;
 using Battle.UIEvents;
 using UnityEngine.UI;
 
-public class UIBattleManager : MonoBehaviour
+namespace Battle
+{
+    public class UIBattleManager : MonoBehaviour
 {
     [Header("Battle Timeline")] [SerializeField]
     private UIBattleEntityTimeline battleEntityTimelinePrefab;
 
     [SerializeField] private Transform battleTimelineParent;
 
-    [Header("Player Controls")] [SerializeField]
-    private Button endTurnButton;
+    [Header("Player Controls")] 
+    [SerializeField] private Button endTurnButton;
+    
+    [SerializeField] private UIUnitAbilityButton abilityButtonPrefab;
+    [SerializeField] private Transform abilityButtonParent;
+    private List<UIUnitAbilityButton> abilityButtons = new();
 
     private Dictionary<BattleEntity, UIBattleEntityTimeline> uibattleTimelineDict = new();
 
@@ -26,7 +32,9 @@ public class UIBattleManager : MonoBehaviour
         //Player Buttons events
         EventManager.AddListener<StartPlayerControlEvent>(ShowPlayerButtonsOnPlayerTurnStart);
         EventManager.AddListener<EndPlayerControlEvent>(HidePlayerButtonsOnPlayerTurnEnd);
-
+        
+        //TODO - Move Player Movement Here (?)
+        
         EnablePlayerButtons(false);
     }
 
@@ -34,17 +42,63 @@ public class UIBattleManager : MonoBehaviour
     private void ShowPlayerButtonsOnPlayerTurnStart(StartPlayerControlEvent ctx)
     {
         EnablePlayerButtons(true);
+        
+        ShowUnitAbilitiesButton(ctx.PlayerUnit);
     }
 
     private void HidePlayerButtonsOnPlayerTurnEnd(EndPlayerControlEvent ctx)
     {
         EnablePlayerButtons(false);
+        
+        HideUnitAbilitiesButton();
     }
     
     private void EnablePlayerButtons(bool value)
     {
         endTurnButton.interactable = value;
     }
+
+    #region Unit Ability
+
+    private void ShowUnitAbilitiesButton(Unit unit)
+    {
+        var abilities = unit.Stats.Abilities;
+        
+        UpdateAbilityButtonCount(abilities.Count);
+
+        for (var index = 0; index < abilities.Count; index++)
+        {
+            var ability = abilities[index];
+            abilityButtons[index].LinkAbility(ability);
+            abilityButtonParent.GetChild(index).gameObject.SetActive(true);
+        }
+    }
+
+    private void UpdateAbilityButtonCount(int amount)
+    {
+        var currentButtons = abilityButtonParent.childCount;
+        var missingButtons = amount - currentButtons;
+        
+        if(missingButtons <= 0) return;
+
+        for (int i = 0; i < missingButtons; i++)
+        {
+            var ability = Instantiate(abilityButtonPrefab, abilityButtonParent);
+            abilityButtons.Add(ability);
+        }
+    }
+
+    private void HideUnitAbilitiesButton()
+    {
+        foreach (var abilityButton in abilityButtons)
+        {
+            abilityButton.gameObject.SetActive(false);
+        }
+    }
+
+    #endregion
+
+    #region Battle Timeline
 
     private void InstantiateBattleEntityTimelineUI(EntityJoinBattleEvent ctx)
     {
@@ -89,4 +143,8 @@ public class UIBattleManager : MonoBehaviour
             ui.Show(i <= roundIndex);
         }
     }
+
+    #endregion
 }
+}
+

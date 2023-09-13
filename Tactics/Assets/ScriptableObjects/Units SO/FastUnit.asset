@@ -16,6 +16,8 @@ MonoBehaviour:
     type: 3}
   <Behaviour>k__BackingField: {fileID: 11400000, guid: d70b7e818c234f34c9fb661ceb2610dd,
     type: 2}
+  <Abilities>k__BackingField:
+  - {fileID: 11400000, guid: 6d66f29768ebfd348ac9a0a509a6f556, type: 2}
   <BaseMovement>k__BackingField: 3
   <Initiative>k__BackingField: 1
   <BaseSpeed>k__BackingField: 200

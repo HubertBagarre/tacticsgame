@@ -48,7 +48,7 @@ namespace Battle.ScriptableObjects
 
             EventManager.AddListener<EndPlayerControlEvent>(RemoveMouseInputs, true);
 
-            EventManager.Trigger(new StartPlayerControlEvent());
+            EventManager.Trigger(new StartPlayerControlEvent(unit));
         }
 
         private void RemoveMouseInputs(EndPlayerControlEvent _)
@@ -187,6 +187,12 @@ namespace Battle.UIEvents
 {
     public class StartPlayerControlEvent
     {
+        public Unit PlayerUnit { get; }
+
+        public StartPlayerControlEvent(Unit playerUnit)
+        {
+            PlayerUnit = playerUnit;
+        }
     }
 
     public class EndPlayerControlEvent

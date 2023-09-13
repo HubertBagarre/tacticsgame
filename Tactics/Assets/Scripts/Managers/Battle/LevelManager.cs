@@ -39,6 +39,11 @@ namespace Battle
     }
 }
 
+public class SetupLevelEvent
+{
+    
+}
+
 public class StartLevelEvent
 {
     public List<BattleEntity> StartingEntities { get; }

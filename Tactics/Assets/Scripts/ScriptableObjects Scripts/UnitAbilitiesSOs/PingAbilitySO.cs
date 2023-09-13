@@ -2,12 +2,16 @@ using UnityEngine;
 
 namespace Battle.ScriptableObjects
 {
+    using AbilityEvent;
+    
     [CreateAssetMenu(menuName = "Battle Scriptables/Unit Ability/Ping")]
     public class PingAbilitySO : UnitAbilitySO
     {
-        public override void CastAbility(Unit[] targetUnits, Tile[] targetTiles)
+        protected override void AbilityEffect(Unit[] targetUnits, Tile[] targetTiles)
         {
+            Debug.Log("Ping");
             
+            EventManager.Trigger(new EndAbilityCast());
         }
     }
 }
