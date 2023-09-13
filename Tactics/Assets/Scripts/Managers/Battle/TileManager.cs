@@ -6,6 +6,7 @@ namespace Battle
 {
     using UnitEvents;
     using InputEvent;
+    using AbilityEvent;
 
     /// <summary>
     /// Handles Tiles
@@ -25,11 +26,12 @@ namespace Battle
             InputManager.LeftClickEvent += ClickTile;
             
             EventManager.AddListener<EndUnitTurnEvent>(ClearSelectableTilesOnTurnEnd);
-            
+
             void ClearSelectableTilesOnTurnEnd(EndUnitTurnEvent _)
             {
                 ResetTileAppearance();
             }
+            
 
             void ClickTile()
             {

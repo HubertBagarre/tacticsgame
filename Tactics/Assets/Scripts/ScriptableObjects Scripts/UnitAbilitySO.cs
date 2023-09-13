@@ -18,7 +18,7 @@ namespace Battle
         [field: SerializeField] public int Cooldown { get; private set; }
         [field: SerializeField] public bool IsInstantCast { get; private set; }
 
-        public Func<Tile, bool> TileSelector { get; protected set; } = tile => tile != null;
+        public Func<Tile, bool> TileSelector { get; protected set; } = tile => tile != null; // maybe tile => Func(tile) where Func(tile) is virtual
 
         public void CastAbility(Unit caster, Tile[] targetTiles)
         {
@@ -31,6 +31,13 @@ namespace Battle
 
         protected abstract void AbilityEffect(Unit caster, Tile[] targetTiles);
 
+        protected void EndAbility()
+        {
+            Debug.Log($"Cast ended.");
+            
+            EventManager.Trigger(new EndAbilityCastEvent());
+        }
+        
         public UnitAbilityInstance CreateInstance()
         {
             return new UnitAbilityInstance(this);

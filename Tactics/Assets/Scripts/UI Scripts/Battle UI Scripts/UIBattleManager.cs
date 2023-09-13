@@ -57,7 +57,7 @@ namespace Battle
             //EventManager.AddListener<StartAbilitySelectionEvent>();
 
             //TODO - Move Player Movement Here (?)
-            EventManager.AddListener<StartUnitMovementSelectionEvent>(ShowUIForUnitMovement);
+            EventManager.AddListener<StartUnitMovementSelectionEvent>(ShowWalkableTiles);
 
             AbilityManager.OnUpdatedCastingAbility += UpdateAbilityTargetSelection;
             
@@ -104,14 +104,12 @@ namespace Battle
             endTurnButton.interactable = value;
         }
 
-        private void ShowUIForUnitMovement(StartUnitMovementSelectionEvent ctx)
+        private void ShowWalkableTiles(StartUnitMovementSelectionEvent ctx)
         {
-            
-        }
-
-        private void HideUIForUnitMovement()
-        {
-            
+            foreach (var tile in ctx.SelectableTiles)
+            {
+                tile.SetAppearance(Tile.Appearance.Selectable);
+            }
         }
         
         #region Ability Target Selection

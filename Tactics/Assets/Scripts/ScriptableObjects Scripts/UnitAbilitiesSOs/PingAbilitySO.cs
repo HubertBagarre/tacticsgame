@@ -2,8 +2,6 @@ using UnityEngine;
 
 namespace Battle.ScriptableObjects
 {
-    using AbilityEvent;
-    
     [CreateAssetMenu(menuName = "Battle Scriptables/Unit Ability/Ping")]
     public class PingAbilitySO : UnitAbilitySO
     {
@@ -11,7 +9,7 @@ namespace Battle.ScriptableObjects
         {
             Debug.Log($"Ping on {targetTiles[0]} and {targetTiles[1]}");
             
-            EventManager.Trigger(new EndAbilityCastEvent());
+            EndAbility();
         }
     }
 }
