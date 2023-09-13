@@ -59,8 +59,8 @@ namespace Battle
             //TODO - Move Player Movement Here (?)
             EventManager.AddListener<StartUnitMovementSelectionEvent>(ShowUIForUnitMovement);
 
-            EventManager.AddListener<StartAbilitySelectionEvent>(ShowAbilityTargetSelectionOnTargetSelectionStart);
-            EventManager.AddListener<EndAbilitySelectionEvent>(HideAbilityTargetSelectionOnTargetSelectionEnd);
+            AbilityManager.OnUpdatedCastingAbility += UpdateAbilityTargetSelection;
+            
             cancelTileSelectionButton.onClick.AddListener(CancelSelection);
             confirmTileSelectionButton.onClick.AddListener(ConfirmSelection);
 
@@ -121,9 +121,24 @@ namespace Battle
             abilityTargetSelectionUIObj.SetActive(value);
         }
 
-        private void ShowAbilityTargetSelectionOnTargetSelectionStart(StartAbilitySelectionEvent ctx)
+        private void UpdateAbilityTargetSelection(UnitAbilityInstance ability)
         {
-            currentAbilityInTargetSelection = ctx.Ability;
+            if (ability == null)
+            {
+                ShowAbilityTargetSelection(false);
+            
+                currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated -= UpdateAbilitySelectionLeftText;
+                currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated -= UpdateConfirmAbilityTargetSelectionButton;
+
+                currentAbilityInTargetSelection = null;
+
+                //TODO- Clear selection
+                
+                currentAbilityInTargetSelection = null;
+                return;
+            }
+            
+            currentAbilityInTargetSelection = ability;
 
             currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated += UpdateAbilitySelectionLeftText;
             currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated += UpdateConfirmAbilityTargetSelectionButton;
@@ -131,7 +146,7 @@ namespace Battle
             UpdateAbilitySelectionLeftText(0);
             UpdateConfirmAbilityTargetSelectionButton(0);
             
-            ShowAbilityTargetSelection(!ctx.Ability.SO.IsInstantCast);
+            ShowAbilityTargetSelection(!currentAbilityInTargetSelection.SO.IsInstantCast);
         }
 
         private void UpdateConfirmAbilityTargetSelectionButton(int _)
@@ -143,17 +158,7 @@ namespace Battle
         {
             selectionsLeftText.text = $"Select {currentAbilityInTargetSelection.SelectionsLeft} Target{(currentAbilityInTargetSelection.SelectionsLeft > 0 ? "s":"")}"; //Select 66 Targets
         }
-
-        private void HideAbilityTargetSelectionOnTargetSelectionEnd(EndAbilitySelectionEvent ctx)
-        {
-            ShowAbilityTargetSelection(false);
-            
-            currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated -= UpdateAbilitySelectionLeftText;
-            currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated -= UpdateConfirmAbilityTargetSelectionButton;
-            
-            //TODO- Clear selection
-        }
-
+        
         #endregion
 
         #region Unit Ability

@@ -12,38 +12,45 @@ namespace Battle
     {
         [SerializeField] private TileManager tileManager;
 
+        public static event Action<UnitAbilityInstance> OnUpdatedCastingAbility;
+        private UnitAbilityInstance currentCastingAbilityInstance;
+
         private void Start()
         {
+            currentCastingAbilityInstance = null;
+            
             EventManager.AddListener<StartAbilitySelectionEvent>(StartAbilitySelection);
         }
 
         private void StartAbilitySelection(StartAbilitySelectionEvent ctx)
         {
-            var ability = ctx.Ability;
+            if (currentCastingAbilityInstance != null) EventManager.Trigger(new EndAbilitySelectionEvent(true));
+            
+            currentCastingAbilityInstance = ctx.Ability;
             var caster = ctx.Caster;
             
             EventManager.AddListener<EndAbilitySelectionEvent>(TryCastAbility,true);
             
-            // add listener on click to add tile to ability instance
             EventManager.AddListener<ClickTileEvent>(SelectTile);
             
-            if (ability.SO.IsInstantCast)
-            {
-                EventManager.Trigger(new EndAbilitySelectionEvent(false));
-                return;
-            }
+            OnUpdatedCastingAbility?.Invoke(currentCastingAbilityInstance);
+            
+            if (currentCastingAbilityInstance.SO.IsInstantCast) EventManager.Trigger(new EndAbilitySelectionEvent(false));
 
             void TryCastAbility(EndAbilitySelectionEvent selectionEvent)
             {
                 EventManager.RemoveListener<ClickTileEvent>(SelectTile);
-
+                
+                OnUpdatedCastingAbility?.Invoke(null);
+                
                 if (selectionEvent.Canceled)
                 {
-                    ability.ClearTileSelection();
+                    currentCastingAbilityInstance.ClearTileSelection();
+                    currentCastingAbilityInstance = null;
                     return;
                 }
                 
-                ability.CastAbility(caster);
+                currentCastingAbilityInstance.CastAbility(caster);
             }
 
             void SelectTile(ClickTileEvent clickEvent)
@@ -52,7 +59,7 @@ namespace Battle
                 
                 if(tile == null) return;
 
-                ability.AddTileToSelection(tile);
+                currentCastingAbilityInstance.AddTileToSelection(tile);
             }
         }
     }

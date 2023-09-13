@@ -20,11 +20,12 @@ public class UIUnitAbilityButton : MonoBehaviour
         associatedAbility = ability;
         associatedUnit = caster;
         
-        Button.onClick.AddListener(TryCastAbility);
+        Button.onClick.AddListener(StartAbilityTargetSelection);
     }
     
-    private void TryCastAbility()
+    private void StartAbilityTargetSelection()
     {
+        Debug.Log("Starting Target Selection");
         EventManager.Trigger(new StartAbilitySelectionEvent(associatedAbility,associatedUnit));
     }
 }
