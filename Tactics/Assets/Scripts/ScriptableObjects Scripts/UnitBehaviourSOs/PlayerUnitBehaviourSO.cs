@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects
 {
     using UIEvents;
     using UnitEvents;
+    using AbilityEvent;
     
     [CreateAssetMenu(menuName = "Battle Scriptables/UnitBehaviour/PlayerUnit")]
     public class PlayerUnitBehaviourSO : UnitBehaviourSO
@@ -34,7 +33,22 @@ namespace Battle.ScriptableObjects
 
         public override void RunBehaviour(Unit unit)
         {
+            EventManager.AddListener<EndAbilityCastEvent>(EndTurnAfterAbilityCast);
+            EventManager.AddListener<EndUnitTurnEvent>(RemoveEndTurnListenerAtTurnEnd,true);
+            
             EventManager.Trigger(new StartPlayerControlEvent(unit));
+        }
+        
+        private void EndTurnAfterAbilityCast(EndAbilityCastEvent ctx)
+        {
+            if (!ctx.Ability.EndUnitTurnAfterCast) return;
+            
+            battleM.EndCurrentEntityTurn();
+        }
+        
+        private void RemoveEndTurnListenerAtTurnEnd(EndUnitTurnEvent ctx)
+        {
+            EventManager.RemoveListener<EndAbilityCastEvent>(EndTurnAfterAbilityCast);
         }
     }
 }

@@ -26,12 +26,17 @@ namespace Battle
             InputManager.LeftClickEvent += ClickTile;
             
             EventManager.AddListener<EndUnitTurnEvent>(ClearSelectableTilesOnTurnEnd);
+            EventManager.AddListener<EndAbilitySelectionEvent>(ClearSelectableTilesOnEndAbilityTargetSelection);
 
             void ClearSelectableTilesOnTurnEnd(EndUnitTurnEvent _)
             {
                 ResetTileAppearance();
             }
             
+            void ClearSelectableTilesOnEndAbilityTargetSelection(EndAbilitySelectionEvent _)
+            {
+                ResetTileAppearance();
+            }
 
             void ClickTile()
             {

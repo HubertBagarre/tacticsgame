@@ -54,7 +54,7 @@ namespace Battle
             EventManager.AddListener<StartPlayerControlEvent>(ShowPlayerButtonsOnPlayerTurnStart);
             EventManager.AddListener<EndPlayerControlEvent>(HidePlayerButtonsOnPlayerTurnEnd);
 
-            //EventManager.AddListener<StartAbilitySelectionEvent>();
+            EventManager.AddListener<StartAbilityCastEvent>(HideAbilityButtonsOnAbilityCast);
 
             //TODO - Move Player Movement Here (?)
             EventManager.AddListener<StartUnitMovementSelectionEvent>(ShowWalkableTiles);
@@ -89,14 +89,11 @@ namespace Battle
             HideUnitAbilitiesButton();
         }
 
-        private void HidePlayerButtonsOnAbilitySelection(StartAbilitySelectionEvent ctx)
+        private void HideAbilityButtonsOnAbilityCast(StartAbilityCastEvent ctx)
         {
-            
-        }
-        
-        private void ShowPlayerButtonsOnAbilitySelection(StartAbilitySelectionEvent ctx)
-        {
-            
+            EnableEndTurnButton(false);
+
+            HideUnitAbilitiesButton();
         }
 
         private void EnableEndTurnButton(bool value)

@@ -25,7 +25,7 @@ public class EventManager : MonoBehaviour
 
     public delegate void EventCallback<in T>(T data);
 
-    public static void AddListener<T>(EventCallback<T> callback, bool ephemeral = false)
+    public static void AddListener<T>(EventCallback<T> callback, bool removeAfterInvoke = false)
     {
         if (Instance.m_events.TryGetValue(typeof(T), out var listeners))
         {
@@ -40,7 +40,7 @@ public class EventManager : MonoBehaviour
             Instance.m_events.Add(typeof(T), listeners);
         }
 
-        if (ephemeral) Instance.ephemeral_events.Add(callback);
+        if (removeAfterInvoke) Instance.ephemeral_events.Add(callback);
     }
 
     public static void RemoveListener<T>(EventCallback<T> callback)

@@ -28,7 +28,7 @@ namespace Battle
 
         [field: SerializeField] public int CurrentRound { get; private set; }
 
-        private List<BattleEntity> entitiesInBattle = new List<BattleEntity>();
+        private List<BattleEntity> entitiesInBattle = new ();
 
         private UpdateTurnValuesEvent updateTurnValuesEvent => new (entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList(),endRoundEntity);
 
@@ -62,7 +62,7 @@ namespace Battle
             
             CurrentRound = 0;
             
-            UnitBehaviourSO.SetTurnManager(this);
+            UnitBehaviourSO.SetBattleManager(this);
 
             EventManager.Trigger(new StartBattleEvent());
 
@@ -197,13 +197,13 @@ namespace Battle
         public int Speed { get;}
         public float DecayRate => Speed / 100f;
         public float DistanceFromTurnStart { get; private set; }
-        private float TurnResetValue => tm.ResetTurnValue;
-        private BattleManager tm;
+        private float TurnResetValue => battleM.ResetTurnValue;
+        private BattleManager battleM;
 
         public EndRoundEntity(BattleManager battleManager,int speed)
         {
-            tm = battleManager;
-            Portrait = tm.EndTurnImage;
+            battleM = battleManager;
+            Portrait = battleM.EndTurnImage;
 
             Speed = speed;
             DistanceFromTurnStart = TurnResetValue;
@@ -225,13 +225,13 @@ namespace Battle
         {
             EventManager.AddListener<RoundStartEvent>(EndThisUnitTurn,true);
             
-            tm.EndRound(); // End Current Round and Start next round
+            battleM.EndRound(); // End Current Round and Start next round
             
             //End turn
 
             void EndThisUnitTurn(RoundStartEvent ctx)
             {
-                tm.EndCurrentEntityTurn();
+                battleM.EndCurrentEntityTurn();
             }
         }
 

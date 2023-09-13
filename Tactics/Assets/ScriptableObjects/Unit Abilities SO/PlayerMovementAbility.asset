@@ -18,3 +18,4 @@ MonoBehaviour:
   <ExpectedSelections>k__BackingField: 0
   <Cooldown>k__BackingField: 0
   <IsInstantCast>k__BackingField: 1
+  <EndUnitTurnAfterCast>k__BackingField: 0

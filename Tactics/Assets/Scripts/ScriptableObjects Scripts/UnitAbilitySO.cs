@@ -16,16 +16,13 @@ namespace Battle
         [field: SerializeField] public string Description { get; private set; }
         [field: SerializeField] public int ExpectedSelections { get; private set; }
         [field: SerializeField] public int Cooldown { get; private set; }
-        [field: SerializeField] public bool IsInstantCast { get; private set; }
+        [field: SerializeField] public bool IsInstantCast { get; private set; } = false;
+        [field: SerializeField] public bool EndUnitTurnAfterCast { get; private set; } = true;
 
         public Func<Tile, bool> TileSelector { get; protected set; } = tile => tile != null; // maybe tile => Func(tile) where Func(tile) is virtual
 
         public void CastAbility(Unit caster, Tile[] targetTiles)
         {
-            EventManager.Trigger(new StartAbilityCastEvent());
-
-            Debug.Log($"{caster} is Casting! \n{targetTiles.Length} targets");
-            
             AbilityEffect(caster, targetTiles);
         }
 
@@ -35,7 +32,7 @@ namespace Battle
         {
             Debug.Log($"Cast ended.");
             
-            EventManager.Trigger(new EndAbilityCastEvent());
+            EventManager.Trigger(new EndAbilityCastEvent(this));
         }
         
         public UnitAbilityInstance CreateInstance()
@@ -66,6 +63,8 @@ namespace Battle
 
         public void CastAbility(Unit caster)
         {
+            EventManager.Trigger(new StartAbilityCastEvent(this,caster));
+            
             SO.CastAbility(caster,currentSelectedTiles.ToArray());
 
             ClearTileSelection();

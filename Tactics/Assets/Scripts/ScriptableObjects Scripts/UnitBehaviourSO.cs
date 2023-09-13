@@ -9,7 +9,7 @@ namespace Battle.ScriptableObjects
         protected static TileManager tileM;
         protected static UnitManager unitM;
 
-        public static void SetTurnManager(BattleManager battleManager)
+        public static void SetBattleManager(BattleManager battleManager)
         {
             battleM = battleManager;
         }

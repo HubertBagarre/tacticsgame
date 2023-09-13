@@ -24,8 +24,12 @@ namespace Battle
 
         private void StartAbilitySelection(StartAbilitySelectionEvent ctx)
         {
+            var cancel = (currentCastingAbilityInstance == ctx.Ability);
+            
             if (currentCastingAbilityInstance != null) EventManager.Trigger(new EndAbilitySelectionEvent(true));
             
+            if(cancel) return;
+
             currentCastingAbilityInstance = ctx.Ability;
             var caster = ctx.Caster;
             
@@ -90,8 +94,26 @@ namespace Battle.AbilityEvent
             Canceled = canceled;
         }
     }
-    
-    public class StartAbilityCastEvent{}
-    
-    public class EndAbilityCastEvent{}
+
+    public class StartAbilityCastEvent
+    {
+        public UnitAbilityInstance Ability { get; }
+        public Unit Caster { get; }
+
+        public StartAbilityCastEvent(UnitAbilityInstance ability,Unit caster)
+        {
+            Ability = ability;
+            Caster = caster;
+        }
+    }
+
+    public class EndAbilityCastEvent
+    {
+        public UnitAbilitySO Ability { get; }
+
+        public EndAbilityCastEvent(UnitAbilitySO ability)
+        {
+            Ability = ability;
+        }
+    }
 }
