@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Battle.UnitEvents;
 using UnityEngine;
 
 namespace Battle
@@ -13,11 +14,14 @@ namespace Battle
         [SerializeField] private TileManager tileManager;
 
         public static event Action<Unit,UnitAbilityInstance> OnUpdatedCastingAbility;
+
+        private Unit caster;
         private UnitAbilityInstance currentCastingAbilityInstance;
 
         private void Start()
         {
             currentCastingAbilityInstance = null;
+            caster = null;
             
             EventManager.AddListener<StartAbilityTargetSelectionEvent>(StartAbilitySelection);
         }
@@ -38,17 +42,26 @@ namespace Battle
             }
             
             currentCastingAbilityInstance = ctx.Ability;
-            var caster = ctx.Caster;
+            caster = ctx.Caster;
             
             EventManager.AddListener<EndAbilityTargetSelectionEvent>(TryCastAbility,true);
-            
+
+            caster.OnDeath += CancelAbilityTargetSelection;
+                
             EventManager.AddListener<ClickTileEvent>(SelectTile);
             
             OnUpdatedCastingAbility?.Invoke(caster,currentCastingAbilityInstance);
 
             if (currentCastingAbilityInstance.SO.SkipTargetSelection)
             {
+                caster.OnDeath -= CancelAbilityTargetSelection;
+                
                 EventManager.Trigger(new EndAbilityTargetSelectionEvent(false));
+            }
+            
+            void CancelAbilityTargetSelection()
+            {
+                EventManager.Trigger(new EndAbilityTargetSelectionEvent(true));
             }
 
             void TryCastAbility(EndAbilityTargetSelectionEvent selectionEvent)
@@ -58,7 +71,9 @@ namespace Battle
                 OnUpdatedCastingAbility?.Invoke(caster,null);
                 
                 var ability = currentCastingAbilityInstance;
+                var unit = caster;
                 currentCastingAbilityInstance = null;
+                caster = null;
                 
                 if (selectionEvent.Canceled)
                 {
@@ -66,7 +81,7 @@ namespace Battle
                     return;
                 }
                 
-                ability.CastAbility(caster);
+                ability.CastAbility(unit);
             }
 
             void SelectTile(ClickTileEvent clickEvent)
@@ -77,6 +92,8 @@ namespace Battle
 
                 currentCastingAbilityInstance.AddTileToSelection(caster,tile);
             }
+            
+            
         }
     }
 }

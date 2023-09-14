@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Battle.UnitEvents;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -40,6 +41,7 @@ namespace Battle
         private void AddCallbacks()
         {
             EventManager.AddListener<StartLevelEvent>(StartBattle);
+            EventManager.AddListener<UnitDeathEvent>(RemoveDeadUnitFromBattle);
 
             endTurnButton.onClick.AddListener(EndCurrentEntityTurn);
         }
@@ -146,10 +148,10 @@ namespace Battle
         private void AddEntityToBattle(BattleEntity entity,bool createPreview)
         {
             entity.InitEntityForBattle();
-            
+
             entitiesInBattle.Add(entity);
             entity.ResetTurnValue(-1);
-
+            
             EventManager.Trigger(new EntityJoinBattleEvent(entity,false));
             
             if (createPreview)
@@ -157,10 +159,35 @@ namespace Battle
                 var previewEntity = new PreviewEntity(this,entity);
                 entitiesInBattle.Add(previewEntity);
                 
+                EventManager.AddListener<EntityLeaveBattleEvent>(RemoveAssociatedPreviewEntityFromBattle);
+                
                 EventManager.Trigger(new EntityJoinBattleEvent(previewEntity,true));
+
+                void RemoveAssociatedPreviewEntityFromBattle(EntityLeaveBattleEvent ctx)
+                {
+                    if(ctx.Entity != entity) return;
+                    EventManager.RemoveListener<EntityLeaveBattleEvent>(RemoveAssociatedPreviewEntityFromBattle);
+                    
+                    RemoveEntityFromBattle(previewEntity);
+                }
             }
             
             EventManager.Trigger(updateTurnValuesEvent);
+        }
+
+        private void RemoveEntityFromBattle(BattleEntity entity)
+        {
+            if(!entitiesInBattle.Contains(entity)) return;
+            entitiesInBattle.Remove(entity);
+            
+            EventManager.Trigger(new EntityLeaveBattleEvent(entity));
+
+            if (CurrentEntityTurn == entity) EndCurrentEntityTurn();
+        }
+
+        private void RemoveDeadUnitFromBattle(UnitDeathEvent ctx)
+        {
+            RemoveEntityFromBattle(ctx.Unit);
         }
     }
 
@@ -180,6 +207,8 @@ namespace Battle
         }
 
         public void InitEntityForBattle() { }
+        public void KillEntityInBattle() { }
+
         public void ResetTurnValue(float value) { }
         public void DecayTurnValue(float amount) { }
         public void StartTurn() { }
@@ -210,6 +239,7 @@ namespace Battle
         }
 
         public void InitEntityForBattle() { }
+        public void KillEntityInBattle(){ }
 
         public void ResetTurnValue(float _)
         {

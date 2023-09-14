@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,8 +30,11 @@ namespace Battle
         [field:SerializeField] public float DistanceFromTurnStart { get; protected set; }
         
         [field:SerializeField] public int CurrentHp { get; protected set; }
+        public bool IsDead => CurrentHp <= 0;
         
         public List<UnitAbilityInstance> AbilityInstances { get; } = new ();
+
+        public event Action OnDeath;
 
         public void InitUnit(Tile tile, int team, UnitStatsSO so)
         {
@@ -70,7 +74,7 @@ namespace Battle
         {
             MovementLeft = Movement;
 
-            //apply effects
+            //apply effects ?
             
             EventManager.Trigger(new StartUnitTurnEvent(this));
             
@@ -79,6 +83,8 @@ namespace Battle
 
         public void EndTurn()
         {
+            //apply effects ?
+            
             EventManager.Trigger(new EndUnitTurnEvent(this));
         }
 
@@ -104,10 +110,10 @@ namespace Battle
             {
                 EventManager.Trigger(new UnitMovementStartEvent(this));
 
-                for (var index = 0; index < path.Count && MovementLeft > 0; index++)
+                for (var index = 0; index < path.Count && MovementLeft > 0 && !IsDead; index++)
                 {
                     var tile = path[index];
-                    yield return new WaitForSeconds(0.5f);
+                    yield return new WaitForSeconds(1f);
 
                     transform.position = tile.transform.position;
 
@@ -128,6 +134,41 @@ namespace Battle
         public void DecayTurnValue(float amount)
         {
             DistanceFromTurnStart -= amount * DecayRate;
+        }
+        
+        public void TakeDamage(int amount)
+        {
+            if (amount < 0) amount = 0; //No negative damage, negative damage doesn't heal, but can deal 0 damage
+
+            var startHp = CurrentHp;
+            CurrentHp -= amount;
+            
+            EventManager.Trigger(new UnitTakeDamageEvent(this,startHp));
+            
+            if(CurrentHp <= 0) KillEntityInBattle();
+        }
+
+        [ContextMenu("Kill")]
+        public void KillEntityInBattle()
+        {
+            OnDeath?.Invoke();
+            OnDeath = null;
+            
+            EventManager.Trigger(new UnitDeathEvent(this));
+            
+            gameObject.SetActive(false);
+        }
+
+        public void HealDamage(int amount)
+        {
+            if (amount < 0) amount = 0;
+
+            var startHp = CurrentHp;
+            CurrentHp += amount;
+            
+            EventManager.Trigger(new UnitHealDamageEvent(this,startHp));
+
+            if (CurrentHp > Stats.MaxHp) CurrentHp = Stats.MaxHp; //No overheal (yet ?)
         }
     }
 }
@@ -169,6 +210,44 @@ namespace Battle.UnitEvents
         public Unit Unit { get; }
 
         public UnitMovementEndEvent(Unit unit)
+        {
+            Unit = unit;
+        }
+    }
+
+    public class UnitTakeDamageEvent
+    {
+        public Unit Unit { get; }
+        public int StartHp { get; }
+        public int Amount { get; }
+        
+        public UnitTakeDamageEvent(Unit unit,int startHp)
+        {
+            Unit = unit;
+            StartHp = startHp;
+            Amount = StartHp - Unit.CurrentHp;
+        }
+    }
+    
+    public class UnitHealDamageEvent
+    {
+        public Unit Unit { get; }
+        public int StartHp { get; }
+        public int Amount { get; }
+        
+        public UnitHealDamageEvent(Unit unit,int startHp)
+        {
+            Unit = unit;
+            StartHp = startHp;
+            Amount = Unit.CurrentHp - StartHp;
+        }
+    }
+
+    public class UnitDeathEvent
+    {
+        public Unit Unit { get;}
+
+        public UnitDeathEvent(Unit unit)
         {
             Unit = unit;
         }

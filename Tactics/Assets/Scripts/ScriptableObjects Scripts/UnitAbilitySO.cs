@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Battle.UnitEvents;
 using UnityEngine;
 
 namespace Battle
@@ -19,17 +20,17 @@ namespace Battle
         [field: SerializeField] public bool SkipTargetSelection { get; private set; } = false;
         [field: SerializeField] public bool SkipTargetConfirmation { get; private set; } = false;
         [field: SerializeField] public bool EndUnitTurnAfterCast { get; private set; } = true;
-        
-        public bool IsTileSelectable(Unit caster,Tile tile,List<Tile> currentlySelectedTiles)
+
+        public bool IsTileSelectable(Unit caster, Tile tile, List<Tile> currentlySelectedTiles)
         {
-            return TileSelectionMethod(caster,tile,currentlySelectedTiles);
+            return TileSelectionMethod(caster, tile, currentlySelectedTiles);
         }
 
-        protected virtual bool TileSelectionMethod(Unit caster,Tile selectableTile,List<Tile> currentlySelectedTiles)
+        protected virtual bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
         {
             return selectableTile != null;
         }
-        
+
         public void CastAbility(Unit caster, Tile[] targetTiles)
         {
             AbilityEffect(caster, targetTiles);
@@ -41,7 +42,7 @@ namespace Battle
         {
             EventManager.Trigger(new EndAbilityCastEvent(this));
         }
-        
+
         public UnitAbilityInstance CreateInstance()
         {
             return new UnitAbilityInstance(this);
@@ -56,9 +57,9 @@ namespace Battle
         public int CurrentCooldown { get; private set; }
         public int CurrentSelectionCount => currentSelectedTiles.Count;
 
-        public bool IsTileSelectable(Unit caster, Tile tile) => SO.IsTileSelectable(caster, tile,currentSelectedTiles);
+        public bool IsTileSelectable(Unit caster, Tile tile) => SO.IsTileSelectable(caster, tile, currentSelectedTiles);
 
-        private List<Tile> currentSelectedTiles = new ();
+        private List<Tile> currentSelectedTiles = new();
 
         public event Action<int> OnCurrentSelectedTilesUpdated;
         public event Action<int> OnCurrentCooldownUpdated;
@@ -77,54 +78,47 @@ namespace Battle
 
         public void CastAbility(Unit caster)
         {
-            EventManager.Trigger(new StartAbilityCastEvent(this,caster,currentSelectedTiles));
-            
-            //ClearTileSelection();
-            
-            SO.CastAbility(caster,currentSelectedTiles.ToArray());
-            
+            EventManager.Trigger(new StartAbilityCastEvent(this, caster, currentSelectedTiles));
+
+            SO.CastAbility(caster, currentSelectedTiles.ToArray());
+
             currentSelectedTiles.Clear();
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
         }
 
-        public void ClearTileSelection()
+        public void AddTileToSelection(Unit caster, Tile tile)
         {
-            foreach (var tile in currentSelectedTiles)
-            {
-                tile.SetAppearance(Tile.Appearance.Default);
-            }
-        }
+            if (!IsTileSelectable(caster, tile)) return;
 
-        public void AddTileToSelection(Unit caster,Tile tile)
-        {
-            if(!IsTileSelectable(caster,tile)) return;
-            
             if (currentSelectedTiles.Contains(tile))
             {
-                RemoveTileFromSelection(caster,tile);
+                RemoveTileFromSelection(caster, tile);
                 return;
             }
+
             currentSelectedTiles.Add(tile);
-            
+
             tile.SetAppearance(Tile.Appearance.Selected);
-            
+
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
-            
-            if(CurrentSelectionCount > SO.ExpectedSelections) RemoveTileFromSelection(caster,currentSelectedTiles[0]);
-            
-            if(SO.SkipTargetConfirmation)
+
+            if (CurrentSelectionCount > SO.ExpectedSelections) RemoveTileFromSelection(caster, currentSelectedTiles[0]);
+
+            if (SO.SkipTargetConfirmation)
             {
                 EventManager.Trigger(new EndAbilityTargetSelectionEvent(false));
             }
         }
 
-        public void RemoveTileFromSelection(Unit caster,Tile tile)
+        public void RemoveTileFromSelection(Unit caster, Tile tile)
         {
-            if(!currentSelectedTiles.Contains(tile)) return;
+            if (!currentSelectedTiles.Contains(tile)) return;
             currentSelectedTiles.Remove(tile);
-            
-            tile.SetAppearance(IsTileSelectable(caster,tile) ? Tile.Appearance.Selectable : Tile.Appearance.Unselectable);
-            
+
+            tile.SetAppearance(IsTileSelectable(caster, tile)
+                ? Tile.Appearance.Selectable
+                : Tile.Appearance.Unselectable);
+
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
         }
     }

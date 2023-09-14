@@ -28,6 +28,7 @@ namespace Battle
             
             EventManager.AddListener<EndUnitTurnEvent>(ClearSelectableTilesOnTurnEnd);
             
+            EventManager.AddListener<EndAbilityTargetSelectionEvent>(ResetRingPathOnTargetSelectionCanceled);
             AbilityManager.OnUpdatedCastingAbility += UpdateAbilityTargetSelection;
             
             EventManager.AddListener<StartAbilityCastEvent>(ShowSelectedTilesOnStartAbilityCast);
@@ -41,6 +42,16 @@ namespace Battle
             void ClearSelectedTilesOnCastEnd(EndAbilityCastEvent _)
             {
                 ResetTileAppearance(true);
+            }
+
+            void ResetRingPathOnTargetSelectionCanceled(EndAbilityTargetSelectionEvent ctx)
+            {
+                if(!ctx.Canceled) return;
+
+                foreach (var tile in AllTiles)
+                {
+                    tile.SetPathRing(0);
+                }
             }
         }
 
