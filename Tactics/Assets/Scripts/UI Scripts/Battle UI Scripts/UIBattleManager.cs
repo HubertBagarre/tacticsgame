@@ -54,9 +54,7 @@ namespace Battle
             EventManager.AddListener<StartPlayerControlEvent>(ShowPlayerButtonsOnPlayerTurnStart);
             EventManager.AddListener<EndPlayerControlEvent>(HidePlayerButtonsOnPlayerTurnEnd);
             EventManager.AddListener<StartAbilityCastEvent>(HideAbilityButtonsOnAbilityCast);
-
-            EventManager.AddListener<StartUnitMovementSelectionEvent>(ShowWalkableTiles);
-
+            
             AbilityManager.OnUpdatedCastingAbility += UpdateAbilityTargetSelection;
             
             cancelTileSelectionButton.onClick.AddListener(CancelSelection);
@@ -108,14 +106,6 @@ namespace Battle
         private void EnableEndTurnButton(bool value)
         {
             endTurnButton.interactable = value;
-        }
-
-        private void ShowWalkableTiles(StartUnitMovementSelectionEvent ctx)
-        {
-            foreach (var tile in ctx.SelectableTiles)
-            {
-                tile.SetAppearance(Tile.Appearance.Selectable);
-            }
         }
         
         #region Ability Target Selection

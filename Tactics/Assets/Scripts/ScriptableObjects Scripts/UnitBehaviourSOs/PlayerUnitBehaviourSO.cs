@@ -69,21 +69,4 @@ namespace Battle.UIEvents
     public class EndPlayerControlEvent
     {
     }
-
-    public class StartUnitMovementSelectionEvent
-    {
-        public Unit Unit { get; }
-        public List<Tile> SelectableTiles { get; }
-
-        public StartUnitMovementSelectionEvent(Unit unit,List<Tile> selectableTiles)
-        {
-            Unit = unit;
-            SelectableTiles = selectableTiles;
-        }
-    }
-
-    public class EndUnitMovementSelectionEvent
-    {
-        
-    }
 }
