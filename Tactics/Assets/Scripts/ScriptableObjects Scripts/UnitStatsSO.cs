@@ -21,6 +21,7 @@ namespace Battle.ScriptableObjects
         [field: SerializeField, Tooltip("Turn Value Decay Rate, higher is faster")]
         public int BaseSpeed { get; private set; } = 100;
 
+        // See UnitAbilitySO if can't be overriden (use a virtual bool func(Unit,Tile) instead)
         public Func<Tile, bool> WalkableTileSelector {  get; protected set; } =
             tile => tile.IsWalkable && !tile.HasUnit();
     }

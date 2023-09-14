@@ -388,9 +388,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   position: {x: 0, y: 0}
-  <Walkable>k__BackingField: 0
-  neighbors: []
   currentUnit: {fileID: 0}
+  <IsWalkable>k__BackingField: 0
+  neighbors: []
+  <PathRing>k__BackingField: 0
   modelRenderer: {fileID: 5935183296807465691}
   defaultMat: {fileID: 2100000, guid: 35f88edf3851c9b44bfd57ff363c8bf6, type: 2}
   selectableMat: {fileID: 2100000, guid: e3bd85f4b2d20fd4f99caffc811fe899, type: 2}

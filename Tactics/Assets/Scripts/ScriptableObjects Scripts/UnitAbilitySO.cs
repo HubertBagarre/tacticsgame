@@ -18,9 +18,17 @@ namespace Battle
         [field: SerializeField] public int Cooldown { get; private set; }
         [field: SerializeField] public bool IsInstantCast { get; private set; } = false;
         [field: SerializeField] public bool EndUnitTurnAfterCast { get; private set; } = true;
+        
+        public bool IsTileSelectable(Unit caster,Tile tile,List<Tile> currentlySelectedTiles)
+        {
+            return TileSelectionMethod(caster,tile,currentlySelectedTiles);
+        }
 
-        public Func<Tile, bool> TileSelector { get; protected set; } = tile => tile != null; // maybe tile => Func(tile) where Func(tile) is virtual
-
+        protected virtual bool TileSelectionMethod(Unit caster,Tile tile,List<Tile> currentlySelectedTiles)
+        {
+            return tile != null;
+        }
+        
         public void CastAbility(Unit caster, Tile[] targetTiles)
         {
             AbilityEffect(caster, targetTiles);
@@ -47,6 +55,8 @@ namespace Battle
         public int CurrentCooldown { get; private set; }
         public int CurrentSelectionCount => currentSelectedTiles.Count;
 
+        public bool IsTileSelectable(Unit caster, Tile tile) => SO.IsTileSelectable(caster, tile,currentSelectedTiles);
+
         private List<Tile> currentSelectedTiles = new ();
 
         public event Action<int> OnCurrentSelectedTilesUpdated;
@@ -66,9 +76,9 @@ namespace Battle
 
         public void CastAbility(Unit caster)
         {
-            EventManager.Trigger(new StartAbilityCastEvent(this,caster));
+            EventManager.Trigger(new StartAbilityCastEvent(this,caster,currentSelectedTiles));
             
-            ClearTileSelection();
+            //ClearTileSelection();
             
             SO.CastAbility(caster,currentSelectedTiles.ToArray());
             
@@ -84,11 +94,13 @@ namespace Battle
             }
         }
 
-        public void AddTileToSelection(Tile tile)
+        public void AddTileToSelection(Unit caster,Tile tile)
         {
+            if(!IsTileSelectable(caster,tile)) return;
+            
             if (currentSelectedTiles.Contains(tile))
             {
-                RemoveTileFromSelection(tile);
+                RemoveTileFromSelection(caster,tile);
                 return;
             }
             currentSelectedTiles.Add(tile);
@@ -97,15 +109,15 @@ namespace Battle
             
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
             
-            if(CurrentSelectionCount > SO.ExpectedSelections) RemoveTileFromSelection(currentSelectedTiles[0]);
+            if(CurrentSelectionCount > SO.ExpectedSelections) RemoveTileFromSelection(caster,currentSelectedTiles[0]);
         }
 
-        public void RemoveTileFromSelection(Tile tile)
+        public void RemoveTileFromSelection(Unit caster,Tile tile)
         {
             if(!currentSelectedTiles.Contains(tile)) return;
             currentSelectedTiles.Remove(tile);
             
-            tile.SetAppearance(Tile.Appearance.Default);
+            tile.SetAppearance(IsTileSelectable(caster,tile) ? Tile.Appearance.Selectable : Tile.Appearance.Unselectable);
             
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
         }

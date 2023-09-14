@@ -40,7 +40,7 @@ namespace Battle
 
             EnableEndTurnButton(false);
 
-            ShowAbilityTargetSelection(false);
+            ShowAbilityTargetSelectionButtons(false);
         }
 
         private void AddCallbacks()
@@ -120,23 +120,19 @@ namespace Battle
         
         #region Ability Target Selection
         
-        private void ShowAbilityTargetSelection(bool value)
+        private void ShowAbilityTargetSelectionButtons(bool value)
         {
             abilityTargetSelectionUIObj.SetActive(value);
         }
 
-        private void UpdateAbilityTargetSelection(UnitAbilityInstance ability)
+        private void UpdateAbilityTargetSelection(Unit _,UnitAbilityInstance ability)
         {
             if (ability == null)
             {
-                ShowAbilityTargetSelection(false);
+                ShowAbilityTargetSelectionButtons(false);
             
                 currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated -= UpdateAbilitySelectionLeftText;
                 currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated -= UpdateConfirmAbilityTargetSelectionButton;
-
-                currentAbilityInTargetSelection = null;
-
-                //TODO- Clear selection
                 
                 currentAbilityInTargetSelection = null;
                 return;
@@ -150,7 +146,7 @@ namespace Battle
             UpdateAbilitySelectionLeftText(0);
             UpdateConfirmAbilityTargetSelectionButton(0);
             
-            ShowAbilityTargetSelection(!currentAbilityInTargetSelection.SO.IsInstantCast);
+            ShowAbilityTargetSelectionButtons(!currentAbilityInTargetSelection.SO.IsInstantCast);
         }
 
         private void UpdateConfirmAbilityTargetSelectionButton(int _)

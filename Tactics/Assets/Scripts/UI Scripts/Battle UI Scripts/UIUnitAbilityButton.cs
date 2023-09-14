@@ -29,6 +29,8 @@ public class UIUnitAbilityButton : MonoBehaviour
     
     private void StartAbilityTargetSelection()
     {
+        Debug.Log("CLICK");
         EventManager.Trigger(new StartAbilityTargetSelectionEvent(associatedAbility,associatedUnit));
+        Debug.Log("After CLICK");
     }
 }

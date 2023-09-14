@@ -27,7 +27,10 @@ namespace Battle
             InputManager.LeftClickEvent += ClickTile;
             
             EventManager.AddListener<EndUnitTurnEvent>(ClearSelectableTilesOnTurnEnd);
-            EventManager.AddListener<EndAbilityTargetSelectionEvent>(ClearSelectableTilesOnEndAbilityTargetSelection);
+            
+            AbilityManager.OnUpdatedCastingAbility += UpdateAbilityTargetSelection;
+            
+            EventManager.AddListener<StartAbilityCastEvent>(ShowSelectedTilesOnStartAbilityCast);
 
             void ClearSelectableTilesOnTurnEnd(EndUnitTurnEvent _)
             {
@@ -36,12 +39,9 @@ namespace Battle
             
             void ClearSelectableTilesOnEndAbilityTargetSelection(EndAbilityTargetSelectionEvent _)
             {
+                Debug.Log("Clear tiles after tiles are selected");
+                
                 ResetTileAppearance();
-            }
-            
-            void ClickTile()
-            {
-                EventManager.Trigger(new ClickTileEvent(GetClickTile()));
             }
         }
 
@@ -49,21 +49,53 @@ namespace Battle
         {
             tiles = list;
         }
-
-        public Tile GetClickTile()
-        {
-            InputManager.CastCamRay(out var tileHit, worldLayers);
-
-            return tileHit.transform != null ? tileHit.transform.GetComponent<Tile>() : null;
-        }
-
+        
         private void ResetTileAppearance()
         {
-            foreach (var tile in tiles)
+            foreach (var tile in AllTiles)
             {
                 tile.SetAppearance(Tile.Appearance.Default);
                 tile.SetPathRing(0);
             }
+        }
+        
+        private void UpdateAbilityTargetSelection(Unit caster,UnitAbilityInstance ability)
+        {
+            if (ability == null)
+            {
+                ResetTileAppearance();
+                return;
+            }
+            
+            foreach (var tile in AllTiles)
+            {
+                tile.SetAppearance(ability.IsTileSelectable(caster,tile) ? Tile.Appearance.Selectable : Tile.Appearance.Unselectable );
+            }
+        }
+        
+        private void ShowSelectedTilesOnStartAbilityCast(StartAbilityCastEvent ctx)
+        {
+            ResetTileAppearance();
+
+            var selected = ctx.SelectedTiles;
+            if(selected.Count <= 0) return;
+            
+            foreach (var tile in selected)
+            {
+                tile.SetAppearance(Tile.Appearance.Selected);
+            }
+        }
+        
+        private void ClickTile()
+        {
+            EventManager.Trigger(new ClickTileEvent(GetClickTile()));
+        }
+        
+        private Tile GetClickTile()
+        {
+            InputManager.CastCamRay(out var tileHit, worldLayers);
+
+            return tileHit.transform != null ? tileHit.transform.GetComponent<Tile>() : null;
         }
     }
 }

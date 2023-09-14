@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Battle
@@ -8,9 +9,10 @@ namespace Battle
     
     public class AbilityManager : MonoBehaviour
     {
+        // TODO - Remove if unused
         [SerializeField] private TileManager tileManager;
 
-        public static event Action<UnitAbilityInstance> OnUpdatedCastingAbility;
+        public static event Action<Unit,UnitAbilityInstance> OnUpdatedCastingAbility;
         private UnitAbilityInstance currentCastingAbilityInstance;
 
         private void Start()
@@ -22,16 +24,17 @@ namespace Battle
 
         private void StartAbilitySelection(StartAbilityTargetSelectionEvent ctx)
         {
-            // check if already casting ability
-            // if yes and same ability cancel cast
-            // if yes and differenet ability, cancel cast and start again with new ability
-            
-            var cancel = (currentCastingAbilityInstance == ctx.Ability);
-
             if (currentCastingAbilityInstance != null)
             {
+                var cancel = (currentCastingAbilityInstance == ctx.Ability);
+                
                 EventManager.Trigger(new EndAbilityTargetSelectionEvent(true));
-                if (cancel) return;
+                
+                if(cancel) return;
+                
+                EventManager.Trigger(ctx);
+                
+                return;
             }
             
             currentCastingAbilityInstance = ctx.Ability;
@@ -41,7 +44,7 @@ namespace Battle
             
             EventManager.AddListener<ClickTileEvent>(SelectTile);
             
-            OnUpdatedCastingAbility?.Invoke(currentCastingAbilityInstance);
+            OnUpdatedCastingAbility?.Invoke(caster,currentCastingAbilityInstance);
 
             if (currentCastingAbilityInstance.SO.IsInstantCast)
             {
@@ -52,17 +55,16 @@ namespace Battle
             {
                 EventManager.RemoveListener<ClickTileEvent>(SelectTile);
                 
-                OnUpdatedCastingAbility?.Invoke(null);
+                OnUpdatedCastingAbility?.Invoke(caster,null);
+                
+                var ability = currentCastingAbilityInstance;
+                currentCastingAbilityInstance = null;
                 
                 if (selectionEvent.Canceled)
                 {
-                    currentCastingAbilityInstance.ClearTileSelection();
-                    currentCastingAbilityInstance = null;
+                    //currentCastingAbilityInstance.ClearTileSelection();
                     return;
                 }
-
-                var ability = currentCastingAbilityInstance;
-                currentCastingAbilityInstance = null;
                 
                 ability.CastAbility(caster);
             }
@@ -73,7 +75,7 @@ namespace Battle
                 
                 if(tile == null) return;
 
-                currentCastingAbilityInstance.AddTileToSelection(tile);
+                currentCastingAbilityInstance.AddTileToSelection(caster,tile);
             }
         }
     }
@@ -109,11 +111,13 @@ namespace Battle.AbilityEvent
     {
         public UnitAbilityInstance Ability { get; }
         public Unit Caster { get; }
+        public List<Tile> SelectedTiles { get; }
 
-        public StartAbilityCastEvent(UnitAbilityInstance ability,Unit caster)
+        public StartAbilityCastEvent(UnitAbilityInstance ability,Unit caster,List<Tile> selectedTiles)
         {
             Ability = ability;
             Caster = caster;
+            SelectedTiles = selectedTiles;
         }
     }
 
