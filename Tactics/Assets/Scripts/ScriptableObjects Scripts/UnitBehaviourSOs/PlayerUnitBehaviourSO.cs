@@ -10,13 +10,8 @@ namespace Battle.ScriptableObjects
     [CreateAssetMenu(menuName = "Battle Scriptables/UnitBehaviour/PlayerUnit")]
     public class PlayerUnitBehaviourSO : UnitBehaviourSO
     {
-        private List<Tile> selectableTilesForMovement = new List<Tile>();
-        private Unit controlledUnit;
-
         public override void InitBehaviour(Unit unit)
         {
-            controlledUnit = unit;
-
             EventManager.AddListener<EndUnitTurnEvent>(EndPlayerControl);
             
             void EndPlayerControl(EndUnitTurnEvent ctx)

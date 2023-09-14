@@ -114,7 +114,6 @@ namespace Battle
             
             if(SO.SkipTargetConfirmation)
             {
-                Debug.Log("Skip Confirmation and valid tile");
                 EventManager.Trigger(new EndAbilityTargetSelectionEvent(false));
             }
         }

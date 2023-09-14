@@ -8,8 +8,10 @@ namespace Battle.ScriptableObjects
     public class UnitStatsSO : ScriptableObject
     {
         [field: SerializeField] public Sprite Portrait { get; private set; }
+        [field: SerializeField] public string Name { get; private set; }
+        [field: SerializeField] public string Description { get; private set; }
+        [field: SerializeField] public int MaxHp { get; private set; }
         [field: SerializeField] public UnitBehaviourSO Behaviour { get; private set; }
-        
         [field: SerializeField] public List<UnitAbilitySO> Abilities { get; private set; }
 
         [field: SerializeField, Tooltip("Maximum Tiles that can be moved during a turn")]

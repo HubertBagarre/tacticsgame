@@ -13,7 +13,8 @@ namespace Battle
         [field: SerializeField] public Tile Tile { get; private set; }
         [field: SerializeField] public int Team { get; private set; } //0 is player
         [field: SerializeField] public UnitStatsSO Stats { get; private set; }
-
+        public Sprite Portrait => Stats.Portrait;
+        
         [field: Header("Current Flags")]
         [field: SerializeField] public bool IsActive { get; private set; }
         [field: SerializeField] public bool CanMove { get; private set; } = true;
@@ -26,8 +27,9 @@ namespace Battle
         [field:SerializeField] public int Speed { get; protected set; }
         public float DecayRate => Speed / 100f;
         [field:SerializeField] public float DistanceFromTurnStart { get; protected set; }
-        public Sprite Portrait => Stats.Portrait;
-
+        
+        [field:SerializeField] public int CurrentHp { get; protected set; }
+        
         public List<UnitAbilityInstance> AbilityInstances { get; } = new ();
 
         public void InitUnit(Tile tile, int team, UnitStatsSO so)
@@ -39,6 +41,7 @@ namespace Battle
             Movement = so.BaseMovement;
             Speed = so.BaseSpeed;
             Behaviour = so.Behaviour;
+            CurrentHp = so.MaxHp;
 
             IsActive = true;
             
@@ -52,6 +55,7 @@ namespace Battle
             Movement = Stats.BaseMovement;
             Speed = Stats.BaseSpeed;
             Behaviour = Stats.Behaviour;
+            CurrentHp = Stats.MaxHp;
 
             AbilityInstances.Clear();
             foreach (var ability in Stats.Abilities)
@@ -100,12 +104,13 @@ namespace Battle
             {
                 EventManager.Trigger(new UnitMovementStartEvent(this));
 
-                foreach (var tile in path)
+                for (var index = 0; index < path.Count && MovementLeft > 0; index++)
                 {
+                    var tile = path[index];
                     yield return new WaitForSeconds(0.5f);
 
                     transform.position = tile.transform.position;
-                    
+
                     MovementLeft--;
                     tile.SetUnit(this);
                     SetTile(tile);
