@@ -38,7 +38,7 @@ namespace Battle
         {
             AddCallbacks();
 
-            EnableEndTurnButton(false);
+            ShowEndTurnButton(false);
 
             ShowAbilityTargetSelectionButtons(false);
         }
@@ -53,7 +53,9 @@ namespace Battle
             //Player Abilities Buttons events
             EventManager.AddListener<StartPlayerControlEvent>(ShowPlayerButtonsOnPlayerTurnStart);
             EventManager.AddListener<EndPlayerControlEvent>(HidePlayerButtonsOnPlayerTurnEnd);
-            EventManager.AddListener<StartAbilityCastEvent>(HideAbilityButtonsOnAbilityCast);
+            EventManager.AddListener<EndAbilityTargetSelectionEvent>(ShowEndTurnButtonOnAbilityTargetSelectionCancel);
+            EventManager.AddListener<StartAbilityCastEvent>(HidePlayerButtonsOnAbilityCast);
+            //EventManager.AddListener<StartAbilityCastEvent> is in HidePlayerButtonsOnAbilityCast()
             
             AbilityManager.OnUpdatedCastingAbility += UpdateAbilityTargetSelection;
             
@@ -69,10 +71,17 @@ namespace Battle
             {
                 EventManager.Trigger(new EndAbilityTargetSelectionEvent(false));
             }
+
+            void ShowEndTurnButtonOnAbilityTargetSelectionCancel(EndAbilityTargetSelectionEvent ctx)
+            {
+                if(ctx.Canceled) ShowEndTurnButton(true);
+            }
         }
         
         private void ShowPlayerButtonsOnPlayerTurnStart(StartPlayerControlEvent ctx)
         {
+            ShowEndTurnButton(true);
+            
             EnableEndTurnButton(true);
 
             ShowUnitAbilitiesButton(ctx.PlayerUnit);
@@ -80,14 +89,16 @@ namespace Battle
 
         private void HidePlayerButtonsOnPlayerTurnEnd(EndPlayerControlEvent ctx)
         {
+            ShowEndTurnButton(false);
+            
             EnableEndTurnButton(false);
 
             HideUnitAbilitiesButton();
         }
 
-        private void HideAbilityButtonsOnAbilityCast(StartAbilityCastEvent ctx)
+        private void HidePlayerButtonsOnAbilityCast(StartAbilityCastEvent ctx)
         {
-            EnableEndTurnButton(false);
+            ShowEndTurnButton(false);
 
             HideUnitAbilitiesButton();
             
@@ -97,10 +108,17 @@ namespace Battle
             
             void ShowAbilityButtonsAfterAbilityCast(EndAbilityCastEvent endAbilityCastEvent)
             {
+                ShowEndTurnButton(true);
+                
                 EnableEndTurnButton(true);
 
                 ShowUnitAbilitiesButton(ctx.Caster);
             }
+        }
+        
+        private void ShowEndTurnButton(bool value)
+        {
+            endTurnButton.gameObject.SetActive(value);
         }
 
         private void EnableEndTurnButton(bool value)
@@ -113,6 +131,8 @@ namespace Battle
         private void ShowAbilityTargetSelectionButtons(bool value)
         {
             abilityTargetSelectionUIObj.SetActive(value);
+            
+            if(value) ShowEndTurnButton(false);
         }
 
         private void UpdateAbilityTargetSelection(Unit _,UnitAbilityInstance ability)
@@ -120,7 +140,7 @@ namespace Battle
             if (ability == null)
             {
                 ShowAbilityTargetSelectionButtons(false);
-            
+
                 currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated -= UpdateAbilitySelectionLeftText;
                 currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated -= UpdateConfirmAbilityTargetSelectionButton;
                 
