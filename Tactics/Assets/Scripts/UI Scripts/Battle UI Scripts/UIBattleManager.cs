@@ -64,12 +64,12 @@ namespace Battle
 
             void CancelSelection()
             {
-                EventManager.Trigger(new EndAbilitySelectionEvent(true));
+                EventManager.Trigger(new EndAbilityTargetSelectionEvent(true));
             }
 
             void ConfirmSelection()
             {
-                EventManager.Trigger(new EndAbilitySelectionEvent(false));
+                EventManager.Trigger(new EndAbilityTargetSelectionEvent(false));
             }
         }
         
@@ -112,8 +112,6 @@ namespace Battle
 
         private void ShowWalkableTiles(StartUnitMovementSelectionEvent ctx)
         {
-            Debug.Log("Showing Walkable Tiles");
-            
             foreach (var tile in ctx.SelectableTiles)
             {
                 tile.SetAppearance(Tile.Appearance.Selectable);

@@ -38,6 +38,8 @@ namespace Battle
             EventManager.AddListener<ClickTileEvent>(TryMoveToTile);
 
             EventManager.Trigger(new StartUnitMovementSelectionEvent(unit, selectableTilesForMovement));
+            
+            
 
             void SetSelectableTilesForMovement(Tile origin, int range, bool includeDiag, Func<Tile, bool> extraCondition = null)
             {
@@ -88,17 +90,26 @@ namespace Battle
                 
                 if(destination == null) return;
                 if(!selectableTilesForMovement.Contains(destination)) return;
-
-                foreach (var tile in selectableTilesForMovement)
-                {
-                    tile.SetAppearance(Tile.Appearance.Default);
-                }
-                destination.SetAppearance(Tile.Appearance.Selected);
                 
                 EventManager.RemoveListener<ClickTileEvent>(TryMoveToTile);
+
+                if (unit.Tile == destination)
+                {
+                    Debug.Log("Destination is same as current tile");
+                    EndAbility();
+                    return;
+                }
+                
+                destination.SetAppearance(Tile.Appearance.Selected);
                 
                 var path = GetPathFromSelectableTiles(destination);
                 
+                foreach (var tile in selectableTilesForMovement)
+                {
+                    tile.SetAppearance(Tile.Appearance.Default);
+                    tile.SetPathRing(0);
+                }
+
                 EventManager.AddListener<UnitMovementEndEvent>(EndMovementAbility,true);
                 
                 unit.MoveUnit(path);

@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Battle
@@ -19,29 +17,38 @@ namespace Battle
         {
             currentCastingAbilityInstance = null;
             
-            EventManager.AddListener<StartAbilitySelectionEvent>(StartAbilitySelection);
+            EventManager.AddListener<StartAbilityTargetSelectionEvent>(StartAbilitySelection);
         }
 
-        private void StartAbilitySelection(StartAbilitySelectionEvent ctx)
+        private void StartAbilitySelection(StartAbilityTargetSelectionEvent ctx)
         {
+            // check if already casting ability
+            // if yes and same ability cancel cast
+            // if yes and differenet ability, cancel cast and start again with new ability
+            
             var cancel = (currentCastingAbilityInstance == ctx.Ability);
-            
-            if (currentCastingAbilityInstance != null) EventManager.Trigger(new EndAbilitySelectionEvent(true));
-            
-            if(cancel) return;
 
+            if (currentCastingAbilityInstance != null)
+            {
+                EventManager.Trigger(new EndAbilityTargetSelectionEvent(true));
+                if (cancel) return;
+            }
+            
             currentCastingAbilityInstance = ctx.Ability;
             var caster = ctx.Caster;
             
-            EventManager.AddListener<EndAbilitySelectionEvent>(TryCastAbility,true);
+            EventManager.AddListener<EndAbilityTargetSelectionEvent>(TryCastAbility,true);
             
             EventManager.AddListener<ClickTileEvent>(SelectTile);
             
             OnUpdatedCastingAbility?.Invoke(currentCastingAbilityInstance);
-            
-            if (currentCastingAbilityInstance.SO.IsInstantCast) EventManager.Trigger(new EndAbilitySelectionEvent(false));
 
-            void TryCastAbility(EndAbilitySelectionEvent selectionEvent)
+            if (currentCastingAbilityInstance.SO.IsInstantCast)
+            {
+                EventManager.Trigger(new EndAbilityTargetSelectionEvent(false));
+            }
+
+            void TryCastAbility(EndAbilityTargetSelectionEvent selectionEvent)
             {
                 EventManager.RemoveListener<ClickTileEvent>(SelectTile);
                 
@@ -53,8 +60,11 @@ namespace Battle
                     currentCastingAbilityInstance = null;
                     return;
                 }
+
+                var ability = currentCastingAbilityInstance;
+                currentCastingAbilityInstance = null;
                 
-                currentCastingAbilityInstance.CastAbility(caster);
+                ability.CastAbility(caster);
             }
 
             void SelectTile(ClickTileEvent clickEvent)
@@ -73,23 +83,23 @@ namespace Battle
 
 namespace Battle.AbilityEvent
 {
-    public class StartAbilitySelectionEvent
+    public class StartAbilityTargetSelectionEvent
     {
         public UnitAbilityInstance Ability { get; }
         public Unit Caster { get; }
 
-        public StartAbilitySelectionEvent(UnitAbilityInstance ability,Unit caster)
+        public StartAbilityTargetSelectionEvent(UnitAbilityInstance ability,Unit caster)
         {
             Ability = ability;
             Caster = caster;
         }
     }
 
-    public class EndAbilitySelectionEvent
+    public class EndAbilityTargetSelectionEvent
     {
         public bool Canceled { get; }
 
-        public EndAbilitySelectionEvent(bool canceled)
+        public EndAbilityTargetSelectionEvent(bool canceled)
         {
             Canceled = canceled;
         }

@@ -59,26 +59,29 @@ namespace Battle
             currentSelectedTiles.Clear();
         }
 
+        public override string ToString()
+        {
+            return $"{SO.name} (Instance)";
+        }
+
         public void CastAbility(Unit caster)
         {
             EventManager.Trigger(new StartAbilityCastEvent(this,caster));
             
-            SO.CastAbility(caster,currentSelectedTiles.ToArray());
-
             ClearTileSelection();
+            
+            SO.CastAbility(caster,currentSelectedTiles.ToArray());
+            
+            currentSelectedTiles.Clear();
+            OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
         }
 
         public void ClearTileSelection()
         {
-            Debug.Log("Clearing Tiles");
-            
             foreach (var tile in currentSelectedTiles)
             {
                 tile.SetAppearance(Tile.Appearance.Default);
             }
-            
-            currentSelectedTiles.Clear();
-            OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
         }
 
         public void AddTileToSelection(Tile tile)

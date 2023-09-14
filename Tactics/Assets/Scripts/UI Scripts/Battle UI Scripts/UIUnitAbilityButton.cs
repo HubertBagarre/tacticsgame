@@ -1,3 +1,4 @@
+using System;
 using Battle;
 using Battle.AbilityEvent;
 using UnityEngine;
@@ -15,16 +16,19 @@ public class UIUnitAbilityButton : MonoBehaviour
     private UnitAbilityInstance associatedAbility;
     private Unit associatedUnit;
 
+    private void Start()
+    {
+        Button.onClick.AddListener(StartAbilityTargetSelection);
+    }
+
     public void LinkAbility(UnitAbilityInstance ability,Unit caster)
     {
         associatedAbility = ability;
         associatedUnit = caster;
-        
-        Button.onClick.AddListener(StartAbilityTargetSelection);
     }
     
     private void StartAbilityTargetSelection()
     {
-        EventManager.Trigger(new StartAbilitySelectionEvent(associatedAbility,associatedUnit));
+        EventManager.Trigger(new StartAbilityTargetSelectionEvent(associatedAbility,associatedUnit));
     }
 }

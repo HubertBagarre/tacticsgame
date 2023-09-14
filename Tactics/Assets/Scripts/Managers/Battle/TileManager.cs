@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Battle.UIEvents;
 using UnityEngine;
 
 namespace Battle
@@ -26,18 +27,18 @@ namespace Battle
             InputManager.LeftClickEvent += ClickTile;
             
             EventManager.AddListener<EndUnitTurnEvent>(ClearSelectableTilesOnTurnEnd);
-            EventManager.AddListener<EndAbilitySelectionEvent>(ClearSelectableTilesOnEndAbilityTargetSelection);
+            EventManager.AddListener<EndAbilityTargetSelectionEvent>(ClearSelectableTilesOnEndAbilityTargetSelection);
 
             void ClearSelectableTilesOnTurnEnd(EndUnitTurnEvent _)
             {
                 ResetTileAppearance();
             }
             
-            void ClearSelectableTilesOnEndAbilityTargetSelection(EndAbilitySelectionEvent _)
+            void ClearSelectableTilesOnEndAbilityTargetSelection(EndAbilityTargetSelectionEvent _)
             {
                 ResetTileAppearance();
             }
-
+            
             void ClickTile()
             {
                 EventManager.Trigger(new ClickTileEvent(GetClickTile()));
