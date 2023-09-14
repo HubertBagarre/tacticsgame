@@ -9,9 +9,9 @@ namespace Battle.ScriptableObjects
     {
         [SerializeField] private int range = 2;
         
-        protected override bool TileSelectionMethod(Unit caster, Tile tile, List<Tile> currentlySelectedTiles)
+        protected override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
         {
-            return caster.Tile.IsInSurroundingTileDistance(tile,range);
+            return caster.Tile.IsInSurroundingTileDistance(selectableTile,range);
         }
 
         protected override void AbilityEffect(Unit caster, Tile[] targetTiles)

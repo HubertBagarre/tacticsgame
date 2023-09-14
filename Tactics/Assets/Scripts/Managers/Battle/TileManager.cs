@@ -31,17 +31,16 @@ namespace Battle
             AbilityManager.OnUpdatedCastingAbility += UpdateAbilityTargetSelection;
             
             EventManager.AddListener<StartAbilityCastEvent>(ShowSelectedTilesOnStartAbilityCast);
+            EventManager.AddListener<EndAbilityCastEvent>(ClearSelectedTilesOnCastEnd);
 
             void ClearSelectableTilesOnTurnEnd(EndUnitTurnEvent _)
             {
-                ResetTileAppearance();
+                ResetTileAppearance(true);
             }
             
-            void ClearSelectableTilesOnEndAbilityTargetSelection(EndAbilityTargetSelectionEvent _)
+            void ClearSelectedTilesOnCastEnd(EndAbilityCastEvent _)
             {
-                Debug.Log("Clear tiles after tiles are selected");
-                
-                ResetTileAppearance();
+                ResetTileAppearance(true);
             }
         }
 
@@ -50,12 +49,12 @@ namespace Battle
             tiles = list;
         }
         
-        private void ResetTileAppearance()
+        private void ResetTileAppearance(bool resetPathRing)
         {
             foreach (var tile in AllTiles)
             {
                 tile.SetAppearance(Tile.Appearance.Default);
-                tile.SetPathRing(0);
+                if(resetPathRing) tile.SetPathRing(0);
             }
         }
         
@@ -63,7 +62,7 @@ namespace Battle
         {
             if (ability == null)
             {
-                ResetTileAppearance();
+                ResetTileAppearance(false);
                 return;
             }
             
@@ -75,7 +74,7 @@ namespace Battle
         
         private void ShowSelectedTilesOnStartAbilityCast(StartAbilityCastEvent ctx)
         {
-            ResetTileAppearance();
+            ResetTileAppearance(false);
 
             var selected = ctx.SelectedTiles;
             if(selected.Count <= 0) return;

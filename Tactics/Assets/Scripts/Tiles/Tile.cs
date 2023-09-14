@@ -120,14 +120,19 @@ namespace Battle
         /// <returns></returns>
         public bool IsInSurroundingTileDistance(Tile targetTile,int range,Func<Tile,bool> condition = null)
         {
+            if (range <= 0 && this != targetTile) return false;
+            
+            if (this == targetTile) return true;
+            
             condition ??= _ => true;
             
-            var found = false;
             var iteration = 1;
             var alreadyvisited = new List<Tile>();
             var surroundingTiles = GetSurroundingTiles(condition);
+            
+            UpdatePathRing();
 
-            return this == targetTile || surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
+            return surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
 
             bool SearchInTiles(List<Tile> previouslySearchedTiles)
             {
@@ -136,7 +141,6 @@ namespace Battle
                 alreadyvisited.AddRange(surroundingTiles);
                 surroundingTiles = new List<Tile>();
                 
-
                 foreach (var previouslySearchedTile in previouslySearchedTiles)
                 {
                     surroundingTiles.AddRange(previouslySearchedTile.GetSurroundingTiles(condition)
@@ -144,7 +148,17 @@ namespace Battle
                         .Where(tile => !surroundingTiles.Contains(tile)));
                 }
                 
+                UpdatePathRing();
+                
                 return surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
+            }
+            
+            void UpdatePathRing()
+            {
+                foreach (var tile in surroundingTiles)
+                {
+                    tile.SetPathRing(iteration);
+                }
             }
         }
         
@@ -157,14 +171,19 @@ namespace Battle
         /// <returns></returns>
         public bool IsInAdjacentTileDistance(Tile targetTile,int range,Func<Tile,bool> condition = null)
         {
+            if (range <= 0 && this != targetTile) return false;
+            
+            if (this == targetTile) return true;
+            
             condition ??= _ => true;
             
-            var found = false;
             var iteration = 1;
             var alreadyvisited = new List<Tile>();
             var surroundingTiles = GetAdjacentTiles(condition);
+
+            UpdatePathRing();
             
-            return this == targetTile || surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
+            return surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
 
             bool SearchInTiles(List<Tile> previouslySearchedTiles)
             {
@@ -180,7 +199,17 @@ namespace Battle
                         .Where(tile => !surroundingTiles.Contains(tile)));
                 }
                 
+                UpdatePathRing();
+                
                 return surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
+            }
+
+            void UpdatePathRing()
+            {
+                foreach (var tile in surroundingTiles)
+                {
+                    tile.SetPathRing(iteration);
+                }
             }
         }
 

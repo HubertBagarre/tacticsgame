@@ -102,7 +102,7 @@ namespace Battle
 
                 foreach (var tile in path)
                 {
-                    yield return null;
+                    yield return new WaitForSeconds(0.5f);
 
                     transform.position = tile.transform.position;
                     

@@ -25,9 +25,9 @@ namespace Battle
             return TileSelectionMethod(caster,tile,currentlySelectedTiles);
         }
 
-        protected virtual bool TileSelectionMethod(Unit caster,Tile tile,List<Tile> currentlySelectedTiles)
+        protected virtual bool TileSelectionMethod(Unit caster,Tile selectableTile,List<Tile> currentlySelectedTiles)
         {
-            return tile != null;
+            return selectableTile != null;
         }
         
         public void CastAbility(Unit caster, Tile[] targetTiles)
@@ -111,6 +111,12 @@ namespace Battle
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
             
             if(CurrentSelectionCount > SO.ExpectedSelections) RemoveTileFromSelection(caster,currentSelectedTiles[0]);
+            
+            if(SO.SkipTargetConfirmation)
+            {
+                Debug.Log("Skip Confirmation and valid tile");
+                EventManager.Trigger(new EndAbilityTargetSelectionEvent(false));
+            }
         }
 
         public void RemoveTileFromSelection(Unit caster,Tile tile)
