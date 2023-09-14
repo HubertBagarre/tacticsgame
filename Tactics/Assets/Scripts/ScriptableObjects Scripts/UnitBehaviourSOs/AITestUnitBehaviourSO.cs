@@ -24,7 +24,7 @@ namespace Battle.ScriptableObjects
 
             EventManager.AddListener<UnitMovementEndEvent>(EndTurnOnMovementEnd, true);
 
-            unit.MoveUnit(unit.Tile.GetDirectNeighbors().ToList());
+            unit.MoveUnit(unit.Tile.GetAdjacentTiles().ToList());
 
             void EndTurnOnMovementEnd(UnitMovementEndEvent ctx)
             {

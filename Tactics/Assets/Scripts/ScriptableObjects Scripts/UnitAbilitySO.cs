@@ -16,7 +16,8 @@ namespace Battle
         [field: SerializeField] public string Description { get; private set; }
         [field: SerializeField] public int ExpectedSelections { get; private set; }
         [field: SerializeField] public int Cooldown { get; private set; }
-        [field: SerializeField] public bool IsInstantCast { get; private set; } = false;
+        [field: SerializeField] public bool SkipTargetSelection { get; private set; } = false;
+        [field: SerializeField] public bool SkipTargetConfirmation { get; private set; } = false;
         [field: SerializeField] public bool EndUnitTurnAfterCast { get; private set; } = true;
         
         public bool IsTileSelectable(Unit caster,Tile tile,List<Tile> currentlySelectedTiles)

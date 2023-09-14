@@ -12,6 +12,11 @@ namespace Battle
     [CreateAssetMenu(menuName = "Battle Scriptables/Unit Ability/Special/PlayerMovement")]
     public class PlayerMovementAbilitySO : UnitAbilitySO
     {
+        protected override bool TileSelectionMethod(Unit caster, Tile tile, List<Tile> currentlySelectedTiles)
+        {
+            return caster.Tile.IsInAdjacentTileDistance(tile,caster.MovementLeft,caster.Stats.WalkableTileSelector);
+        }
+        
         protected override void AbilityEffect(Unit caster, Tile[] targetTiles)
         {
             SetSelectableTilesForMovementAndSetInputs(caster);
@@ -62,7 +67,7 @@ namespace Battle
                 {
                     if (iteration >= range) return;
 
-                    var neighbors = justAdded.SelectMany(tile => tile.GetDirectNeighbors(includeDiag)).Distinct()
+                    var neighbors = justAdded.SelectMany(tile => tile.GetAdjacentTiles()).Distinct()
                         .ToList();
 
                     var validTiles = neighbors
@@ -131,7 +136,7 @@ namespace Battle
 
                 for (int i = destination.PathRing - 1; i >= 1; i--)
                 {
-                    lastAdded = lastAdded.GetDirectNeighbors().FirstOrDefault(tile => tile.PathRing == i);
+                    lastAdded = lastAdded.GetAdjacentTiles().FirstOrDefault(tile => tile.PathRing == i);
                     if (lastAdded == null) break;
                     path.Add(lastAdded);
                 }

@@ -1,5 +1,8 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Battle
@@ -76,23 +79,109 @@ namespace Battle
             return currentUnit;
         }
 
-        public Tile[] GetDirectNeighbors(bool includeDiag = false)
+        public List<Tile> GetAdjacentTiles(Func<Tile,bool> condition = null)
         {
-            var tiles = includeDiag ? neighbors : new[] {neighbors[0], neighbors[1], neighbors[2], neighbors[3]};
-
-            return tiles.Where(tile => tile != null).ToArray();
+            condition ??= _ => true;
+            
+            return new List<Tile> {neighbors[0], neighbors[1], neighbors[2], neighbors[3]}.Where(tile => tile != null).Where(condition).ToList();
         }
 
-        public Tile[] GetNeighbors(int range, bool includeDiag = false)
+        public List<Tile> GetSurroundingTiles(Func<Tile,bool> condition = null)
         {
-            //TODO Implement GetNeighbors method
+            condition ??= _ => true;
+            
+            return neighbors.Where(tile => tile != null).Where(condition).ToList();
+        }
 
-            return range switch
+        public List<Tile> GetSurroundingTiles(int range,Func<Tile,bool> condition = null)
+        {
+            condition ??= _ => true;
+
+            var tiles = new List<Tile>();
+
+            if (range <= 0) return tiles;
+            if (range == 1)
             {
-                <= 0 => new[] {this},
-                1 => GetDirectNeighbors(),
-                _ => GetDirectNeighbors()
-            };
+                tiles.AddRange(GetSurroundingTiles().Where(condition));
+                return tiles;
+            }
+            
+            // TODO - do kinda of the same as below, but return list instead of bool (return already visited xd)
+            
+            return tiles;
+        }
+
+        /// <summary>
+        /// Tries to path from this to targetTile
+        /// </summary>
+        /// <param name="targetTile"></param>
+        /// <param name="range"></param>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        public bool IsInSurroundingTileDistance(Tile targetTile,int range,Func<Tile,bool> condition = null)
+        {
+            condition ??= _ => true;
+            
+            var found = false;
+            var iteration = 1;
+            var alreadyvisited = new List<Tile>();
+            var surroundingTiles = GetSurroundingTiles(condition);
+
+            return this == targetTile || surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
+
+            bool SearchInTiles(List<Tile> previouslySearchedTiles)
+            {
+                iteration++;
+                if (iteration > range) return false;
+                alreadyvisited.AddRange(surroundingTiles);
+                surroundingTiles = new List<Tile>();
+                
+
+                foreach (var previouslySearchedTile in previouslySearchedTiles)
+                {
+                    surroundingTiles.AddRange(previouslySearchedTile.GetSurroundingTiles(condition)
+                        .Where(tile => !alreadyvisited.Contains(tile))
+                        .Where(tile => !surroundingTiles.Contains(tile)));
+                }
+                
+                return surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
+            }
+        }
+        
+        /// <summary>
+        /// Tries to path from this to targetTile
+        /// </summary>
+        /// <param name="targetTile"></param>
+        /// <param name="range"></param>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        public bool IsInAdjacentTileDistance(Tile targetTile,int range,Func<Tile,bool> condition = null)
+        {
+            condition ??= _ => true;
+            
+            var found = false;
+            var iteration = 1;
+            var alreadyvisited = new List<Tile>();
+            var surroundingTiles = GetAdjacentTiles(condition);
+            
+            return this == targetTile || surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
+
+            bool SearchInTiles(List<Tile> previouslySearchedTiles)
+            {
+                iteration++;
+                if (iteration > range) return false;
+                alreadyvisited.AddRange(surroundingTiles);
+                surroundingTiles = new List<Tile>();
+
+                foreach (var previouslySearchedTile in previouslySearchedTiles)
+                {
+                    surroundingTiles.AddRange(previouslySearchedTile.GetAdjacentTiles(condition)
+                        .Where(tile => !alreadyvisited.Contains(tile))
+                        .Where(tile => !surroundingTiles.Contains(tile)));
+                }
+                
+                return surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
+            }
         }
 
         public void SetAppearance(Appearance appearance)

@@ -17,4 +17,7 @@ MonoBehaviour:
   <Description>k__BackingField: 
   <ExpectedSelections>k__BackingField: 2
   <Cooldown>k__BackingField: 0
-  <IsInstantCast>k__BackingField: 0
+  <SkipTargetSelection>k__BackingField: 0
+  <SkipTargetConfirmation>k__BackingField: 0
+  <EndUnitTurnAfterCast>k__BackingField: 1
+  range: 3

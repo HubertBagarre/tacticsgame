@@ -146,7 +146,7 @@ namespace Battle
             UpdateAbilitySelectionLeftText(0);
             UpdateConfirmAbilityTargetSelectionButton(0);
             
-            ShowAbilityTargetSelectionButtons(!currentAbilityInTargetSelection.SO.IsInstantCast);
+            ShowAbilityTargetSelectionButtons(!currentAbilityInTargetSelection.SO.SkipTargetSelection);
         }
 
         private void UpdateConfirmAbilityTargetSelectionButton(int _)

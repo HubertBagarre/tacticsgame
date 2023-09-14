@@ -46,7 +46,7 @@ namespace Battle
             
             OnUpdatedCastingAbility?.Invoke(caster,currentCastingAbilityInstance);
 
-            if (currentCastingAbilityInstance.SO.IsInstantCast)
+            if (currentCastingAbilityInstance.SO.SkipTargetSelection)
             {
                 EventManager.Trigger(new EndAbilityTargetSelectionEvent(false));
             }

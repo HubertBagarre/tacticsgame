@@ -7,9 +7,11 @@ namespace Battle.ScriptableObjects
     [CreateAssetMenu(menuName = "Battle Scriptables/Unit Ability/Ping")]
     public class PingAbilitySO : UnitAbilitySO
     {
+        [SerializeField] private int range = 2;
+        
         protected override bool TileSelectionMethod(Unit caster, Tile tile, List<Tile> currentlySelectedTiles)
         {
-            return caster.Tile.GetDirectNeighbors(true).Contains(tile);
+            return caster.Tile.IsInSurroundingTileDistance(tile,range);
         }
 
         protected override void AbilityEffect(Unit caster, Tile[] targetTiles)

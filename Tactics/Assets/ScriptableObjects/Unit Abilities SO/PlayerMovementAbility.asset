@@ -15,7 +15,8 @@ MonoBehaviour:
   <Sprite>k__BackingField: {fileID: 0}
   <Name>k__BackingField: Movement
   <Description>k__BackingField: MovesTheUnit
-  <ExpectedSelections>k__BackingField: 0
+  <ExpectedSelections>k__BackingField: 1
   <Cooldown>k__BackingField: 0
-  <IsInstantCast>k__BackingField: 1
+  <SkipTargetSelection>k__BackingField: 0
+  <SkipTargetConfirmation>k__BackingField: 1
   <EndUnitTurnAfterCast>k__BackingField: 0
