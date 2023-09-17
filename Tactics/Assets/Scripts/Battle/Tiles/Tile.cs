@@ -149,7 +149,7 @@ namespace Battle
                 }
                 
                 UpdatePathRing();
-                
+
                 return surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
             }
             
@@ -159,6 +159,7 @@ namespace Battle
                 {
                     tile.SetPathRing(iteration);
                 }
+                SetPathRing(0);
             }
         }
         
