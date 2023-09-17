@@ -35,6 +35,8 @@ namespace Battle
         
         public List<UnitAbilityInstance> AbilityInstances { get; } = new ();
 
+        public event Action OnTurnStart;
+        public event Action OnTurnEnd;
         public event Action OnDeath;
 
         public void InitUnit(Tile tile, int team, UnitStatsSO so)
@@ -93,6 +95,8 @@ namespace Battle
                 yield break;
             }
 
+            OnTurnStart?.Invoke();
+            
             yield return StartCoroutine(Behaviour.RunBehaviour(this));
             
             EventManager.Trigger(new StartUnitTurnEvent(this));
@@ -101,6 +105,8 @@ namespace Battle
         public IEnumerator EndTurn()
         {
             yield return null; //apply effects
+            
+            OnTurnEnd?.Invoke();
             
             EventManager.Trigger(new EndUnitTurnEvent(this));
         }

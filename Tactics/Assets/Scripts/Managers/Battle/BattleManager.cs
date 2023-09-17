@@ -45,7 +45,7 @@ namespace Battle
 
         private void AddCallbacks()
         {
-            EventManager.AddListener<UnitDeathEvent>(RemoveDeadUnitFromBattle);
+            EventManager.AddListener<UnitDeathEvent>(AddDeadUnitToList);
         }
 
         public void SetupBattle(Level level)
@@ -177,6 +177,12 @@ namespace Battle
 
         private void NextUnitTurn()
         {
+            foreach (var deadUnit in deadUnits)
+            {
+                RemoveEntityFromBattle(deadUnit);
+            }
+            deadUnits.Clear();
+            
             var nextUnit = entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList().First();
             
             DecayTurnValues(nextUnit.TurnOrder);
@@ -185,6 +191,7 @@ namespace Battle
             
             StartEntityTurn(nextUnit);
         }
+
         
         private void AddEntityToBattle(BattleEntity entity,bool createPreview)
         {
@@ -222,11 +229,9 @@ namespace Battle
             entitiesInBattle.Remove(entity);
             
             EventManager.Trigger(new EntityLeaveBattleEvent(entity));
-
-            if (CurrentTurnEntity == entity) EndCurrentEntityTurn();
         }
 
-        private void RemoveDeadUnitFromBattle(UnitDeathEvent ctx)
+        private void AddDeadUnitToList(UnitDeathEvent ctx)
         {
             deadUnits.Add(ctx.Unit);
         }
