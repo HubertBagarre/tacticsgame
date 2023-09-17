@@ -8,6 +8,7 @@ namespace Battle
 {
     using UnitEvents;
     using ScriptableObjects;
+    using BattleEvents;
     
     public class Unit : MonoBehaviour, BattleEntity
     {
@@ -70,15 +71,28 @@ namespace Battle
             Behaviour.InitBehaviour(this);
         }
         
+        public void StartRound()
+        {
+            // effects here
+        }
+
+        public void EndRound()
+        {
+            // effects here
+        }
+
         public void StartTurn()
         {
             MovementLeft = Movement;
 
             //apply effects ?
             
-            EventManager.Trigger(new StartUnitTurnEvent(this));
+            DelayedBattleActionsManager.PlayDelayedAction(Behaviour.RunBehaviour(this),TriggerStartEntityTurnEvent);
             
-            Behaviour.RunBehaviour(this);
+            void TriggerStartEntityTurnEvent()
+            {
+                EventManager.Trigger(new StartEntityTurnEvent(this));
+            }
         }
 
         public void EndTurn()

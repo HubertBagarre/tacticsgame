@@ -17,6 +17,8 @@ public interface BattleEntity
     public void KillEntityInBattle();
     public void ResetTurnValue(float value);
     public void DecayTurnValue(float amount);
+    public void StartRound();
+    public void EndRound();
     public void StartTurn();
     public void EndTurn();
 }

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Linq;
 using Battle.UnitEvents;
 using UnityEngine;
@@ -18,8 +19,10 @@ namespace Battle.ScriptableObjects
 
         }
 
-        public override void RunBehaviour(Unit unit)
+        public override IEnumerator RunBehaviour(Unit unit)
         {
+            yield return null;
+            
             Debug.Log("AI Behaviour");
 
             EventManager.AddListener<UnitMovementEndEvent>(EndTurnOnMovementEnd, true);

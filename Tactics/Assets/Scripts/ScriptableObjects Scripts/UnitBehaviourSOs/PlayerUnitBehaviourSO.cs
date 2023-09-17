@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects
@@ -26,11 +26,12 @@ namespace Battle.ScriptableObjects
         {
         }
 
-        public override void RunBehaviour(Unit unit)
+        public override IEnumerator RunBehaviour(Unit unit)
         {
             EventManager.AddListener<EndAbilityCastEvent>(EndTurnAfterAbilityCast);
             EventManager.AddListener<EndUnitTurnEvent>(RemoveEndTurnListenerAtTurnEnd,true);
-            
+
+            yield return null;
             EventManager.Trigger(new StartPlayerControlEvent(unit));
         }
         

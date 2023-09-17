@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Battle
 {
@@ -13,48 +15,36 @@ namespace Battle
         [field: SerializeField] private UnitManager unitManager;
         [field: SerializeField] private TileGenerator generator;
 
-        private IEnumerator Start()
-        {
-            Setup();
+        [SerializeField] private int levelSceneIndex;
+        
+        [Header("UI")]
+        [SerializeField] private Button startLevelButton;
 
-            yield return null;
-            
-            Run();
+        public static Level SelectedLevel{ get; private set; } =  new Level();
+
+        private void Start()
+        {
+            startLevelButton.onClick.AddListener(GoToLevelScene);
         }
 
-        public void Setup()
+        public void ChangeSelectedLevel(Level level)
         {
-            generator.GenerateLevel();
-            
-            foreach (var tile in tileManager.AllTiles)
-            {
-                tile.SetAppearance(Tile.Appearance.Default);
-            }
-            
-            UnitBehaviourSO.SetTileManager(tileManager);
-            UnitBehaviourSO.SetUnitManager(unitManager);
+            SelectedLevel = level;
         }
 
-        public void Run()
+        private void GoToLevelScene()
         {
-            EventManager.Trigger(new StartLevelEvent(unitManager.AllUnits.Cast<BattleEntity>().ToList()));
+            Debug.Log("Launching level");
+            
+            // TODO - Loading screen here
+            
+            SceneManager.LoadScene(levelSceneIndex);
         }
     }
 }
 
-public class SetupLevelEvent
+public class Level
 {
-    
+    public List<BattleEntity> StartingEntities;
 }
-
-public class StartLevelEvent
-{
-    public List<BattleEntity> StartingEntities { get; }
-
-    public StartLevelEvent(List<BattleEntity> startingEntities)
-    {
-        StartingEntities = startingEntities;
-    }
-}
-
 

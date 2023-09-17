@@ -49,9 +49,8 @@ GameObject:
   - component: {fileID: 1371654530433637942}
   - component: {fileID: 3888119252441381184}
   - component: {fileID: 9022627755020377437}
-  - component: {fileID: 586197423522455952}
   m_Layer: 5
-  m_Name: Battle Canvas
+  m_Name: Player Unit Control Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -143,29 +142,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &586197423522455952
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 640498079530213922}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1429f5d7638f784c88b4bff717fca37, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  battleEntityTimelinePrefab: {fileID: 8208835791797979481, guid: a98e4692f99d9344bafa11b222490fef,
-    type: 3}
-  battleTimelineParent: {fileID: 0}
-  endTurnButton: {fileID: 1352682740641532090}
-  abilityButtonPrefab: {fileID: 8884394064699142754, guid: d1ff55a559b96b648b0f03978671bc35,
-    type: 3}
-  abilityButtonParent: {fileID: 629851859068793524}
-  abilityTargetSelectionUIObj: {fileID: 338824192872231962}
-  confirmTileSelectionButton: {fileID: 2770204684074447848}
-  cancelTileSelectionButton: {fileID: 547362029280125196}
-  selectionsLeftText: {fileID: 2852358584083757001}
 --- !u!1 &1298104237575086325
 GameObject:
   m_ObjectHideFlags: 0

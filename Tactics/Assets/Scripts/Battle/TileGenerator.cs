@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Battle;
 using Battle.ScriptableObjects;
@@ -106,6 +107,9 @@ public class TileGenerator : MonoBehaviour
         }
 
         unitManager.SetUnits(units);
+        
+        //TODO - starting units should be set in a LevelScriptable or something, this is for testing
+        LevelManager.SelectedLevel.StartingEntities = units.Cast<BattleEntity>().ToList();
     }
 
     private void ClearList<T>(List<T> list) where T : MonoBehaviour

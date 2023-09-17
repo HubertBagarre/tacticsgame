@@ -1,3 +1,4 @@
+using System.Collections;
 using Battle;
 using UnityEngine;
 
@@ -27,6 +28,6 @@ namespace Battle.ScriptableObjects
         public abstract void InitBehaviour(Unit unit);
         public abstract void ShowBehaviourPreview(Unit unit); // when you hover on timeline
     
-        public abstract void RunBehaviour(Unit unit);
+        public abstract IEnumerator RunBehaviour(Unit unit);
     }
 }

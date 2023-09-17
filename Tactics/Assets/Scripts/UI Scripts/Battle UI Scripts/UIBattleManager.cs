@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -12,10 +13,15 @@ namespace Battle
 
     public class UIBattleManager : MonoBehaviour
     {
+        [SerializeField] private BattleManager battleManager;
+        
         [Header("Battle Timeline")] [SerializeField]
         private UIBattleEntityTimeline battleEntityTimelinePrefab;
-
         [SerializeField] private Transform battleTimelineParent;
+
+        [Header("Battle State")]
+        [SerializeField] private RectTransform battleRoundIndicatorTr;
+        [SerializeField] private TextMeshProUGUI battleRoundIndicatorText;
 
         [Header("Player Controls")] [SerializeField]
         private Button endTurnButton;
@@ -37,6 +43,8 @@ namespace Battle
         private void Start()
         {
             AddCallbacks();
+
+            battleRoundIndicatorTr.anchoredPosition = new Vector2(-Screen.width, 0);
 
             ShowEndTurnButton(false);
 
@@ -61,6 +69,11 @@ namespace Battle
             
             cancelTileSelectionButton.onClick.AddListener(CancelSelection);
             confirmTileSelectionButton.onClick.AddListener(ConfirmSelection);
+            
+            //Battle Phases
+            endTurnButton.onClick.AddListener(battleManager.EndCurrentEntityTurn);
+
+            battleManager.OnStartRound += PlayStartRoundAnimation;
 
             void CancelSelection()
             {
@@ -125,6 +138,23 @@ namespace Battle
         {
             endTurnButton.interactable = value;
         }
+        
+        #region Battle Phases
+
+        private void PlayStartRoundAnimation(float duration)
+        {
+            battleRoundIndicatorText.text = $"Round {battleManager.CurrentRound}";
+
+            var sequence = DOTween.Sequence();
+            sequence.Append(battleRoundIndicatorTr.DOMoveX(0, duration / 4f));
+            sequence.AppendInterval(duration / 2f);
+            sequence.Append(battleRoundIndicatorTr.DOMoveX(Screen.width, duration / 4f));
+            sequence.AppendCallback(()=>battleRoundIndicatorTr.anchoredPosition = new Vector2(-Screen.width,0));
+
+            sequence.Play();
+        }
+        
+        #endregion
         
         #region Ability Target Selection
         
