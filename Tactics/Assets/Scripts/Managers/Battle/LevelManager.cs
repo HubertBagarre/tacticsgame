@@ -7,14 +7,8 @@ using UnityEngine.UI;
 
 namespace Battle
 {
-    using ScriptableObjects;
-    
     public class LevelManager : MonoBehaviour
     {
-        [field: SerializeField] private TileManager tileManager;
-        [field: SerializeField] private UnitManager unitManager;
-        [field: SerializeField] private TileGenerator generator;
-
         [SerializeField] private int levelSceneIndex;
         
         [Header("UI")]

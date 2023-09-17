@@ -69,9 +69,7 @@ namespace Battle
 
                 endRoundEntity = new EndRoundEntity(this, 100);
                 AddEntityToBattle(endRoundEntity,false);
-
-                // TODO - add units at start of battle based on level
-
+                
                 foreach (var battleEntity in level.StartingEntities)
                 {
                     AddEntityToBattle(battleEntity,true);
