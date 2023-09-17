@@ -34,7 +34,7 @@ namespace Battle
         [field: SerializeField] public int CurrentRound { get; private set; }
 
         private List<BattleEntity> entitiesInBattle = new ();
-        private List<Unit> deadUnits = new List<Unit>();
+        private List<BattleEntity> deadUnits = new ();
 
         private UpdateTurnValuesEvent updateTurnValuesEvent => new (entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList(),endRoundEntity);
 
@@ -74,6 +74,16 @@ namespace Battle
                 {
                     AddEntityToBattle(battleEntity,true);
                 }
+            }
+
+            void SetupWinCondition()
+            {
+                
+            }
+
+            void SetupLoseCondition()
+            {
+                
             }
         }
 
@@ -123,17 +133,21 @@ namespace Battle
             }
         }
         
-        public void EndRound()
+        private void EndRound()
         {
-            //internal stuff
-            foreach (var battleEntity in entitiesInBattle)
-            {
-                battleEntity.EndRound();
-            }
+            StartCoroutine(EndRoundLogicRoutine());
             
-            EventManager.Trigger(new RoundEndEvent(CurrentRound));
+            IEnumerator EndRoundLogicRoutine()
+            {
+                foreach (var battleEntity in entitiesInBattle)
+                {
+                    yield return StartCoroutine(battleEntity.EndRound());
+                }
 
-            NextRound();
+                EventManager.Trigger(new RoundEndEvent(CurrentRound));
+
+                NextRound();
+            }
         }
         
         private void DecayTurnValues(float decayValue)
@@ -204,17 +218,14 @@ namespace Battle
             {
                 var previewEntity = new PreviewEntity(this,entity);
                 entitiesInBattle.Add(previewEntity);
-                
-                EventManager.AddListener<EntityLeaveBattleEvent>(RemoveAssociatedPreviewEntityFromBattle);
+
+                entity.OnDeath += RemoveAssociatedPreviewEntityFromBattle;
                 
                 EventManager.Trigger(new EntityJoinBattleEvent(previewEntity,true));
 
-                void RemoveAssociatedPreviewEntityFromBattle(EntityLeaveBattleEvent ctx)
+                void RemoveAssociatedPreviewEntityFromBattle()
                 {
-                    if(ctx.Entity != entity) return;
-                    EventManager.RemoveListener<EntityLeaveBattleEvent>(RemoveAssociatedPreviewEntityFromBattle);
-                    
-                    RemoveEntityFromBattle(previewEntity);
+                    if(!deadUnits.Contains(previewEntity)) deadUnits.Add(previewEntity);
                 }
             }
             
@@ -231,6 +242,8 @@ namespace Battle
 
         private void AddDeadUnitToList(UnitDeathEvent ctx)
         {
+            EventManager.Trigger(updateTurnValuesEvent);
+            
             deadUnits.Add(ctx.Unit);
         }
     }
@@ -239,18 +252,20 @@ namespace Battle
     {
         public Sprite Portrait => associatedEntity.Portrait;
         public int Speed => associatedEntity.Speed;
-        public float DistanceFromTurnStart => associatedEntity.DistanceFromTurnStart + tm.ResetTurnValue;
+        public float DistanceFromTurnStart => associatedEntity.DistanceFromTurnStart + bm.ResetTurnValue;
+        public event Action OnDeath;
 
-        private BattleManager tm;
+        private BattleManager bm;
         private BattleEntity associatedEntity;
 
         public PreviewEntity(BattleManager battleManager,BattleEntity entity)
         {
-            tm = battleManager;
+            bm = battleManager;
             associatedEntity = entity;
         }
 
         public void InitEntityForBattle() { }
+
         public void KillEntityInBattle() { }
 
         public void ResetTurnValue(float value) { }
@@ -287,6 +302,7 @@ namespace Battle
 
         public void InitEntityForBattle() { }
         public void KillEntityInBattle(){ }
+        public event Action OnDeath;
 
         public void ResetTurnValue(float _)
         {

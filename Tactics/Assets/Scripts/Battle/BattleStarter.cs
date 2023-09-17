@@ -13,6 +13,8 @@ namespace Battle
             Debug.Log("Scene Loading, starting level");
         
             levelGenerator.GenerateLevel();
+
+            yield return null;
             
             battleManager.SetupBattle(LevelManager.SelectedLevel);
 

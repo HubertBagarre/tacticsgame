@@ -76,6 +76,11 @@ namespace Battle
             return $"{SO.name} (Instance)";
         }
 
+        public void ClearSelection()
+        {
+            currentSelectedTiles.Clear();
+        }
+
         public void CastAbility(Unit caster)
         {
             EventManager.Trigger(new StartAbilityCastEvent(this, caster, currentSelectedTiles));

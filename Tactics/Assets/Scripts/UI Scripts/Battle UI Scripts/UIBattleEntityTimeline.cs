@@ -17,12 +17,22 @@ public class UIBattleEntityTimeline : MonoBehaviour
     {
         AssociatedEntity = entity;
         
+        gameObject.name = $"{AssociatedEntity}'s time";
+        
         portraitImage.sprite = AssociatedEntity.Portrait;
         turnValueText.text = $"{AssociatedEntity.DistanceFromTurnStart}";
 
         EventManager.AddListener<UpdateTurnValuesEvent>(UpdateTurnValue);
         
         Show(false);
+
+        entity.OnDeath += DestroySelf;
+    }
+
+    private void DestroySelf()
+    {
+        Disconnect();
+        gameObject.SetActive(false);
     }
 
     public void Disconnect()

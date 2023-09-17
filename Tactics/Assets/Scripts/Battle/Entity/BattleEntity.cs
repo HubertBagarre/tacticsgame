@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -12,10 +13,10 @@ public interface BattleEntity
     
     public int Speed { get; }
     public float DistanceFromTurnStart { get; }
-
     public float TurnOrder => DistanceFromTurnStart / (Speed/100f);
     public void InitEntityForBattle();
     public void KillEntityInBattle();
+    public event Action OnDeath;
     public void ResetTurnValue(float value);
     public void DecayTurnValue(float amount);
     public IEnumerator StartRound();

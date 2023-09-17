@@ -191,6 +191,8 @@ namespace Battle
         [ContextMenu("Kill")]
         public void KillEntityInBattle()
         {
+            Speed = 0;
+            
             OnDeath?.Invoke();
             OnDeath = null;
             

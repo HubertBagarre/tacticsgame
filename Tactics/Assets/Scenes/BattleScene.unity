@@ -692,11 +692,6 @@ PrefabInstance:
       propertyPath: endTurnButton
       value: 
       objectReference: {fileID: 344935526}
-    - target: {fileID: 4749299947456972236, guid: d199fcebe4717a144b5aa807d02228a4,
-        type: 3}
-      propertyPath: turnStartTransitionDuration
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 7059149321718778210, guid: d199fcebe4717a144b5aa807d02228a4,
         type: 3}
       propertyPath: m_LocalPosition.x

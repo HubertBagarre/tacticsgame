@@ -20,4 +20,5 @@ MonoBehaviour:
   <SkipTargetSelection>k__BackingField: 0
   <SkipTargetConfirmation>k__BackingField: 0
   <EndUnitTurnAfterCast>k__BackingField: 1
-  range: 3
+  range: 6
+  damage: 10

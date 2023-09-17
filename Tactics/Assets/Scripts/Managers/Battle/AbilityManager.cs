@@ -44,6 +44,8 @@ namespace Battle
             currentCastingAbilityInstance = ctx.Ability;
             caster = ctx.Caster;
             
+            currentCastingAbilityInstance.ClearSelection();
+            
             EventManager.AddListener<EndAbilityTargetSelectionEvent>(TryCastAbility,true);
 
             caster.OnDeath += CancelAbilityTargetSelection;
