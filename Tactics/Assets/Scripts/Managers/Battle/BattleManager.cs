@@ -58,7 +58,7 @@ namespace Battle
             UnitBehaviourSO.SetTileManager(tileManager);
             UnitBehaviourSO.SetUnitManager(unitManager);
             UnitBehaviourSO.SetBattleManager(this);
-            DelayedBattleActionsManager.Init(this);
+            //DelayedBattleActionsManager.Init(this); //yield return StartCoroutine() is op
             
             SetupStartingEntities();
             
@@ -87,14 +87,9 @@ namespace Battle
             
             EventManager.Trigger(new StartBattleEvent());
 
-            EventManager.AddListener<StartRoundEvent>(StartEntityTurnAtRoundStart,true);
+            CurrentTurnEntity = endRoundEntity;
             
             NextRound();
-            
-            void StartEntityTurnAtRoundStart(StartRoundEvent ctx)
-            {
-                NextUnitTurn();
-            }
         }
         
         private void NextRound()
@@ -106,25 +101,27 @@ namespace Battle
 
         private void StartRound()
         {
-            Debug.Log($"Starting Round {CurrentRound}");
-            
-            DelayedBattleActionsManager.PlayDelayedAction(InvokeOnStartRound(),TriggerStartRoundLogic);
+            StartCoroutine(InvokeOnStartRound());
             
             IEnumerator InvokeOnStartRound()
             {
                 OnStartRound?.Invoke(turnStartTransitionDuration);
 
                 yield return new WaitForSeconds(turnStartTransitionDuration);
+                
+                StartCoroutine(StartRoundLogicRoutine());
             }
             
-            void TriggerStartRoundLogic()
+            IEnumerator StartRoundLogicRoutine()
             {
                 foreach (var battleEntity in entitiesInBattle)
                 {
-                    battleEntity.StartRound();
+                    yield return StartCoroutine(battleEntity.StartRound());
                 }
 
                 EventManager.Trigger(new StartRoundEvent(CurrentRound,turnStartTransitionDuration));
+                
+                if(CurrentTurnEntity != null) EndCurrentEntityTurn();
             }
         }
         
@@ -159,21 +156,19 @@ namespace Battle
             {
                 EndRound();
                 
-                EndCurrentEntityTurn();
-                
                 return;
             }
             
-            CurrentTurnEntity.StartTurn();
+            EventManager.Trigger(new StartEntityTurnEvent(CurrentTurnEntity));
+            
+            StartCoroutine(CurrentTurnEntity.StartTurn());
         }
         
         public void EndCurrentEntityTurn()
         {
-            Debug.Log($"Ending {CurrentTurnEntity}'s turn ");
-            
             CurrentTurnEntity.ResetTurnValue(ResetTurnValue);
             
-            CurrentTurnEntity.EndTurn();
+            StartCoroutine(CurrentTurnEntity.EndTurn());
             
             EventManager.Trigger(new EndEntityTurnEvent(CurrentTurnEntity));
             
@@ -257,10 +252,11 @@ namespace Battle
 
         public void ResetTurnValue(float value) { }
         public void DecayTurnValue(float amount) { }
-        public void StartRound() { }
-        public void EndRound() { }
-        public void StartTurn() { }
-        public void EndTurn() { }
+
+        public IEnumerator StartRound() { yield return null;}
+        public IEnumerator EndRound() { yield return null;}
+        public IEnumerator StartTurn() { yield return null;}
+        public IEnumerator EndTurn() { yield return null;}
 
         public override string ToString()
         {
@@ -299,12 +295,12 @@ namespace Battle
             DistanceFromTurnStart -= amount * DecayRate;
         }
 
-        public void StartRound() { }
-        public void EndRound() { }
+        public IEnumerator StartRound() { yield return null;}
+        public IEnumerator EndRound() { yield return null;}
 
-        public void StartTurn() { }
+        public IEnumerator StartTurn() { yield return null;}
 
-        public void EndTurn() { }
+        public IEnumerator EndTurn() { yield return null;}
     }
 }
 
@@ -344,9 +340,9 @@ namespace Battle.BattleEvents
     {
         public BattleEntity Entity { get; }
 
-        public StartEntityTurnEvent(BattleEntity unit)
+        public StartEntityTurnEvent(BattleEntity entity)
         {
-            Entity = unit;
+            Entity = entity;
         }
     }
 

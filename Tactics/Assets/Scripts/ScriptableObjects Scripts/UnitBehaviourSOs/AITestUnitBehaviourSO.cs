@@ -24,17 +24,8 @@ namespace Battle.ScriptableObjects
             yield return null;
             
             Debug.Log("AI Behaviour");
-
-            EventManager.AddListener<UnitMovementEndEvent>(EndTurnOnMovementEnd, true);
-
-            unit.MoveUnit(unit.Tile.GetAdjacentTiles().ToList());
-
-            void EndTurnOnMovementEnd(UnitMovementEndEvent ctx)
-            {
-                if (ctx.Unit != unit) return;
-
-                battleM.EndCurrentEntityTurn();
-            }
+            
+            unit.MoveUnit(unit.Tile.GetAdjacentTiles().ToList(),battleM.EndCurrentEntityTurn);
         }
     }
 }

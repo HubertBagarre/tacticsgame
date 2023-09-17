@@ -36,14 +36,7 @@ namespace Battle
 
             path.Reverse();
             
-            EventManager.AddListener<UnitMovementEndEvent>(EndMovementAbility,true);
-                
-            caster.MoveUnit(path);
-
-            void EndMovementAbility(UnitMovementEndEvent ctx)
-            {
-                EndAbility();
-            }
+            caster.MoveUnit(path,EndAbility);
         }
     }
 }

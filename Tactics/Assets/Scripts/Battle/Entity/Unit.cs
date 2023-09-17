@@ -71,33 +71,36 @@ namespace Battle
             Behaviour.InitBehaviour(this);
         }
         
-        public void StartRound()
+        public IEnumerator StartRound()
         {
-            // effects here
+            yield return null; //apply effects
         }
 
-        public void EndRound()
+        public IEnumerator EndRound()
         {
-            // effects here
+            yield return null; //apply effects
         }
 
-        public void StartTurn()
+        public IEnumerator StartTurn()
         {
             MovementLeft = Movement;
+            
+            yield return null; //apply effects
 
-            //apply effects ?
-            
-            DelayedBattleActionsManager.PlayDelayedAction(Behaviour.RunBehaviour(this),TriggerStartEntityTurnEvent);
-            
-            void TriggerStartEntityTurnEvent()
+            if (IsDead)
             {
-                EventManager.Trigger(new StartEntityTurnEvent(this));
+                StartCoroutine(EndTurn());
+                yield break;
             }
-        }
 
-        public void EndTurn()
+            yield return StartCoroutine(Behaviour.RunBehaviour(this));
+            
+            EventManager.Trigger(new StartUnitTurnEvent(this));
+        }
+        
+        public IEnumerator EndTurn()
         {
-            //apply effects ?
+            yield return null; //apply effects
             
             EventManager.Trigger(new EndUnitTurnEvent(this));
         }
@@ -111,20 +114,32 @@ namespace Battle
             Tile.SetUnit(this);
         }
 
-        public void MoveUnit(List<Tile> path) //PATH DOESN'T INCLUDE STARTING TILE
+        public void MoveUnit(List<Tile> path,Action callback) //PATH DOESN'T INCLUDE STARTING TILE
         {
-            if (!path.Any()) return; // checks for valid path
-            if (path.Any(tile => tile.HasUnit())) return; //does the path have any unit on it ?
+            if (!path.Any())
+            {
+                callback.Invoke();
+                return; // checks for valid path
+            }
+            
+            if (path.Any(tile => tile.HasUnit()))
+            {
+                return; //does the path have any unit on it ?
+            }
 
             if (Tile != null) Tile.RemoveUnit();
+
+            if (!CanContinueMovement())
+            {
+                callback.Invoke();
+                return;
+            }
 
             StartCoroutine(MoveAnimationRoutine());
 
             IEnumerator MoveAnimationRoutine()
             {
-                EventManager.Trigger(new UnitMovementStartEvent(this));
-
-                for (var index = 0; index < path.Count && MovementLeft > 0 && !IsDead; index++)
+                for (var index = 0; index < path.Count && CanContinueMovement(); index++)
                 {
                     var tile = path[index];
                     yield return new WaitForSeconds(1f);
@@ -136,7 +151,12 @@ namespace Battle
                     SetTile(tile);
                 }
 
-                EventManager.Trigger(new UnitMovementEndEvent(this));
+                callback.Invoke();
+            }
+
+            bool CanContinueMovement()
+            {
+                return MovementLeft > 0 && !IsDead;
             }
         }
 
@@ -209,26 +229,6 @@ namespace Battle.UnitEvents
         }
     }
     
-    public class UnitMovementStartEvent
-    {
-        public Unit Unit { get; }
-
-        public UnitMovementStartEvent(Unit unit)
-        {
-            Unit = unit;
-        }
-    }
-
-    public class UnitMovementEndEvent
-    {
-        public Unit Unit { get; }
-
-        public UnitMovementEndEvent(Unit unit)
-        {
-            Unit = unit;
-        }
-    }
-
     public class UnitTakeDamageEvent
     {
         public Unit Unit { get; }

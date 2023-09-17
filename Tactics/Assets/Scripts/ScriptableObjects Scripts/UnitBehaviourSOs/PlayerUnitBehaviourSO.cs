@@ -32,6 +32,8 @@ namespace Battle.ScriptableObjects
             EventManager.AddListener<EndUnitTurnEvent>(RemoveEndTurnListenerAtTurnEnd,true);
 
             yield return null;
+            
+            Debug.Log("Starting player turn");
             EventManager.Trigger(new StartPlayerControlEvent(unit));
         }
         
