@@ -15,6 +15,7 @@ public interface BattleEntity
     public int Speed { get; }
     public float DistanceFromTurnStart { get; }
     public float TurnOrder => DistanceFromTurnStart / (Speed/100f);
+    public bool IsDead { get; }
     public void InitEntityForBattle();
     public void KillEntityInBattle();
     public event Action OnDeath;

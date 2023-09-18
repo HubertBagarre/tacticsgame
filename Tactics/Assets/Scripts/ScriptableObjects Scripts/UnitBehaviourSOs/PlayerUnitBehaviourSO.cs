@@ -5,7 +5,7 @@ namespace Battle.ScriptableObjects
 {
     using UIEvents;
     using UnitEvents;
-    using AbilityEvent;
+    using AbilityEvents;
     
     [CreateAssetMenu(menuName = "Battle Scriptables/UnitBehaviour/PlayerUnit")]
     public class PlayerUnitBehaviourSO : UnitBehaviourSO

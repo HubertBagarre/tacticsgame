@@ -207,7 +207,7 @@ MonoBehaviour:
   battleManager: {fileID: 4749299947456972236}
   tileManager: {fileID: 2014707271379037570}
   unitManager: {fileID: 9046372973711033605}
-  defaultLevel: {fileID: 558228172500973346, guid: 8fce1aeb1902f3b45bcc74daeaba4ead,
+  defaultLevel: {fileID: 558228172500973346, guid: d9a4f41f3fbfe5240b61e8ab5ad15637,
     type: 3}
 --- !u!1 &8949087217103233743
 GameObject:

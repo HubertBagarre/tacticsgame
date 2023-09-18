@@ -1,6 +1,6 @@
 using System;
 using Battle;
-using Battle.AbilityEvent;
+using Battle.AbilityEvents;
 using UnityEngine;
 using UnityEngine.UI;
 

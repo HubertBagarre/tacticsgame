@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Battle
 {
-    using AbilityEvent;
+    using AbilityEvents;
     using InputEvent;
     
     public class AbilityManager : MonoBehaviour
@@ -102,7 +102,7 @@ namespace Battle
 
 
 
-namespace Battle.AbilityEvent
+namespace Battle.AbilityEvents
 {
     public class StartAbilityTargetSelectionEvent
     {

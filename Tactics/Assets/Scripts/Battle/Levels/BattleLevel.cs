@@ -21,29 +21,29 @@ namespace Battle
 
         public virtual void SetupEndBattleConditions(BattleManager battleManager)
         {
-            EventManager.AddListener<RoundEndEvent>(TryEndBattle);
+            EventManager.AddListener<UnitDeathEvent>(TryEndBattle);
             
-            void TryEndBattle(RoundEndEvent ctx)
+            void TryEndBattle(UnitDeathEvent ctx)
             {
-                var entities = battleManager.EntitiesInBattle;
+                var entities = battleManager.EntitiesInBattle.Where(entity => !entity.IsDead).ToArray();
                 if (entities.Length <= 0)
                 {
                     Debug.Log("No entities, lose");
-                    battleManager.EndBattle(false);
+                    battleManager.LoseBattle();
                     return;
                 }
 
                 if (entities.All(entity => entity.Team == 0))
                 {
                     Debug.Log("All allies, win");
-                    battleManager.EndBattle(true);
+                    battleManager.WinBattle();
                     return;
                 }
                 
                 if (entities.All(entity => entity.Team != 0))
                 {
                     Debug.Log("No allies, lose");
-                    battleManager.EndBattle(false);
+                    battleManager.LoseBattle();
                     return;
                 }
                 
@@ -63,7 +63,6 @@ namespace Battle
 
         protected virtual List<BattleEntity> GetStartingEntities()
         {
-            Debug.Log("Getting starting entities");
             return Units.Cast<BattleEntity>().ToList();
         }
     }

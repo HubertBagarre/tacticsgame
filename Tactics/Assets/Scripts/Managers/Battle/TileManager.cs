@@ -7,7 +7,7 @@ namespace Battle
 {
     using UnitEvents;
     using InputEvent;
-    using AbilityEvent;
+    using AbilityEvents;
 
     /// <summary>
     /// Handles Tiles

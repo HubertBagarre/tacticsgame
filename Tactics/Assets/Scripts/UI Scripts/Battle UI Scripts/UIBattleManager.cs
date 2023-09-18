@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Battle
 {
-    using AbilityEvent;
+    using AbilityEvents;
     using BattleEvents;
     using UIEvents;
 
@@ -64,6 +64,7 @@ namespace Battle
             EventManager.AddListener<EndAbilityTargetSelectionEvent>(ShowEndTurnButtonOnAbilityTargetSelectionCancel);
             EventManager.AddListener<StartAbilityCastEvent>(HidePlayerButtonsOnAbilityCast);
             //EventManager.AddListener<StartAbilityCastEvent> is in HidePlayerButtonsOnAbilityCast()
+            EventManager.AddListener<EndBattleEvent>(HidePlayerButtonsOnBattleEnd);
             
             AbilityManager.OnUpdatedCastingAbility += UpdateAbilityTargetSelection;
             
@@ -109,6 +110,15 @@ namespace Battle
             HideUnitAbilitiesButton();
         }
 
+        private void HidePlayerButtonsOnBattleEnd(EndBattleEvent ctx)
+        {
+            Debug.Log("Battle Ended, hiding ui");
+            
+            ShowEndTurnButton(false);
+            
+            HideUnitAbilitiesButton();
+        }
+
         private void HidePlayerButtonsOnAbilityCast(StartAbilityCastEvent ctx)
         {
             ShowEndTurnButton(false);
@@ -121,6 +131,8 @@ namespace Battle
             
             void ShowAbilityButtonsAfterAbilityCast(EndAbilityCastEvent endAbilityCastEvent)
             {
+                Debug.Log("AYA");
+                
                 ShowEndTurnButton(true);
                 
                 EnableEndTurnButton(true);
@@ -167,6 +179,8 @@ namespace Battle
 
         private void UpdateAbilityTargetSelection(Unit _,UnitAbilityInstance ability)
         {
+            Debug.Log("Here");
+            
             if (ability == null)
             {
                 ShowAbilityTargetSelectionButtons(false);

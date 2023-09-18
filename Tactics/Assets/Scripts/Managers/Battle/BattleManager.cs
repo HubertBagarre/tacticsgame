@@ -2,14 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Battle.UnitEvents;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Battle
 {
-    using BattleEvents;
     using ScriptableObjects;
+    using BattleEvents;
+    using UnitEvents;
+    using AbilityEvents;
 
     public class BattleManager : MonoBehaviour
     {
@@ -35,7 +35,8 @@ namespace Battle
         private List<BattleEntity> entitiesInBattle = new ();
         public BattleEntity[] EntitiesInBattle => entitiesInBattle.Where(entity => entity.Team >= 0).ToArray();
         private List<BattleEntity> deadUnits = new ();
-        
+
+        private bool endBattle;
 
         private UpdateTurnValuesEvent updateTurnValuesEvent => new (entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList(),endRoundEntity);
 
@@ -89,6 +90,7 @@ namespace Battle
         {
             Debug.Log("Starting Battle");
 
+            endBattle = false;
             CurrentRound = 0;
             
             EventManager.Trigger(new StartBattleEvent());
@@ -98,15 +100,31 @@ namespace Battle
             NextRound();
         }
 
-        public void EndBattle(bool win)
+        public void WinBattle()
+        {
+            EndBattle(true);
+        }
+
+        public void LoseBattle()
+        {
+            EndBattle(false);
+        }
+
+        private void EndBattle(bool win)
         {
             Debug.Log($"Ending Battle (win : {win})");
+
+            endBattle = true;
             
+            EventManager.RemoveListeners<EndAbilityCastEvent>();
+
             EventManager.Trigger(new EndBattleEvent(win));
         }
         
         private void NextRound()
         {
+            if(endBattle) return;
+            
             CurrentRound++;
             
             StartRound();
@@ -200,6 +218,8 @@ namespace Battle
             }
             deadUnits.Clear();
             
+            if(endBattle) return;
+            
             var nextUnit = entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList().First();
             
             DecayTurnValues(nextUnit.TurnOrder);
@@ -259,6 +279,7 @@ namespace Battle
         public int Team => -associatedEntity.Team;
         public int Speed => associatedEntity.Speed;
         public float DistanceFromTurnStart => associatedEntity.DistanceFromTurnStart + bm.ResetTurnValue;
+        public bool IsDead => true;
         public event Action OnDeath;
 
         private BattleManager bm;
@@ -296,6 +317,7 @@ namespace Battle
         public float DecayRate => Speed / 100f;
         public float DistanceFromTurnStart { get; private set; }
         private float TurnResetValue => battleM.ResetTurnValue;
+        public bool IsDead => false;
         private BattleManager battleM;
 
         public EndRoundEntity(BattleManager battleManager,int speed)

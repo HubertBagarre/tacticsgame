@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Battle
 {
-    using AbilityEvent;
+    using AbilityEvents;
 
     public abstract class UnitAbilitySO : ScriptableObject
     {
