@@ -10,8 +10,8 @@ namespace Battle
     
     public class AbilityManager : MonoBehaviour
     {
-        // TODO - Remove if unused
-        [SerializeField] private TileManager tileManager;
+        [field:SerializeField] public int AbilityPoints { get; private set; }
+        [SerializeField] private int maxAbilityPoints = 8;
 
         public static event Action<Unit,UnitAbilityInstance> OnUpdatedCastingAbility;
 

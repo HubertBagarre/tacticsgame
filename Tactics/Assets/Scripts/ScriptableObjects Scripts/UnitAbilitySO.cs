@@ -18,6 +18,7 @@ namespace Battle
         [field: SerializeField] public string Description { get; private set; }
         [field: SerializeField] public int ExpectedSelections { get; private set; }
         [field: SerializeField] public int Cooldown { get; private set; }
+        [field: SerializeField] public int Cost { get; private set; }
         [field: SerializeField] public bool SkipTargetSelection { get; private set; } = false;
         [field: SerializeField] public bool SkipTargetConfirmation { get; private set; } = false;
         [field: SerializeField] public bool EndUnitTurnAfterCast { get; private set; } = true;
@@ -50,6 +51,8 @@ namespace Battle
         public UnitAbilitySO SO { get; }
         public int ExpectedSelections => SO.ExpectedSelections;
         public int SelectionsLeft => SO.ExpectedSelections - CurrentSelectionCount;
+        private int costModifier = 0;
+        public int Cost => SO.Cost + costModifier;
         public int CurrentCooldown { get; private set; }
         public int CurrentSelectionCount => currentSelectedTiles.Count;
 
@@ -128,6 +131,16 @@ namespace Battle
                 : Tile.Appearance.Unselectable);
 
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
+        }
+
+        public void ResetCost()
+        {
+            costModifier = 0;
+        }
+
+        public void IncreaseCost(int value)
+        {
+            costModifier += value;
         }
     }
 }
