@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Battle;
 using Battle.ScriptableObjects;
+using UnityEditor;
 
 //TODO - Change to level generator
 /// <summary>
@@ -14,8 +15,8 @@ using Battle.ScriptableObjects;
 public class TileGenerator : MonoBehaviour
 {
     [Header("Dependencies")]
-    [SerializeField] private TileManager tileManager;
-    [SerializeField] private UnitManager unitManager;
+    [SerializeField] private BattleLevel battleLevel;
+    [SerializeField] private Transform transformParent;
     
     [Header("Tile Parameters")]
     [SerializeField] private Tile tilePrefab;
@@ -39,7 +40,8 @@ public class TileGenerator : MonoBehaviour
     [SerializeField] private List<Unit> units;
     private Tile[,] grid;
     
-
+#if UNITY_EDITOR
+    
     [ContextMenu("Generate Level")]
     public void GenerateLevel()
     {
@@ -57,7 +59,12 @@ public class TileGenerator : MonoBehaviour
             {
 
                 var pos = new Vector3(x * tileSpacing.x, 0, y * tileSpacing.y);
-                var tile = Instantiate(tilePrefab, pos, Quaternion.identity, transform);
+                var tile = PrefabUtility.InstantiatePrefab(tilePrefab) as Tile;
+                var tileTr = tile.transform;
+                tileTr.position = pos;
+                tileTr.rotation = Quaternion.identity;
+                tileTr.SetParent(transformParent);
+                
                 tile.name = $"Tile {x},{y}";
                 tile.InitPosition(x,y);
                 tiles.Add(tile);
@@ -88,7 +95,7 @@ public class TileGenerator : MonoBehaviour
             tile.InitNeighbors(neighbors);
         }
 
-        tileManager.SetTiles(tiles);
+        battleLevel.SetTiles(tiles);
 
         foreach (var tile in tiles)
         {
@@ -98,7 +105,12 @@ public class TileGenerator : MonoBehaviour
         foreach (var placedUnit in placedUnits)
         {
             var tile = grid[placedUnit.position.x, placedUnit.position.y];
-            var unit = Instantiate(unitPrefab,tile.transform.position,Quaternion.identity,transform);
+            
+            var unit = PrefabUtility.InstantiatePrefab(unitPrefab) as Unit;
+            var unitTr = unit.transform;
+            unitTr.position = tile.transform.position;
+            unitTr.rotation = Quaternion.identity;
+            unitTr.SetParent(transformParent);
 
             unit.name = placedUnit.so.name;
             unit.InitUnit(tile,placedUnit.team,placedUnit.so);
@@ -106,10 +118,9 @@ public class TileGenerator : MonoBehaviour
             units.Add(unit);
         }
 
-        unitManager.SetUnits(units);
+        battleLevel.SetUnits(units);
         
-        //TODO - starting units should be set in a LevelScriptable or something, this is for testing
-        LevelManager.SelectedLevel.StartingEntities = units.Cast<BattleEntity>().ToList();
+        EditorUtility.SetDirty(transformParent);
     }
 
     private void ClearList<T>(List<T> list) where T : MonoBehaviour
@@ -124,14 +135,13 @@ public class TileGenerator : MonoBehaviour
         int count = list.Count;
         for (int i = 0; i < count; i++)
         {
-#if UNITY_EDITOR
+
             DestroyImmediate(list[0].gameObject);
-#else
-            Destroy(list[0]);
-#endif
+
             list.RemoveAt(0);
         }
 
         list.Clear();
     }
+#endif
 }

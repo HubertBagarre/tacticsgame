@@ -22,19 +22,20 @@ namespace Battle
         public int ResetTurnValue { get; private set; } = 999;
         [field:SerializeField] public Sprite EndTurnImage { get; private set; }
         [SerializeField] private float turnStartTransitionDuration = 1f;
+        
 
-        [field: Header("Debug")]
-        [field: SerializeField]
+        [field:Header("Debug")]
+        [field: SerializeField] public int CurrentRound { get; private set; }
+        public event Action<float> OnStartRound;
+
+        private BattleLevel battleLevel;
         public BattleEntity CurrentTurnEntity { get; private set; }
-
         private EndRoundEntity endRoundEntity;
 
-        public event Action<float> OnStartRound; 
-
-        [field: SerializeField] public int CurrentRound { get; private set; }
-
         private List<BattleEntity> entitiesInBattle = new ();
+        public BattleEntity[] EntitiesInBattle => entitiesInBattle.Where(entity => entity.Team >= 0).ToArray();
         private List<BattleEntity> deadUnits = new ();
+        
 
         private UpdateTurnValuesEvent updateTurnValuesEvent => new (entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList(),endRoundEntity);
 
@@ -48,8 +49,10 @@ namespace Battle
             EventManager.AddListener<UnitDeathEvent>(AddDeadUnitToList);
         }
 
-        public void SetupBattle(Level level)
+        public void SetupBattle(BattleLevel level)
         {
+            battleLevel = level;
+            
             foreach (var tile in tileManager.AllTiles)
             {
                 tile.SetAppearance(Tile.Appearance.Default);
@@ -59,6 +62,11 @@ namespace Battle
             UnitBehaviourSO.SetUnitManager(unitManager);
             UnitBehaviourSO.SetBattleManager(this);
             //DelayedBattleActionsManager.Init(this); //yield return StartCoroutine() is op
+            
+            battleLevel.SetupEndBattleConditions(this);
+            
+            tileManager.SetTiles(battleLevel.Tiles);
+            unitManager.SetUnits(battleLevel.Units);
             
             SetupStartingEntities();
             
@@ -75,21 +83,11 @@ namespace Battle
                     AddEntityToBattle(battleEntity,true);
                 }
             }
-
-            void SetupWinCondition()
-            {
-                
-            }
-
-            void SetupLoseCondition()
-            {
-                
-            }
         }
 
         public void StartBattle()
         {
-            Debug.Log("Starting Level");
+            Debug.Log("Starting Battle");
 
             CurrentRound = 0;
             
@@ -98,6 +96,13 @@ namespace Battle
             CurrentTurnEntity = endRoundEntity;
             
             NextRound();
+        }
+
+        public void EndBattle(bool win)
+        {
+            Debug.Log($"Ending Battle (win : {win})");
+            
+            EventManager.Trigger(new EndBattleEvent(win));
         }
         
         private void NextRound()
@@ -251,6 +256,7 @@ namespace Battle
     public class PreviewEntity : BattleEntity
     {
         public Sprite Portrait => associatedEntity.Portrait;
+        public int Team => -associatedEntity.Team;
         public int Speed => associatedEntity.Speed;
         public float DistanceFromTurnStart => associatedEntity.DistanceFromTurnStart + bm.ResetTurnValue;
         public event Action OnDeath;
@@ -285,6 +291,7 @@ namespace Battle
     public class EndRoundEntity : BattleEntity
     {
         public Sprite Portrait { get; }
+        public int Team => -1;
         public int Speed { get;}
         public float DecayRate => Speed / 100f;
         public float DistanceFromTurnStart { get; private set; }
@@ -331,6 +338,12 @@ namespace Battle.BattleEvents
 
     public class EndBattleEvent
     {
+        public bool Win { get; }
+
+        public EndBattleEvent(bool win)
+        {
+            Win = win;
+        }
     }
 
     public class StartRoundEvent

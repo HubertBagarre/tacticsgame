@@ -6,17 +6,23 @@ namespace Battle
     public class BattleStarter : MonoBehaviour
     {
         [SerializeField] private BattleManager battleManager;
-        [SerializeField] private TileGenerator levelGenerator;
+        [SerializeField] private TileManager tileManager;
+        [SerializeField] private UnitManager unitManager;
+        
+
+        [SerializeField] private BattleLevel defaultLevel;
     
-        private IEnumerator Start()
+        private IEnumerator Start() 
         {
             Debug.Log("Scene Loading, starting level");
-        
-            levelGenerator.GenerateLevel();
+
+            if(LevelManager.SelectedLevel == null) LevelManager.ChangeSelectedLevel(defaultLevel);
+            var level = Instantiate(LevelManager.SelectedLevel);
+            level.SetupCallbacks();
 
             yield return null;
             
-            battleManager.SetupBattle(LevelManager.SelectedLevel);
+            battleManager.SetupBattle(level);
 
             yield return null;
             

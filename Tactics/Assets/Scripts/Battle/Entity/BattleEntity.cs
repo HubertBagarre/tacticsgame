@@ -10,6 +10,7 @@ using UnityEngine;
 public interface BattleEntity
 {
     public Sprite Portrait { get; }
+    public int Team { get; }
     
     public int Speed { get; }
     public float DistanceFromTurnStart { get; }

@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -14,14 +11,14 @@ namespace Battle
         [Header("UI")]
         [SerializeField] private Button startLevelButton;
 
-        public static Level SelectedLevel{ get; private set; } =  new Level();
+        public static BattleLevel SelectedLevel{ get; private set; }
 
         private void Start()
         {
             startLevelButton.onClick.AddListener(GoToLevelScene);
         }
 
-        public void ChangeSelectedLevel(Level level)
+        public static void ChangeSelectedLevel(BattleLevel level)
         {
             SelectedLevel = level;
         }
@@ -36,9 +33,3 @@ namespace Battle
         }
     }
 }
-
-public class Level
-{
-    public List<BattleEntity> StartingEntities;
-}
-
