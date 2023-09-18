@@ -23,4 +23,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6d66f29768ebfd348ac9a0a509a6f556, type: 2}
   <BaseMovement>k__BackingField: 3
   <Initiative>k__BackingField: 10
-  <BaseSpeed>k__BackingField: 100
+  <BaseSpeed>k__BackingField: 200

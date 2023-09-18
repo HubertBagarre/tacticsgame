@@ -15,10 +15,10 @@ MonoBehaviour:
   <Sprite>k__BackingField: {fileID: 0}
   <Name>k__BackingField: 
   <Description>k__BackingField: 
-  <ExpectedSelections>k__BackingField: 2
+  <ExpectedSelections>k__BackingField: 1
   <Cooldown>k__BackingField: 0
   <SkipTargetSelection>k__BackingField: 0
   <SkipTargetConfirmation>k__BackingField: 0
-  <EndUnitTurnAfterCast>k__BackingField: 1
-  range: 6
+  <EndUnitTurnAfterCast>k__BackingField: 0
+  range: 7
   damage: 10
