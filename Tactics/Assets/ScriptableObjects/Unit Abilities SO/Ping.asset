@@ -19,6 +19,6 @@ MonoBehaviour:
   <Cooldown>k__BackingField: 0
   <SkipTargetSelection>k__BackingField: 0
   <SkipTargetConfirmation>k__BackingField: 0
-  <EndUnitTurnAfterCast>k__BackingField: 0
+  <EndUnitTurnAfterCast>k__BackingField: 1
   range: 7
-  damage: 10
+  damage: 0

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Battle
 {
@@ -21,12 +22,16 @@ namespace Battle
         [field: SerializeField]
         public int ResetTurnValue { get; private set; } = 999;
         [field:SerializeField] public Sprite EndTurnImage { get; private set; }
-        [SerializeField] private float turnStartTransitionDuration = 1f;
+        
+        [SerializeField] private Vector3 battleStartTransitionDuration = Vector3.one;
+        [SerializeField] private Vector3 roundStartTransitionDuration = Vector3.one;
+        private float totalBattleStartTransitionDuration => battleStartTransitionDuration.x + battleStartTransitionDuration.y + battleStartTransitionDuration.z;
+        private float totalRoundStartTransitionDuration => roundStartTransitionDuration.x + roundStartTransitionDuration.y + roundStartTransitionDuration.z;
         
 
         [field:Header("Debug")]
         [field: SerializeField] public int CurrentRound { get; private set; }
-        public event Action<float> OnStartRound;
+        public event Action<Vector3> OnStartRound;
 
         private BattleLevel battleLevel;
         public BattleEntity CurrentTurnEntity { get; private set; }
@@ -75,14 +80,14 @@ namespace Battle
             {
                 entitiesInBattle.Clear();
                 deadUnits.Clear();
-
-                endRoundEntity = new EndRoundEntity(this, 100);
-                AddEntityToBattle(endRoundEntity,false);
                 
                 foreach (var battleEntity in level.StartingEntities)
                 {
                     AddEntityToBattle(battleEntity,true);
                 }
+                
+                endRoundEntity = new EndRoundEntity(this, 100);
+                AddEntityToBattle(endRoundEntity,false);
             }
         }
 
@@ -92,12 +97,19 @@ namespace Battle
 
             endBattle = false;
             CurrentRound = 0;
-            
-            EventManager.Trigger(new StartBattleEvent());
 
-            CurrentTurnEntity = endRoundEntity;
+            StartCoroutine(StartBattleTransition());
             
-            NextRound();
+            IEnumerator StartBattleTransition()
+            {
+                EventManager.Trigger(new StartBattleEvent(battleStartTransitionDuration));
+                
+                yield return new WaitForSeconds(totalBattleStartTransitionDuration);
+
+                CurrentTurnEntity = endRoundEntity;
+            
+                NextRound();
+            }
         }
 
         public void WinBattle()
@@ -136,9 +148,9 @@ namespace Battle
             
             IEnumerator InvokeOnStartRound()
             {
-                OnStartRound?.Invoke(turnStartTransitionDuration);
-
-                yield return new WaitForSeconds(turnStartTransitionDuration);
+                OnStartRound?.Invoke(roundStartTransitionDuration);
+                
+                yield return new WaitForSeconds(totalRoundStartTransitionDuration);
                 
                 StartCoroutine(StartRoundLogicRoutine());
             }
@@ -150,7 +162,7 @@ namespace Battle
                     yield return StartCoroutine(battleEntity.StartRound());
                 }
 
-                EventManager.Trigger(new StartRoundEvent(CurrentRound,turnStartTransitionDuration));
+                EventManager.Trigger(new StartRoundEvent(CurrentRound,totalRoundStartTransitionDuration));
                 
                 if(CurrentTurnEntity != null) EndCurrentEntityTurn();
             }
@@ -333,7 +345,7 @@ namespace Battle
             Portrait = battleM.EndTurnImage;
 
             Speed = speed;
-            DistanceFromTurnStart = TurnResetValue;
+            DistanceFromTurnStart = 0;
         }
 
         public void InitEntityForBattle() { }
@@ -363,6 +375,12 @@ namespace Battle.BattleEvents
 {
     public class StartBattleEvent
     {
+        public Vector3 TransitionDuration { get; }
+
+        public StartBattleEvent(Vector3 transitionDuration)
+        {
+            TransitionDuration = transitionDuration;
+        }
     }
 
     public class EndBattleEvent

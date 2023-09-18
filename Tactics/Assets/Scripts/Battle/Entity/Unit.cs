@@ -122,8 +122,6 @@ namespace Battle
 
             yield return new WaitWhile(IsBehaviourRoutineRunning);
             
-            Debug.Log("Here");
-            
             UIBattleManager.OnEndTurnButtonClicked -= InterruptBehaviour;
             
             onBehaviourEnd.Invoke();
@@ -132,7 +130,6 @@ namespace Battle
             {
                 behaviourRoutine = StartCoroutine(Behaviour.RunBehaviour(this));
                 yield return behaviourRoutine;
-                Debug.Log("Ending Behaviour");
                 behaviourRoutine = null;
                 behaviourRunning = false;
             }
@@ -178,7 +175,7 @@ namespace Battle
                 var tile = path[index];
                 
                 //play movement animation
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(0.1f);
 
                 transform.position = tile.transform.position;
 

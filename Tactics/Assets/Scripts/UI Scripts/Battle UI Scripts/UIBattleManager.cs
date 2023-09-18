@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Battle
@@ -23,6 +22,7 @@ namespace Battle
         [Header("Battle State")]
         [SerializeField] private RectTransform battleRoundIndicatorTr;
         [SerializeField] private TextMeshProUGUI battleRoundIndicatorText;
+        [SerializeField] private RectTransform battleStartIndicatorTr;
 
         [Header("Player Controls")] [SerializeField]
         private Button endTurnButton;
@@ -45,7 +45,10 @@ namespace Battle
         {
             AddCallbacks();
 
-            battleRoundIndicatorTr.anchoredPosition = new Vector2(-Screen.width, 0);
+            battleTimelineParent.gameObject.SetActive(false);
+            
+            battleStartIndicatorTr.anchoredPosition = new Vector2(-Screen.width, battleStartIndicatorTr.anchoredPosition.y);
+            battleRoundIndicatorTr.anchoredPosition = new Vector2(-Screen.width, battleRoundIndicatorTr.anchoredPosition.y);
 
             ShowEndTurnButton(false);
 
@@ -75,7 +78,8 @@ namespace Battle
             //Battle Phases
             endTurnButton.onClick.AddListener(ClickEndTurnButton);
 
-            battleManager.OnStartRound += PlayStartRoundAnimation;
+            battleManager.OnStartRound += PlayRoundStartAnimation;
+            EventManager.AddListener<StartBattleEvent>(PlayBattleStartAnimation);
 
             void ClickEndTurnButton()
             {
@@ -138,8 +142,6 @@ namespace Battle
             
             void ShowAbilityButtonsAfterAbilityCast(EndAbilityCastEvent endAbilityCastEvent)
             {
-                Debug.Log("AYA");
-                
                 ShowEndTurnButton(true);
                 
                 EnableEndTurnButton(true);
@@ -160,14 +162,29 @@ namespace Battle
         
         #region Battle Phases
 
-        private void PlayStartRoundAnimation(float duration)
+        private void PlayBattleStartAnimation(StartBattleEvent ctx)
+        {
+            var posY = battleStartIndicatorTr.anchoredPosition.y;
+            var duration = ctx.TransitionDuration;
+            
+            var sequence = DOTween.Sequence();
+            sequence.Append(battleStartIndicatorTr.DOMoveX(0, duration.x));
+            sequence.AppendInterval(duration.y);
+            sequence.Append(battleStartIndicatorTr.DOMoveX(Screen.width, duration.z));
+            sequence.AppendCallback(()=>battleStartIndicatorTr.anchoredPosition = new Vector2(-Screen.width,posY));
+            sequence.AppendCallback(() => battleTimelineParent.gameObject.SetActive(true)); //replace with animation
+
+            sequence.Play();
+        }
+
+        private void PlayRoundStartAnimation(Vector3 durations)
         {
             battleRoundIndicatorText.text = $"Round {battleManager.CurrentRound}";
 
             var sequence = DOTween.Sequence();
-            sequence.Append(battleRoundIndicatorTr.DOMoveX(0, duration / 4f));
-            sequence.AppendInterval(duration / 2f);
-            sequence.Append(battleRoundIndicatorTr.DOMoveX(Screen.width, duration / 4f));
+            sequence.Append(battleRoundIndicatorTr.DOMoveX(0,durations.x));
+            sequence.AppendInterval(durations.y);
+            sequence.Append(battleRoundIndicatorTr.DOMoveX(Screen.width,durations.z));
             sequence.AppendCallback(()=>battleRoundIndicatorTr.anchoredPosition = new Vector2(-Screen.width,0));
 
             sequence.Play();
