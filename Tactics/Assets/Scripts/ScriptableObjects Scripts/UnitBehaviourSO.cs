@@ -29,5 +29,7 @@ namespace Battle.ScriptableObjects
         public abstract void ShowBehaviourPreview(Unit unit); // when you hover on timeline
     
         public abstract IEnumerator RunBehaviour(Unit unit);
+
+        public abstract void InterruptBehaviour(Unit unit);
     }
 }

@@ -187,6 +187,8 @@ namespace Battle
         {
             CurrentTurnEntity = unit;
             
+            Debug.Log($"{CurrentTurnEntity}'s turn");
+            
             if (CurrentTurnEntity == endRoundEntity)
             {
                 EndRound();
@@ -196,18 +198,23 @@ namespace Battle
             
             EventManager.Trigger(new StartEntityTurnEvent(CurrentTurnEntity));
             
-            StartCoroutine(CurrentTurnEntity.StartTurn());
+            StartCoroutine(CurrentTurnEntity.StartTurn(EndCurrentEntityTurn));
         }
         
         public void EndCurrentEntityTurn()
         {
             CurrentTurnEntity.ResetTurnValue(ResetTurnValue);
+
+            StartCoroutine(EndEntityTurn());
+
+            IEnumerator EndEntityTurn()
+            {
+                yield return StartCoroutine(CurrentTurnEntity.EndTurn());
+                
+                EventManager.Trigger(new EndEntityTurnEvent(CurrentTurnEntity));
             
-            StartCoroutine(CurrentTurnEntity.EndTurn());
-            
-            EventManager.Trigger(new EndEntityTurnEvent(CurrentTurnEntity));
-            
-            NextUnitTurn();
+                NextUnitTurn();
+            }
         }
 
         private void NextUnitTurn()
@@ -300,7 +307,7 @@ namespace Battle
 
         public IEnumerator StartRound() { yield return null;}
         public IEnumerator EndRound() { yield return null;}
-        public IEnumerator StartTurn() { yield return null;}
+        public IEnumerator StartTurn(Action _) { yield return null;}
         public IEnumerator EndTurn() { yield return null;}
 
         public override string ToString()
@@ -346,7 +353,7 @@ namespace Battle
         public IEnumerator StartRound() { yield return null;}
         public IEnumerator EndRound() { yield return null;}
 
-        public IEnumerator StartTurn() { yield return null;}
+        public IEnumerator StartTurn(Action _) { yield return null;}
 
         public IEnumerator EndTurn() { yield return null;}
     }

@@ -8,8 +8,7 @@ namespace Battle
 {
     using UnitEvents;
     using ScriptableObjects;
-    using BattleEvents;
-    
+
     public class Unit : MonoBehaviour, BattleEntity
     {
         [field: SerializeField] public Tile Tile { get; private set; }
@@ -34,6 +33,7 @@ namespace Battle
         public bool IsDead => CurrentHp <= 0;
         
         public List<UnitAbilityInstance> AbilityInstances { get; } = new ();
+        private Coroutine behaviourRoutine;
 
         public event Action OnTurnStart;
         public event Action OnTurnEnd;
@@ -53,6 +53,7 @@ namespace Battle
             IsActive = true;
             
             AbilityInstances.Clear();
+            behaviourRoutine = null;
             
             tile.SetUnit(this);
         }
@@ -83,7 +84,19 @@ namespace Battle
             yield return null; //apply effects
         }
 
-        public IEnumerator StartTurn()
+        public void InterruptBehaviour()
+        {
+            if(behaviourRoutine == null) return;
+            
+            Debug.Log("Interrupting behaviour");
+            
+            Behaviour.InterruptBehaviour(this);
+            
+            StopCoroutine(behaviourRoutine);
+            behaviourRoutine = null;
+        }
+
+        public IEnumerator StartTurn(Action onBehaviourEnd)
         {
             MovementLeft = Movement;
             
@@ -91,15 +104,38 @@ namespace Battle
 
             if (IsDead)
             {
-                StartCoroutine(EndTurn());
+                onBehaviourEnd.Invoke();
                 yield break;
             }
 
             OnTurnStart?.Invoke();
             
-            yield return StartCoroutine(Behaviour.RunBehaviour(this));
-            
             EventManager.Trigger(new StartUnitTurnEvent(this));
+
+            UIBattleManager.OnEndTurnButtonClicked += InterruptBehaviour;
+
+            bool behaviourRunning = true;
+
+            StartCoroutine(RunBehaviour());
+            
+            bool IsBehaviourRoutineRunning() => behaviourRoutine != null && behaviourRunning;
+
+            yield return new WaitWhile(IsBehaviourRoutineRunning);
+            
+            Debug.Log("Here");
+            
+            UIBattleManager.OnEndTurnButtonClicked -= InterruptBehaviour;
+            
+            onBehaviourEnd.Invoke();
+
+            IEnumerator RunBehaviour()
+            {
+                behaviourRoutine = StartCoroutine(Behaviour.RunBehaviour(this));
+                yield return behaviourRoutine;
+                Debug.Log("Ending Behaviour");
+                behaviourRoutine = null;
+                behaviourRunning = false;
+            }
         }
         
         public IEnumerator EndTurn()
@@ -113,53 +149,43 @@ namespace Battle
 
         public void SetTile(Tile tile)
         {
-            Tile.RemoveUnit();
+            if(Tile != null) Tile.RemoveUnit();
 
             Tile = tile;
 
             Tile.SetUnit(this);
         }
 
-        public void MoveUnit(List<Tile> path,Action callback) //PATH DOESN'T INCLUDE STARTING TILE
+        public IEnumerator MoveUnit(List<Tile> path) //PATH DOESN'T INCLUDE STARTING TILE
         {
             if (!path.Any())
             {
-                callback.Invoke();
-                return; // checks for valid path
+                yield break; // checks for valid path
             }
             
             if (path.Any(tile => tile.HasUnit()))
             {
-                return; //does the path have any unit on it ?
+                yield break; //does the path have any unit on it ?
             }
-
-            if (Tile != null) Tile.RemoveUnit();
-
+            
             if (!CanContinueMovement())
             {
-                callback.Invoke();
-                return;
+                yield break;
             }
-
-            StartCoroutine(MoveAnimationRoutine());
-
-            IEnumerator MoveAnimationRoutine()
+            
+            for (var index = 0; index < path.Count && CanContinueMovement(); index++)
             {
-                for (var index = 0; index < path.Count && CanContinueMovement(); index++)
-                {
-                    var tile = path[index];
-                    yield return new WaitForSeconds(1f);
+                var tile = path[index];
+                
+                //play movement animation
+                yield return new WaitForSeconds(1f);
 
-                    transform.position = tile.transform.position;
+                transform.position = tile.transform.position;
 
-                    MovementLeft--;
-                    tile.SetUnit(this);
-                    SetTile(tile);
-                }
-
-                callback.Invoke();
+                MovementLeft--;
+                SetTile(tile);
             }
-
+            
             bool CanContinueMovement()
             {
                 return MovementLeft > 0 && !IsDead;

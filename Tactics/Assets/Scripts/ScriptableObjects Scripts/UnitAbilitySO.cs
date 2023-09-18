@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Battle.UnitEvents;
 using UnityEngine;
@@ -31,17 +32,12 @@ namespace Battle
             return selectableTile != null;
         }
 
-        public void CastAbility(Unit caster, Tile[] targetTiles)
+        public IEnumerator CastAbility(Unit caster, Tile[] targetTiles)
         {
-            AbilityEffect(caster, targetTiles);
+            return AbilityEffect(caster, targetTiles);
         }
 
-        protected abstract void AbilityEffect(Unit caster, Tile[] targetTiles);
-
-        protected void EndAbility()
-        {
-            EventManager.Trigger(new EndAbilityCastEvent(this));
-        }
+        protected abstract IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles);
 
         public UnitAbilityInstance CreateInstance()
         {
@@ -85,10 +81,17 @@ namespace Battle
         {
             EventManager.Trigger(new StartAbilityCastEvent(this, caster, currentSelectedTiles));
 
-            SO.CastAbility(caster, currentSelectedTiles.ToArray());
+            caster.StartCoroutine(AbilityCast());
 
-            currentSelectedTiles.Clear();
-            OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
+            IEnumerator AbilityCast()
+            {
+                yield return caster.StartCoroutine(SO.CastAbility(caster, currentSelectedTiles.ToArray()));
+
+                currentSelectedTiles.Clear();
+                OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
+                
+                EventManager.Trigger(new EndAbilityCastEvent(SO));
+            }
         }
 
         public void AddTileToSelection(Unit caster, Tile tile)

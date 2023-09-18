@@ -23,6 +23,6 @@ public interface BattleEntity
     public void DecayTurnValue(float amount);
     public IEnumerator StartRound();
     public IEnumerator EndRound();
-    public IEnumerator StartTurn();
+    public IEnumerator StartTurn(Action onBehaviourEnd);
     public IEnumerator EndTurn();
 }

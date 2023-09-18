@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using TMPro;
@@ -29,8 +30,7 @@ namespace Battle
         [SerializeField] private UIUnitAbilityButton abilityButtonPrefab;
         [SerializeField] private Transform abilityButtonParent;
         private List<UIUnitAbilityButton> abilityButtons = new();
-
-        [FormerlySerializedAs("tileSelectionUIObj")]
+        
         [Header("Ability Tile Selection")]
         [SerializeField] private GameObject abilityTargetSelectionUIObj;
         [SerializeField] private Button confirmTileSelectionButton;
@@ -39,6 +39,7 @@ namespace Battle
         private UnitAbilityInstance currentAbilityInTargetSelection;
         
         private Dictionary<BattleEntity, UIBattleEntityTimeline> uibattleTimelineDict = new();
+        public static event Action OnEndTurnButtonClicked;
         
         private void Start()
         {
@@ -72,9 +73,15 @@ namespace Battle
             confirmTileSelectionButton.onClick.AddListener(ConfirmSelection);
             
             //Battle Phases
-            endTurnButton.onClick.AddListener(battleManager.EndCurrentEntityTurn);
+            endTurnButton.onClick.AddListener(ClickEndTurnButton);
 
             battleManager.OnStartRound += PlayStartRoundAnimation;
+
+            void ClickEndTurnButton()
+            {
+                OnEndTurnButtonClicked?.Invoke();
+                OnEndTurnButtonClicked = null;
+            }
 
             void CancelSelection()
             {
@@ -179,8 +186,6 @@ namespace Battle
 
         private void UpdateAbilityTargetSelection(Unit _,UnitAbilityInstance ability)
         {
-            Debug.Log("Here");
-            
             if (ability == null)
             {
                 ShowAbilityTargetSelectionButtons(false);

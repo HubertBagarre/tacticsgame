@@ -1,11 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace Battle
 {
-    using UnitEvents;
-    
     [CreateAssetMenu(menuName = "Battle Scriptables/Unit Ability/Special/PlayerMovement")]
     public class PlayerMovementAbilitySO : UnitAbilitySO
     {
@@ -20,7 +19,7 @@ namespace Battle
             return startTile.IsInAdjacentTileDistance(selectableTile,movesLeft,caster.Stats.WalkableTileSelector);
         }
         
-        protected override void AbilityEffect(Unit caster, Tile[] targetTiles)
+        protected override IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles)
         {
             var destination = targetTiles[0];
             
@@ -35,8 +34,8 @@ namespace Battle
             }
 
             path.Reverse();
-            
-            caster.MoveUnit(path,EndAbility);
+
+            yield return caster.StartCoroutine(caster.MoveUnit(path));
         }
     }
 }

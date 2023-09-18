@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -10,16 +11,13 @@ namespace Battle.ScriptableObjects
     [CreateAssetMenu(menuName = "Battle Scriptables/UnitBehaviour/PlayerUnit")]
     public class PlayerUnitBehaviourSO : UnitBehaviourSO
     {
+        private bool playerTurn;
+        private Func<bool> IsPlayerTurn;
+
         public override void InitBehaviour(Unit unit)
         {
-            EventManager.AddListener<EndUnitTurnEvent>(EndPlayerControl);
-            
-            void EndPlayerControl(EndUnitTurnEvent ctx)
-            {
-                if (ctx.Unit != unit) return;
-                
-                EventManager.Trigger(new EndPlayerControlEvent());
-            }
+            playerTurn = false;
+            IsPlayerTurn = () => playerTurn;
         }
 
         public override void ShowBehaviourPreview(Unit unit)
@@ -29,24 +27,33 @@ namespace Battle.ScriptableObjects
         public override IEnumerator RunBehaviour(Unit unit)
         {
             EventManager.AddListener<EndAbilityCastEvent>(EndTurnAfterAbilityCast);
-            EventManager.AddListener<EndUnitTurnEvent>(RemoveEndTurnListenerAtTurnEnd,true);
 
             yield return null;
             
             Debug.Log("Starting player turn");
+            playerTurn = true;
             EventManager.Trigger(new StartPlayerControlEvent(unit));
+
+            yield return new WaitWhile(IsPlayerTurn);
+            
+            EventManager.RemoveListener<EndAbilityCastEvent>(EndTurnAfterAbilityCast);
         }
         
+        public override void InterruptBehaviour(Unit unit)
+        {
+            EventManager.RemoveListener<EndAbilityCastEvent>(EndTurnAfterAbilityCast);
+            
+            playerTurn = false;
+            EventManager.Trigger(new EndPlayerControlEvent());
+        }
+
+
         private void EndTurnAfterAbilityCast(EndAbilityCastEvent ctx)
         {
             if (!ctx.Ability.EndUnitTurnAfterCast) return;
             
-            battleM.EndCurrentEntityTurn();
-        }
-        
-        private void RemoveEndTurnListenerAtTurnEnd(EndUnitTurnEvent ctx)
-        {
-            EventManager.RemoveListener<EndAbilityCastEvent>(EndTurnAfterAbilityCast);
+            playerTurn = false;
+            EventManager.Trigger(new EndPlayerControlEvent());
         }
     }
 }

@@ -21,11 +21,14 @@ namespace Battle.ScriptableObjects
 
         public override IEnumerator RunBehaviour(Unit unit)
         {
-            yield return null;
-            
             Debug.Log("AI Behaviour");
             
-            unit.MoveUnit(unit.Tile.GetAdjacentTiles().ToList(),battleM.EndCurrentEntityTurn);
+            yield return unit.StartCoroutine(unit.MoveUnit(unit.Tile.GetAdjacentTiles().ToList()));
+        }
+
+        public override void InterruptBehaviour(Unit unit)
+        {
+            
         }
     }
 }
