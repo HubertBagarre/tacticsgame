@@ -19,6 +19,9 @@ namespace Battle
         [field: SerializeField] public int ExpectedSelections { get; private set; }
         [field: SerializeField] public int Cooldown { get; private set; }
         [field: SerializeField] public int Cost { get; private set; }
+        [field: SerializeField] public bool IsUltimate { get; private set; } = false;
+        [field: SerializeField] public int UltimateCharges { get; private set; } = 0;
+        
         [field: SerializeField] public bool SkipTargetSelection { get; private set; } = false;
         [field: SerializeField] public bool SkipTargetConfirmation { get; private set; } = false;
         [field: SerializeField] public bool EndUnitTurnAfterCast { get; private set; } = true;
@@ -53,6 +56,9 @@ namespace Battle
         public int SelectionsLeft => SO.ExpectedSelections - CurrentSelectionCount;
         private int costModifier = 0;
         public int Cost => SO.Cost + costModifier;
+        public bool IsUltimate => SO.IsUltimate;
+        private int ultimateCostModifier = 0;
+        public int UltimateCost => SO.UltimateCharges + ultimateCostModifier;
         public int CurrentCooldown { get; private set; }
         public int CurrentSelectionCount => currentSelectedTiles.Count;
 

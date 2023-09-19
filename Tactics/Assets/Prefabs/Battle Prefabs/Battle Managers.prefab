@@ -290,4 +290,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 173684a8fa0665f44ab6f8cef761cc14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileManager: {fileID: 2014707271379037570}
+  <AbilityPoints>k__BackingField: 4

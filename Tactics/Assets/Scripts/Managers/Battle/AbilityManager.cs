@@ -1,28 +1,37 @@
 using System;
 using System.Collections.Generic;
-using Battle.UnitEvents;
 using UnityEngine;
 
 namespace Battle
 {
     using AbilityEvents;
     using InputEvent;
-    
+    using BattleEvents;
+
     public class AbilityManager : MonoBehaviour
     {
-        [field:SerializeField] public int AbilityPoints { get; private set; }
-        [SerializeField] private int maxAbilityPoints = 8;
+        [field: SerializeField] public int AbilityPoints { get; private set; } = 4;
+        public static int MaxAbilityPoints { get; } = 8;
 
-        public static event Action<Unit,UnitAbilityInstance> OnUpdatedCastingAbility;
+        public static event Action<Unit, UnitAbilityInstance> OnUpdatedCastingAbility;
+        public static event Action<int, int> OnUpdatedAbilityPoints;
 
         private Unit caster;
         private UnitAbilityInstance currentCastingAbilityInstance;
+
+        private void Awake()
+        {
+            OnUpdatedCastingAbility = null;
+            OnUpdatedAbilityPoints = null;
+        }
 
         private void Start()
         {
             currentCastingAbilityInstance = null;
             caster = null;
             
+            EventManager.AddListener<StartRoundEvent>(InitAbilityPoints,true);
+
             EventManager.AddListener<StartAbilityTargetSelectionEvent>(StartAbilitySelection);
         }
 
@@ -31,36 +40,42 @@ namespace Battle
             if (currentCastingAbilityInstance != null)
             {
                 var cancel = (currentCastingAbilityInstance == ctx.Ability);
-                
+
                 EventManager.Trigger(new EndAbilityTargetSelectionEvent(true));
-                
-                if(cancel) return;
-                
+
+                if (cancel) return;
+
                 EventManager.Trigger(ctx);
-                
+
                 return;
             }
-            
+
             currentCastingAbilityInstance = ctx.Ability;
             caster = ctx.Caster;
-            
+
             currentCastingAbilityInstance.ClearSelection();
             
-            EventManager.AddListener<EndAbilityTargetSelectionEvent>(TryCastAbility,true);
+            if (AbilityPoints - currentCastingAbilityInstance.Cost < 0)
+            {
+                EventManager.Trigger(new EndAbilityTargetSelectionEvent(true));
+                return;
+            }
+
+            EventManager.AddListener<EndAbilityTargetSelectionEvent>(TryCastAbility, true);
 
             caster.OnDeath += CancelAbilityTargetSelection;
-                
+
             EventManager.AddListener<ClickTileEvent>(SelectTile);
-            
-            OnUpdatedCastingAbility?.Invoke(caster,currentCastingAbilityInstance);
+
+            OnUpdatedCastingAbility?.Invoke(caster, currentCastingAbilityInstance);
 
             if (currentCastingAbilityInstance.SO.SkipTargetSelection)
             {
                 caster.OnDeath -= CancelAbilityTargetSelection;
-                
+
                 EventManager.Trigger(new EndAbilityTargetSelectionEvent(false));
             }
-            
+
             void CancelAbilityTargetSelection()
             {
                 EventManager.Trigger(new EndAbilityTargetSelectionEvent(true));
@@ -69,37 +84,68 @@ namespace Battle
             void TryCastAbility(EndAbilityTargetSelectionEvent selectionEvent)
             {
                 EventManager.RemoveListener<ClickTileEvent>(SelectTile);
-                
-                OnUpdatedCastingAbility?.Invoke(caster,null);
-                
+
+                OnUpdatedCastingAbility?.Invoke(caster, null);
+
                 var ability = currentCastingAbilityInstance;
                 var unit = caster;
                 currentCastingAbilityInstance = null;
                 caster = null;
-                
+
                 if (selectionEvent.Canceled)
                 {
                     //currentCastingAbilityInstance.ClearTileSelection();
                     return;
                 }
-                
-                ability.CastAbility(unit);
+
+                CastAbility(unit, ability);
             }
 
             void SelectTile(ClickTileEvent clickEvent)
             {
                 var tile = clickEvent.Tile;
-                
-                if(tile == null) return;
 
-                currentCastingAbilityInstance.AddTileToSelection(caster,tile);
+                if (tile == null) return;
+
+                currentCastingAbilityInstance.AddTileToSelection(caster, tile);
+            }
+        }
+
+        private void CastAbility(Unit unit, UnitAbilityInstance ability)
+        {
+            ability.CastAbility(unit);
+
+            ConsumeAbilityPoints(ability.Cost);
+        }
+
+        private void InitAbilityPoints(StartRoundEvent ctx)
+        {
+            var startingAmount = -AbilityPoints;
+            AbilityPoints = 0;
+            ConsumeAbilityPoints(startingAmount);
+        }
+
+        public void ConsumeAbilityPoints(int amount)
+        {
+            var previous = AbilityPoints;
+            AbilityPoints -= amount;
+            if (AbilityPoints > MaxAbilityPoints)
+            {
+                //Trigger overload
+                AbilityPoints = MaxAbilityPoints;
+            }
+
+            if (AbilityPoints < 0)
+            {
+                //Trigger underload(?)
+                AbilityPoints = 0;
             }
             
-            
+            Debug.Log($"Updating Ability Points : {previous} to {AbilityPoints}");
+            OnUpdatedAbilityPoints?.Invoke(previous,AbilityPoints);
         }
     }
 }
-
 
 
 namespace Battle.AbilityEvents
@@ -109,7 +155,7 @@ namespace Battle.AbilityEvents
         public UnitAbilityInstance Ability { get; }
         public Unit Caster { get; }
 
-        public StartAbilityTargetSelectionEvent(UnitAbilityInstance ability,Unit caster)
+        public StartAbilityTargetSelectionEvent(UnitAbilityInstance ability, Unit caster)
         {
             Ability = ability;
             Caster = caster;
@@ -132,7 +178,7 @@ namespace Battle.AbilityEvents
         public Unit Caster { get; }
         public List<Tile> SelectedTiles { get; }
 
-        public StartAbilityCastEvent(UnitAbilityInstance ability,Unit caster,List<Tile> selectedTiles)
+        public StartAbilityCastEvent(UnitAbilityInstance ability, Unit caster, List<Tile> selectedTiles)
         {
             Ability = ability;
             Caster = caster;

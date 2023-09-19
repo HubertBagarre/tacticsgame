@@ -25,8 +25,8 @@ namespace Battle
         
         [SerializeField] private Vector3 battleStartTransitionDuration = Vector3.one;
         [SerializeField] private Vector3 roundStartTransitionDuration = Vector3.one;
-        private float totalBattleStartTransitionDuration => battleStartTransitionDuration.x + battleStartTransitionDuration.y + battleStartTransitionDuration.z;
-        private float totalRoundStartTransitionDuration => roundStartTransitionDuration.x + roundStartTransitionDuration.y + roundStartTransitionDuration.z;
+        private float TotalBattleStartTransitionDuration => battleStartTransitionDuration.x + battleStartTransitionDuration.y + battleStartTransitionDuration.z;
+        private float TotalRoundStartTransitionDuration => roundStartTransitionDuration.x + roundStartTransitionDuration.y + roundStartTransitionDuration.z;
         
 
         [field:Header("Debug")]
@@ -104,10 +104,10 @@ namespace Battle
             {
                 EventManager.Trigger(new StartBattleEvent(battleStartTransitionDuration));
                 
-                yield return new WaitForSeconds(totalBattleStartTransitionDuration);
+                yield return new WaitForSeconds(TotalBattleStartTransitionDuration);
 
                 CurrentTurnEntity = endRoundEntity;
-            
+
                 NextRound();
             }
         }
@@ -150,7 +150,7 @@ namespace Battle
             {
                 OnStartRound?.Invoke(roundStartTransitionDuration);
                 
-                yield return new WaitForSeconds(totalRoundStartTransitionDuration);
+                yield return new WaitForSeconds(TotalRoundStartTransitionDuration);
                 
                 StartCoroutine(StartRoundLogicRoutine());
             }
@@ -162,7 +162,7 @@ namespace Battle
                     yield return StartCoroutine(battleEntity.StartRound());
                 }
 
-                EventManager.Trigger(new StartRoundEvent(CurrentRound,totalRoundStartTransitionDuration));
+                EventManager.Trigger(new StartRoundEvent(CurrentRound,TotalRoundStartTransitionDuration));
                 
                 if(CurrentTurnEntity != null) EndCurrentEntityTurn();
             }

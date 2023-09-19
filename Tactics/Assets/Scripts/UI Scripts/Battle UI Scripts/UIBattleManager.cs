@@ -10,6 +10,7 @@ namespace Battle
     using AbilityEvents;
     using BattleEvents;
     using UIEvents;
+    using UIComponent;
 
     public class UIBattleManager : MonoBehaviour
     {
@@ -37,6 +38,11 @@ namespace Battle
         [SerializeField] private Button cancelTileSelectionButton;
         [SerializeField] private TextMeshProUGUI selectionsLeftText;
         private UnitAbilityInstance currentAbilityInTargetSelection;
+
+        [Header("Ability Points")]
+        [SerializeField] private UIAbilityPointCharge abilityPointChargePrefab;
+        [SerializeField] private Transform abilityPointChargeParent;
+        private UIAbilityPointCharge[] abilityPointCharges;
         
         private Dictionary<BattleEntity, UIBattleEntityTimeline> uibattleTimelineDict = new();
         public static event Action OnEndTurnButtonClicked;
@@ -53,6 +59,8 @@ namespace Battle
             ShowEndTurnButton(false);
 
             ShowAbilityTargetSelectionButtons(false);
+            
+            InstantiateAbilityPointCharges();
         }
 
         private void AddCallbacks()
@@ -71,6 +79,7 @@ namespace Battle
             EventManager.AddListener<EndBattleEvent>(HidePlayerButtonsOnBattleEnd);
             
             AbilityManager.OnUpdatedCastingAbility += UpdateAbilityTargetSelection;
+            AbilityManager.OnUpdatedAbilityPoints += UpdateAbilityPointCharges;
             
             cancelTileSelectionButton.onClick.AddListener(CancelSelection);
             confirmTileSelectionButton.onClick.AddListener(ConfirmSelection);
@@ -322,6 +331,42 @@ namespace Battle
                 ui.transform.SetSiblingIndex(0);
 
                 ui.Show(i <= roundIndex);
+            }
+        }
+
+        #endregion
+
+        #region Ability Points
+
+        private void InstantiateAbilityPointCharges()
+        {
+            abilityPointCharges = new UIAbilityPointCharge[AbilityManager.MaxAbilityPoints];
+
+            for (int i = 0; i < AbilityManager.MaxAbilityPoints; i++)
+            {
+                abilityPointCharges[i] = Instantiate(abilityPointChargePrefab, abilityPointChargeParent);
+                abilityPointCharges[i].Charge(false);
+            }
+        }
+
+        private void UpdateAbilityPointCharges(int previousPoints,int newPoints)
+        {
+            if(previousPoints == newPoints) return;
+            var charge = previousPoints < newPoints;
+
+            if (charge)
+            {
+                for (int i = previousPoints; i < newPoints; i++)
+                {
+                    abilityPointCharges[i].Charge(true);
+                }
+            }
+            else
+            {
+                for (int i = previousPoints - 1; i >= newPoints; i--)
+                {
+                    abilityPointCharges[i].Charge(false);
+                }
             }
         }
 
