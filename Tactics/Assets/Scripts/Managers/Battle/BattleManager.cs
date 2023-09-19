@@ -152,6 +152,8 @@ namespace Battle
         private void NextRound()
         {
             if (endBattle) return;
+            
+            endRoundEntity.SetSpeed(SlowestEntitySpeed);
 
             CurrentRound++;
 
@@ -203,8 +205,6 @@ namespace Battle
 
         private void DecayTurnValues(float decayValue)
         {
-            endRoundEntity.SetSpeed(SlowestEntitySpeed);
-
             foreach (var entity in entitiesInBattle)
             {
                 entity.DecayTurnValue(decayValue);

@@ -247,6 +247,7 @@ namespace Battle
 
         public void KillEntityInBattle()
         {
+            if(Tile != null) Tile.RemoveUnit();
             Speed = 0;
 
             OnDeath?.Invoke();
