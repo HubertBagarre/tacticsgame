@@ -9,6 +9,7 @@ namespace Battle.ScriptableObjects
         protected static BattleManager battleM;
         protected static TileManager tileM;
         protected static UnitManager unitM;
+        protected static AbilityManager abilityM;
 
         public static void SetBattleManager(BattleManager battleManager)
         {
@@ -23,6 +24,11 @@ namespace Battle.ScriptableObjects
         public static void SetUnitManager(UnitManager unitManager)
         {
             unitM = unitManager;
+        }
+        
+        public static void SetAbilityManager(AbilityManager abilityManager)
+        {
+            abilityM = abilityManager;
         }
 
         public abstract void InitBehaviour(Unit unit);

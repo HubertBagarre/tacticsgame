@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Battle
 {
@@ -14,8 +13,10 @@ namespace Battle
 
     public class BattleManager : MonoBehaviour
     {
-        [Header("Managers")] [SerializeField] private TileManager tileManager;
+        [Header("Managers")]
+        [SerializeField] private TileManager tileManager;
         [SerializeField] private UnitManager unitManager;
+        [SerializeField] private AbilityManager abilityManager;
 
         [field: Header("Settings")]
         [field: SerializeField]
@@ -77,6 +78,7 @@ namespace Battle
 
             UnitBehaviourSO.SetTileManager(tileManager);
             UnitBehaviourSO.SetUnitManager(unitManager);
+            UnitBehaviourSO.SetAbilityManager(abilityManager);
             UnitBehaviourSO.SetBattleManager(this);
             //DelayedBattleActionsManager.Init(this); //yield return StartCoroutine() is op
 
@@ -105,7 +107,7 @@ namespace Battle
         private int GetSlowestEntitySpeed()
         {
             var availableEntities = entitiesInBattle.Where(entity => entity != endRoundEntity)
-                .Where(entity => !entity.IsDead).ToArray();
+                .Where(entity => !entity.IsDead).Where(entity => entity.Speed != 0).ToArray();
             return !(availableEntities.Length > 0) ? 100 : availableEntities.OrderBy(entity => entity.Speed).First().Speed;
         }
 
