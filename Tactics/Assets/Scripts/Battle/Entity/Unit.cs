@@ -38,8 +38,10 @@ namespace Battle
         [field: SerializeField] public int CurrentUltimatePoints { get; protected set; }
         public int MaxUltimatePoints => GetHighestCostUltimate();
         public event Action<int, int> OnUltimatePointsAmountChanged;
-
+        
         public List<UnitAbilityInstance> AbilityInstances { get; } = new();
+        public List<UnitPassiveInstance> PassiveInstances { get; } = new();
+
         private Coroutine behaviourRoutine;
 
         public event Action OnTurnStart;
@@ -281,6 +283,16 @@ namespace Battle
             if (CurrentUltimatePoints < 0) CurrentUltimatePoints = 0;
 
             OnUltimatePointsAmountChanged?.Invoke(previous, CurrentUltimatePoints);
+        }
+
+        public void AddPassiveEffect(UnitPassiveSO passiveSo)
+        {
+            //add passive instance to list
+        }
+
+        public void RemovePassiveEffect(Unit passiveSo)
+        {
+            
         }
     }
 }

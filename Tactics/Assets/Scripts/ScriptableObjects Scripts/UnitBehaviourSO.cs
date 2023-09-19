@@ -6,6 +6,7 @@ namespace Battle.ScriptableObjects
 {
     public abstract class UnitBehaviourSO : ScriptableObject
     {
+        // TODO - Remove if useless
         protected static BattleManager battleM;
         protected static TileManager tileM;
         protected static UnitManager unitM;
