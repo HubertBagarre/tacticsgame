@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e47b55f978106c549a6398743d9e0290, type: 3}
+  m_Name: Test Ability
+  m_EditorClassIdentifier: 
+  <Sprite>k__BackingField: {fileID: 0}
+  <Name>k__BackingField: 
+  <Description>k__BackingField: 
+  <ExpectedSelections>k__BackingField: 1
+  <Cooldown>k__BackingField: 0
+  <Cost>k__BackingField: 0
+  <IsUltimate>k__BackingField: 1
+  <UltimateCost>k__BackingField: 3
+  <SkipTargetSelection>k__BackingField: 0
+  <SkipTargetConfirmation>k__BackingField: 0
+  <EndUnitTurnAfterCast>k__BackingField: 1
+  range: 7
+  damage: 0

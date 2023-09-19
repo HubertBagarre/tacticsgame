@@ -81,6 +81,22 @@ namespace Battle
             return $"{SO.name} (Instance)";
         }
 
+        public void DecreaseCurrentCooldown(int amount)
+        {
+            CurrentCooldown -= amount;
+            if (CurrentCooldown < 0) CurrentCooldown = 0;
+        }
+
+        public void IncreaseCurrentCooldown(int amount)
+        {
+            CurrentCooldown += amount;
+        }
+
+        public void EnterCooldown()
+        {
+            CurrentCooldown = SO.Cooldown;
+        }
+
         public void ClearSelection()
         {
             currentSelectedTiles.Clear();
@@ -88,6 +104,8 @@ namespace Battle
 
         public void CastAbility(Unit caster)
         {
+            if(SO.Cooldown > 0) EnterCooldown();
+            
             EventManager.Trigger(new StartAbilityCastEvent(this, caster, currentSelectedTiles));
 
             caster.StartCoroutine(AbilityCast());

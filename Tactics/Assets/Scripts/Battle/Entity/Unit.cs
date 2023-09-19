@@ -115,6 +115,11 @@ namespace Battle
                 yield break;
             }
 
+            foreach (var abilityInstance in AbilityInstances)
+            {
+                abilityInstance.DecreaseCurrentCooldown(1);
+            }
+
             OnTurnStart?.Invoke();
             
             EventManager.Trigger(new StartUnitTurnEvent(this));
