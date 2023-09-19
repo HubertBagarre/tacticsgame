@@ -10,8 +10,9 @@ namespace Battle.UIComponent
 
         public void SetCost(int amount)
         {
-            positiveCostObj.SetActive(amount>0);
-            negativeCostObj.SetActive(amount<0);
+            //if the amount is NEGATIVE, you will GAIN Ability Points
+            positiveCostObj.SetActive(amount<0);
+            negativeCostObj.SetActive(amount>0);
         }
     }
 }

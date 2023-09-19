@@ -20,12 +20,14 @@ namespace Battle.UIComponent
             if (charged && !value)
             {
                 //play uncharge animation
+                charged = false;
                 chargedObj.SetActive(false);
             }
 
             if (!charged && value)
             {
                 //play charge animation
+                charged = true;
                 chargedObj.SetActive(true);
             }
         }

@@ -64,10 +64,11 @@ namespace Battle.UIComponent
         private void UpdateCostCharges()
         {
             var cost = associatedAbility.Cost;
+            var invert = cost < 0;
             
             for (int i = 0; i < abilityCostCharges.Length; i++)
             {
-                abilityCostCharges[i].gameObject.SetActive(i < cost);
+                abilityCostCharges[i].gameObject.SetActive(invert ? i < -cost : i < cost);
                 abilityCostCharges[i].SetCost(cost);
             }
             if(cost == 0) abilityCostCharges[0].gameObject.SetActive(true);
