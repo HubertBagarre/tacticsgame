@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Battle.UnitEvents;
 using UnityEngine;
 
 namespace Battle
@@ -15,7 +14,7 @@ namespace Battle
         public Sprite Sprite { get; private set; }
 
         [field: SerializeField] public string Name { get; private set; }
-        [field: SerializeField] public string Description { get; private set; }
+        [field: SerializeField,TextArea(10,10)] public string Description { get; private set; }
         [field: SerializeField] public int ExpectedSelections { get; private set; }
         [field: SerializeField] public int Cooldown { get; private set; }
         [field: SerializeField] public int Cost { get; private set; }

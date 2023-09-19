@@ -5664,7 +5664,7 @@ PrefabInstance:
         type: 3}
       propertyPath: <Stats>k__BackingField
       value: 
-      objectReference: {fileID: 11400000, guid: 8c798ae10bc978341b71cae74b691113,
+      objectReference: {fileID: 11400000, guid: 61a3f0fc4fd04034798ec0fc6883ad4e,
         type: 2}
     - target: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
         type: 3}

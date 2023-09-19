@@ -85,8 +85,10 @@ namespace Battle
                 {
                     AddEntityToBattle(battleEntity,true);
                 }
+
+                var slowestSpeed = entitiesInBattle.OrderBy(entity => entity.Speed).First().Speed;
                 
-                endRoundEntity = new EndRoundEntity(this, 100);
+                endRoundEntity = new EndRoundEntity(this, slowestSpeed);
                 AddEntityToBattle(endRoundEntity,false);
             }
         }

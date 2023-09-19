@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class UIBattleEntityTimeline : MonoBehaviour
 {
     [SerializeField] private Image portraitImage;
+    [SerializeField] private Image borderImage;
     [SerializeField] private TextMeshProUGUI turnValueText;
     [SerializeField] private GameObject turnValueObj;
     [SerializeField] private GameObject obj;
@@ -16,6 +17,7 @@ public class UIBattleEntityTimeline : MonoBehaviour
     public void ConnectToEntity(BattleEntity entity)
     {
         AssociatedEntity = entity;
+        borderImage.color = AssociatedEntity.Team == 0 ? Color.cyan : Color.red;
         
         gameObject.name = $"{AssociatedEntity}'s time";
         
