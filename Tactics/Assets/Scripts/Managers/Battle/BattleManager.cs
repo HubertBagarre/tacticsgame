@@ -14,36 +14,47 @@ namespace Battle
 
     public class BattleManager : MonoBehaviour
     {
-        [Header("Managers")]
-        [SerializeField] private TileManager tileManager;
+        [Header("Managers")] [SerializeField] private TileManager tileManager;
         [SerializeField] private UnitManager unitManager;
-        
+
         [field: Header("Settings")]
         [field: SerializeField]
         public int ResetTurnValue { get; private set; } = 999;
-        [field:SerializeField] public Sprite EndTurnImage { get; private set; }
-        
+
+        [field: SerializeField] public Sprite EndTurnImage { get; private set; }
+
         [SerializeField] private Vector3 battleStartTransitionDuration = Vector3.one;
         [SerializeField] private Vector3 roundStartTransitionDuration = Vector3.one;
-        private float TotalBattleStartTransitionDuration => battleStartTransitionDuration.x + battleStartTransitionDuration.y + battleStartTransitionDuration.z;
-        private float TotalRoundStartTransitionDuration => roundStartTransitionDuration.x + roundStartTransitionDuration.y + roundStartTransitionDuration.z;
-        
 
-        [field:Header("Debug")]
-        [field: SerializeField] public int CurrentRound { get; private set; }
+        private float TotalBattleStartTransitionDuration => battleStartTransitionDuration.x +
+                                                            battleStartTransitionDuration.y +
+                                                            battleStartTransitionDuration.z;
+
+        private float TotalRoundStartTransitionDuration => roundStartTransitionDuration.x +
+                                                           roundStartTransitionDuration.y +
+                                                           roundStartTransitionDuration.z;
+
+
+        [field: Header("Debug")]
+        [field: SerializeField]
+        public int CurrentRound { get; private set; }
+
         public event Action<Vector3> OnStartRound;
 
         private BattleLevel battleLevel;
         public BattleEntity CurrentTurnEntity { get; private set; }
         private EndRoundEntity endRoundEntity;
 
-        private List<BattleEntity> entitiesInBattle = new ();
+        private List<BattleEntity> entitiesInBattle = new();
         public BattleEntity[] EntitiesInBattle => entitiesInBattle.Where(entity => entity.Team >= 0).ToArray();
-        private List<BattleEntity> deadUnits = new ();
+        private List<BattleEntity> deadUnits = new();
 
         private bool endBattle;
 
-        private UpdateTurnValuesEvent updateTurnValuesEvent => new (entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList(),endRoundEntity);
+        private UpdateTurnValuesEvent updateTurnValuesEvent =>
+            new(entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList(), endRoundEntity);
+
+        private int SlowestEntitySpeed => GetSlowestEntitySpeed();
 
         public void Start()
         {
@@ -58,54 +69,57 @@ namespace Battle
         public void SetupBattle(BattleLevel level)
         {
             battleLevel = level;
-            
+
             foreach (var tile in tileManager.AllTiles)
             {
                 tile.SetAppearance(Tile.Appearance.Default);
             }
-            
+
             UnitBehaviourSO.SetTileManager(tileManager);
             UnitBehaviourSO.SetUnitManager(unitManager);
             UnitBehaviourSO.SetBattleManager(this);
             //DelayedBattleActionsManager.Init(this); //yield return StartCoroutine() is op
-            
+
             battleLevel.SetupEndBattleConditions(this);
-            
+
             tileManager.SetTiles(battleLevel.Tiles);
             unitManager.SetUnits(battleLevel.Units);
-            
+
             SetupStartingEntities();
-            
+
             void SetupStartingEntities()
             {
                 entitiesInBattle.Clear();
                 deadUnits.Clear();
-                
+
                 foreach (var battleEntity in level.StartingEntities)
                 {
-                    AddEntityToBattle(battleEntity,true);
+                    AddEntityToBattle(battleEntity, true);
                 }
 
-                var slowestSpeed = entitiesInBattle.OrderBy(entity => entity.Speed).First().Speed;
-                
-                endRoundEntity = new EndRoundEntity(this, slowestSpeed);
-                AddEntityToBattle(endRoundEntity,false);
+                endRoundEntity = new EndRoundEntity(this, SlowestEntitySpeed);
+                AddEntityToBattle(endRoundEntity, false);
             }
+        }
+
+        private int GetSlowestEntitySpeed()
+        {
+            var availableEntities = entitiesInBattle.Where(entity => entity != endRoundEntity)
+                .Where(entity => !entity.IsDead).ToArray();
+            return !(availableEntities.Length > 0) ? 100 : availableEntities.OrderBy(entity => entity.Speed).First().Speed;
         }
 
         public void StartBattle()
         {
-            Debug.Log("Starting Battle");
-
             endBattle = false;
             CurrentRound = 0;
 
             StartCoroutine(StartBattleTransition());
-            
+
             IEnumerator StartBattleTransition()
             {
                 EventManager.Trigger(new StartBattleEvent(battleStartTransitionDuration));
-                
+
                 yield return new WaitForSeconds(TotalBattleStartTransitionDuration);
 
                 CurrentTurnEntity = endRoundEntity;
@@ -129,34 +143,34 @@ namespace Battle
             Debug.Log($"Ending Battle (win : {win})");
 
             endBattle = true;
-            
+
             EventManager.RemoveListeners<EndAbilityCastEvent>();
 
             EventManager.Trigger(new EndBattleEvent(win));
         }
-        
+
         private void NextRound()
         {
-            if(endBattle) return;
-            
+            if (endBattle) return;
+
             CurrentRound++;
-            
+
             StartRound();
         }
 
         private void StartRound()
         {
             StartCoroutine(InvokeOnStartRound());
-            
+
             IEnumerator InvokeOnStartRound()
             {
                 OnStartRound?.Invoke(roundStartTransitionDuration);
-                
+
                 yield return new WaitForSeconds(TotalRoundStartTransitionDuration);
-                
+
                 StartCoroutine(StartRoundLogicRoutine());
             }
-            
+
             IEnumerator StartRoundLogicRoutine()
             {
                 foreach (var battleEntity in entitiesInBattle)
@@ -164,16 +178,16 @@ namespace Battle
                     yield return StartCoroutine(battleEntity.StartRound());
                 }
 
-                EventManager.Trigger(new StartRoundEvent(CurrentRound,TotalRoundStartTransitionDuration));
-                
-                if(CurrentTurnEntity != null) EndCurrentEntityTurn();
+                EventManager.Trigger(new StartRoundEvent(CurrentRound, TotalRoundStartTransitionDuration));
+
+                if (CurrentTurnEntity != null) EndCurrentEntityTurn();
             }
         }
-        
+
         private void EndRound()
         {
             StartCoroutine(EndRoundLogicRoutine());
-            
+
             IEnumerator EndRoundLogicRoutine()
             {
                 foreach (var battleEntity in entitiesInBattle)
@@ -186,35 +200,37 @@ namespace Battle
                 NextRound();
             }
         }
-        
+
         private void DecayTurnValues(float decayValue)
         {
+            endRoundEntity.SetSpeed(SlowestEntitySpeed);
+
             foreach (var entity in entitiesInBattle)
             {
                 entity.DecayTurnValue(decayValue);
             }
-            
+
             EventManager.Trigger(updateTurnValuesEvent);
         }
 
         private void StartEntityTurn(BattleEntity unit)
         {
             CurrentTurnEntity = unit;
-            
+
             Debug.Log($"{CurrentTurnEntity}'s turn");
-            
+
             if (CurrentTurnEntity == endRoundEntity)
             {
                 EndRound();
-                
+
                 return;
             }
-            
+
             EventManager.Trigger(new StartEntityTurnEvent(CurrentTurnEntity));
-            
+
             StartCoroutine(CurrentTurnEntity.StartTurn(EndCurrentEntityTurn));
         }
-        
+
         public void EndCurrentEntityTurn()
         {
             CurrentTurnEntity.ResetTurnValue(ResetTurnValue);
@@ -224,9 +240,9 @@ namespace Battle
             IEnumerator EndEntityTurn()
             {
                 yield return StartCoroutine(CurrentTurnEntity.EndTurn());
-                
+
                 EventManager.Trigger(new EndEntityTurnEvent(CurrentTurnEntity));
-            
+
                 NextUnitTurn();
             }
         }
@@ -237,59 +253,59 @@ namespace Battle
             {
                 RemoveEntityFromBattle(deadUnit);
             }
+
             deadUnits.Clear();
-            
-            if(endBattle) return;
-            
+
+            if (endBattle) return;
+
             var nextUnit = entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList().First();
-            
+
             DecayTurnValues(nextUnit.TurnOrder);
-            
+
             EventManager.Trigger(updateTurnValuesEvent);
-            
+
             StartEntityTurn(nextUnit);
         }
 
-        
-        private void AddEntityToBattle(BattleEntity entity,bool createPreview)
+        private void AddEntityToBattle(BattleEntity entity, bool createPreview)
         {
             entity.InitEntityForBattle();
 
             entitiesInBattle.Add(entity);
             entity.ResetTurnValue(-1);
-            
-            EventManager.Trigger(new EntityJoinBattleEvent(entity,false));
-            
+
+            EventManager.Trigger(new EntityJoinBattleEvent(entity, false));
+
             if (createPreview)
             {
-                var previewEntity = new PreviewEntity(this,entity);
+                var previewEntity = new PreviewEntity(this, entity);
                 entitiesInBattle.Add(previewEntity);
 
                 entity.OnDeath += RemoveAssociatedPreviewEntityFromBattle;
-                
-                EventManager.Trigger(new EntityJoinBattleEvent(previewEntity,true));
+
+                EventManager.Trigger(new EntityJoinBattleEvent(previewEntity, true));
 
                 void RemoveAssociatedPreviewEntityFromBattle()
                 {
-                    if(!deadUnits.Contains(previewEntity)) deadUnits.Add(previewEntity);
+                    if (!deadUnits.Contains(previewEntity)) deadUnits.Add(previewEntity);
                 }
             }
-            
+
             EventManager.Trigger(updateTurnValuesEvent);
         }
 
         private void RemoveEntityFromBattle(BattleEntity entity)
         {
-            if(!entitiesInBattle.Contains(entity)) return;
+            if (!entitiesInBattle.Contains(entity)) return;
             entitiesInBattle.Remove(entity);
-            
+
             EventManager.Trigger(new EntityLeaveBattleEvent(entity));
         }
 
         private void AddDeadUnitToList(UnitDeathEvent ctx)
         {
             EventManager.Trigger(updateTurnValuesEvent);
-            
+
             deadUnits.Add(ctx.Unit);
         }
     }
@@ -306,23 +322,47 @@ namespace Battle
         private BattleManager bm;
         private BattleEntity associatedEntity;
 
-        public PreviewEntity(BattleManager battleManager,BattleEntity entity)
+        public PreviewEntity(BattleManager battleManager, BattleEntity entity)
         {
             bm = battleManager;
             associatedEntity = entity;
         }
 
-        public void InitEntityForBattle() { }
+        public void InitEntityForBattle()
+        {
+        }
 
-        public void KillEntityInBattle() { }
+        public void KillEntityInBattle()
+        {
+        }
 
-        public void ResetTurnValue(float value) { }
-        public void DecayTurnValue(float amount) { }
+        public void ResetTurnValue(float value)
+        {
+        }
 
-        public IEnumerator StartRound() { yield return null;}
-        public IEnumerator EndRound() { yield return null;}
-        public IEnumerator StartTurn(Action _) { yield return null;}
-        public IEnumerator EndTurn() { yield return null;}
+        public void DecayTurnValue(float amount)
+        {
+        }
+
+        public IEnumerator StartRound()
+        {
+            yield return null;
+        }
+
+        public IEnumerator EndRound()
+        {
+            yield return null;
+        }
+
+        public IEnumerator StartTurn(Action _)
+        {
+            yield return null;
+        }
+
+        public IEnumerator EndTurn()
+        {
+            yield return null;
+        }
 
         public override string ToString()
         {
@@ -334,25 +374,37 @@ namespace Battle
     {
         public Sprite Portrait { get; }
         public int Team => -1;
-        public int Speed { get;}
+        public int Speed { get; private set; }
         public float DecayRate => Speed / 100f;
         public float DistanceFromTurnStart { get; private set; }
         private float TurnResetValue => battleM.ResetTurnValue;
         public bool IsDead => false;
         private BattleManager battleM;
 
-        public EndRoundEntity(BattleManager battleManager,int speed)
+        public EndRoundEntity(BattleManager battleManager, int speed)
         {
             battleM = battleManager;
             Portrait = battleM.EndTurnImage;
 
             Speed = speed;
+            Debug.Log($"End round speed is {Speed}");
             DistanceFromTurnStart = 0;
         }
 
-        public void InitEntityForBattle() { }
-        public void KillEntityInBattle(){ }
+        public void InitEntityForBattle()
+        {
+        }
+
+        public void KillEntityInBattle()
+        {
+        }
+
         public event Action OnDeath;
+
+        public void SetSpeed(int newSpeed)
+        {
+            Speed = newSpeed;
+        }
 
         public void ResetTurnValue(float _)
         {
@@ -364,12 +416,25 @@ namespace Battle
             DistanceFromTurnStart -= amount * DecayRate;
         }
 
-        public IEnumerator StartRound() { yield return null;}
-        public IEnumerator EndRound() { yield return null;}
+        public IEnumerator StartRound()
+        {
+            yield return null;
+        }
 
-        public IEnumerator StartTurn(Action _) { yield return null;}
+        public IEnumerator EndRound()
+        {
+            yield return null;
+        }
 
-        public IEnumerator EndTurn() { yield return null;}
+        public IEnumerator StartTurn(Action _)
+        {
+            yield return null;
+        }
+
+        public IEnumerator EndTurn()
+        {
+            yield return null;
+        }
     }
 }
 
@@ -400,7 +465,7 @@ namespace Battle.BattleEvents
         public int Round { get; }
         public float TransitionDuration { get; }
 
-        public StartRoundEvent(int round,float transitionDuration)
+        public StartRoundEvent(int round, float transitionDuration)
         {
             Round = round;
             TransitionDuration = transitionDuration;
@@ -441,18 +506,18 @@ namespace Battle.BattleEvents
     {
         public BattleEntity Entity { get; }
         public bool Preview { get; }
-        
-        public EntityJoinBattleEvent(BattleEntity entity,bool preview)
+
+        public EntityJoinBattleEvent(BattleEntity entity, bool preview)
         {
             Entity = entity;
             Preview = preview;
         }
     }
-    
+
     public class EntityLeaveBattleEvent
     {
         public BattleEntity Entity { get; }
-        
+
         public EntityLeaveBattleEvent(BattleEntity entity)
         {
             Entity = entity;

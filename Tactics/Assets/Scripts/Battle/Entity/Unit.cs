@@ -15,27 +15,31 @@ namespace Battle
         [field: SerializeField] public int Team { get; private set; } //0 is player
         [field: SerializeField] public UnitStatsSO Stats { get; private set; }
         public Sprite Portrait => Stats.Portrait;
-        
+
         [field: Header("Current Flags")]
-        [field: SerializeField] public bool IsActive { get; private set; }
+        [field: SerializeField]
+        public bool IsActive { get; private set; }
+
         [field: SerializeField] public bool CanMove { get; private set; } = true;
 
         [field: Header("Current Stats")]
-        [field: SerializeField] public UnitBehaviourSO Behaviour { get; private set; }
+        [field: SerializeField]
+        public UnitBehaviourSO Behaviour { get; private set; }
+
         [field: SerializeField] public int Movement { get; private set; }
 
         [field: SerializeField] public int MovementLeft { get; private set; }
-        [field:SerializeField] public int Speed { get; protected set; }
+        [field: SerializeField] public int Speed { get; protected set; }
         public float DecayRate => Speed / 100f;
-        [field:SerializeField] public float DistanceFromTurnStart { get; protected set; }
-        [field:SerializeField] public int CurrentHp { get; protected set; }
+        [field: SerializeField] public float DistanceFromTurnStart { get; protected set; }
+        [field: SerializeField] public int CurrentHp { get; protected set; }
         public bool IsDead => CurrentHp <= 0;
-        
-        [field:SerializeField] public int CurrentUltimatePoints { get; protected set; }
+
+        [field: SerializeField] public int CurrentUltimatePoints { get; protected set; }
         public int MaxUltimatePoints => GetHighestCostUltimate();
         public event Action<int, int> OnUltimatePointsAmountChanged;
 
-        public List<UnitAbilityInstance> AbilityInstances { get; } = new ();
+        public List<UnitAbilityInstance> AbilityInstances { get; } = new();
         private Coroutine behaviourRoutine;
 
         public event Action OnTurnStart;
@@ -56,10 +60,10 @@ namespace Battle
             CurrentUltimatePoints = 0;
 
             IsActive = true;
-            
+
             AbilityInstances.Clear();
             behaviourRoutine = null;
-            
+
             tile.SetUnit(this);
         }
 
@@ -69,7 +73,7 @@ namespace Battle
             Speed = Stats.BaseSpeed;
             Behaviour = Stats.Behaviour;
             CurrentHp = Stats.MaxHp;
-            
+
             CurrentUltimatePoints = 0;
 
             AbilityInstances.Clear();
@@ -77,10 +81,10 @@ namespace Battle
             {
                 AbilityInstances.Add(ability.CreateInstance());
             }
-            
+
             Behaviour.InitBehaviour(this);
         }
-        
+
         public IEnumerator StartRound()
         {
             yield return null; //apply effects
@@ -93,12 +97,12 @@ namespace Battle
 
         public void InterruptBehaviour()
         {
-            if(behaviourRoutine == null) return;
-            
+            if (behaviourRoutine == null) return;
+
             Debug.Log("Interrupting behaviour");
-            
+
             Behaviour.InterruptBehaviour(this);
-            
+
             StopCoroutine(behaviourRoutine);
             behaviourRoutine = null;
         }
@@ -106,7 +110,7 @@ namespace Battle
         public IEnumerator StartTurn(Action onBehaviourEnd)
         {
             MovementLeft = Movement;
-            
+
             yield return null; //apply effects
 
             if (IsDead)
@@ -121,7 +125,7 @@ namespace Battle
             }
 
             OnTurnStart?.Invoke();
-            
+
             EventManager.Trigger(new StartUnitTurnEvent(this));
 
             UIBattleManager.OnEndTurnButtonClicked += InterruptBehaviour;
@@ -129,13 +133,13 @@ namespace Battle
             bool behaviourRunning = true;
 
             StartCoroutine(RunBehaviour());
-            
+
             bool IsBehaviourRoutineRunning() => behaviourRoutine != null && behaviourRunning;
 
             yield return new WaitWhile(IsBehaviourRoutineRunning);
-            
+
             UIBattleManager.OnEndTurnButtonClicked -= InterruptBehaviour;
-            
+
             onBehaviourEnd.Invoke();
 
             IEnumerator RunBehaviour()
@@ -146,19 +150,19 @@ namespace Battle
                 behaviourRunning = false;
             }
         }
-        
+
         public IEnumerator EndTurn()
         {
             yield return null; //apply effects
-            
+
             OnTurnEnd?.Invoke();
-            
+
             EventManager.Trigger(new EndUnitTurnEvent(this));
         }
 
         public void SetTile(Tile tile)
         {
-            if(Tile != null) Tile.RemoveUnit();
+            if (Tile != null) Tile.RemoveUnit();
 
             Tile = tile;
 
@@ -171,21 +175,21 @@ namespace Battle
             {
                 yield break; // checks for valid path
             }
-            
+
             if (path.Any(tile => tile.HasUnit()))
             {
                 yield break; //does the path have any unit on it ?
             }
-            
+
             if (!CanContinueMovement())
             {
                 yield break;
             }
-            
+
             for (var index = 0; index < path.Count && CanContinueMovement(); index++)
             {
                 var tile = path[index];
-                
+
                 //play movement animation
                 yield return new WaitForSeconds(0.1f);
 
@@ -194,7 +198,7 @@ namespace Battle
                 MovementLeft--;
                 SetTile(tile);
             }
-            
+
             bool CanContinueMovement()
             {
                 return MovementLeft > 0 && !IsDead;
@@ -210,17 +214,17 @@ namespace Battle
         {
             DistanceFromTurnStart -= amount * DecayRate;
         }
-        
+
         public void TakeDamage(int amount)
         {
             if (amount < 0) amount = 0; //No negative damage, negative damage doesn't heal, but can deal 0 damage
 
             var startHp = CurrentHp;
             CurrentHp -= amount;
-            
-            EventManager.Trigger(new UnitTakeDamageEvent(this,startHp));
-            
-            if(CurrentHp <= 0) KillEntityInBattle();
+
+            EventManager.Trigger(new UnitTakeDamageEvent(this, startHp));
+
+            if (CurrentHp <= 0) KillEntityInBattle();
         }
 
         public void HealDamage(int amount)
@@ -229,22 +233,28 @@ namespace Battle
 
             var startHp = CurrentHp;
             CurrentHp += amount;
-            
-            EventManager.Trigger(new UnitHealDamageEvent(this,startHp));
+
+            EventManager.Trigger(new UnitHealDamageEvent(this, startHp));
 
             if (CurrentHp > Stats.MaxHp) CurrentHp = Stats.MaxHp; //No overheal (yet ?)
         }
         
-        [ContextMenu("Kill")]
+        [ContextMenu("Execute")]
+        public void Execute()
+        {
+            TakeDamage(CurrentHp);
+        }
+
         public void KillEntityInBattle()
         {
             Speed = 0;
-            
+
             OnDeath?.Invoke();
             OnDeath = null;
-            
+
             EventManager.Trigger(new UnitDeathEvent(this));
-            
+
+
             gameObject.SetActive(false);
         }
 
@@ -259,8 +269,8 @@ namespace Battle
             var previous = CurrentUltimatePoints;
             CurrentUltimatePoints += amount;
             if (CurrentUltimatePoints > MaxUltimatePoints) CurrentUltimatePoints = MaxUltimatePoints;
-            
-            OnUltimatePointsAmountChanged?.Invoke(previous,CurrentUltimatePoints);
+
+            OnUltimatePointsAmountChanged?.Invoke(previous, CurrentUltimatePoints);
         }
 
         public void ConsumeUltimatePoint(int amount)
@@ -268,8 +278,8 @@ namespace Battle
             var previous = CurrentUltimatePoints;
             CurrentUltimatePoints -= amount;
             if (CurrentUltimatePoints < 0) CurrentUltimatePoints = 0;
-            
-            OnUltimatePointsAmountChanged?.Invoke(previous,CurrentUltimatePoints);
+
+            OnUltimatePointsAmountChanged?.Invoke(previous, CurrentUltimatePoints);
         }
     }
 }
@@ -295,28 +305,28 @@ namespace Battle.UnitEvents
             Unit = unit;
         }
     }
-    
+
     public class UnitTakeDamageEvent
     {
         public Unit Unit { get; }
         public int StartHp { get; }
         public int Amount { get; }
-        
-        public UnitTakeDamageEvent(Unit unit,int startHp)
+
+        public UnitTakeDamageEvent(Unit unit, int startHp)
         {
             Unit = unit;
             StartHp = startHp;
             Amount = StartHp - Unit.CurrentHp;
         }
     }
-    
+
     public class UnitHealDamageEvent
     {
         public Unit Unit { get; }
         public int StartHp { get; }
         public int Amount { get; }
-        
-        public UnitHealDamageEvent(Unit unit,int startHp)
+
+        public UnitHealDamageEvent(Unit unit, int startHp)
         {
             Unit = unit;
             StartHp = startHp;
@@ -326,7 +336,7 @@ namespace Battle.UnitEvents
 
     public class UnitDeathEvent
     {
-        public Unit Unit { get;}
+        public Unit Unit { get; }
 
         public UnitDeathEvent(Unit unit)
         {
