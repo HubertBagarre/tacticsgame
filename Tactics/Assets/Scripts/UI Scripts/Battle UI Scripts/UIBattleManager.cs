@@ -31,7 +31,8 @@ namespace Battle
         [SerializeField] private UIUnitAbilityButton abilityButtonPrefab;
         [SerializeField] private Transform abilityButtonParent;
         private List<UIUnitAbilityButton> abilityButtons = new();
-        
+        private Dictionary<Unit, List<UIUnitAbilityButton>> unitAbilitButtonsDict = new();
+
         [Header("Ability Tile Selection")]
         [SerializeField] private GameObject abilityTargetSelectionUIObj;
         [SerializeField] private Button confirmTileSelectionButton;
@@ -247,37 +248,30 @@ namespace Battle
         #endregion
 
         #region Unit Ability
-
         
-
         private void ShowUnitAbilitiesButton(Unit unit)
         {
-            var abilities = unit.AbilityInstances;
-
-            UpdateAbilityButtonCount(abilities.Count);
-
-            for (var index = 0; index < abilities.Count; index++)
+            if (!unitAbilitButtonsDict.ContainsKey(unit))
             {
-                var ability = abilities[index];
-                abilityButtons[index].LinkAbility(ability,unit);
-                abilityButtonParent.GetChild(index).gameObject.SetActive(true);
+                var abilities = unit.AbilityInstances;
+                var dictValue = new List<UIUnitAbilityButton>();
+                unitAbilitButtonsDict.Add(unit,dictValue);
+                
+                foreach (var abilityInstance in abilities)
+                {
+                    var abilityButton = Instantiate(abilityButtonPrefab, abilityButtonParent);
+                    abilityButton.LinkAbility(abilityInstance,unit);
+                    abilityButtons.Add(abilityButton);
+                    dictValue.Add(abilityButton);
+                }
+            }
+
+            foreach (var abilityButton in unitAbilitButtonsDict[unit])
+            {
+                abilityButton.gameObject.SetActive(true);
+                abilityButton.UpdateAppearance();
             }
         }
-
-        private void UpdateAbilityButtonCount(int amount)
-        {
-            var currentButtons = abilityButtonParent.childCount;
-            var missingButtons = amount - currentButtons;
-
-            if (missingButtons <= 0) return;
-
-            for (int i = 0; i < missingButtons; i++)
-            {
-                var ability = Instantiate(abilityButtonPrefab, abilityButtonParent);
-                abilityButtons.Add(ability);
-            }
-        }
-
         private void HideUnitAbilitiesButton()
         {
             foreach (var abilityButton in abilityButtons)

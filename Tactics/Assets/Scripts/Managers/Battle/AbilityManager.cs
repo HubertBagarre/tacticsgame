@@ -55,7 +55,7 @@ namespace Battle
 
             currentCastingAbilityInstance.ClearSelection();
             
-            if (AbilityPoints - currentCastingAbilityInstance.Cost < 0)
+            if (caster.CurrentUltimatePoints < currentCastingAbilityInstance.UltimateCost)
             {
                 EventManager.Trigger(new EndAbilityTargetSelectionEvent(true));
                 return;
@@ -113,9 +113,13 @@ namespace Battle
 
         private void CastAbility(Unit unit, UnitAbilityInstance ability)
         {
+            if(ability.IsUltimate) unit.ConsumeUltimatePoint(ability.UltimateCost);
+            
             ability.CastAbility(unit);
 
             ConsumeAbilityPoints(ability.Cost);
+            
+            if(!ability.IsUltimate) unit.GainUltimatePoint(1);
         }
 
         private void InitAbilityPoints(StartRoundEvent ctx)
@@ -143,6 +147,11 @@ namespace Battle
             
             Debug.Log($"Updating Ability Points : {previous} to {AbilityPoints}");
             OnUpdatedAbilityPoints?.Invoke(previous,AbilityPoints);
+        }
+
+        public void IncreaseUnitUltimatePoints()
+        {
+            
         }
     }
 }

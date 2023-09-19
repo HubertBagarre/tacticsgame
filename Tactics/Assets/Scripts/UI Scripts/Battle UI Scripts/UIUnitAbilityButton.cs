@@ -37,6 +37,11 @@ namespace Battle.UIComponent
 
         public void LinkAbility(UnitAbilityInstance ability,Unit caster)
         {
+            if (associatedUnit != null)
+            {
+                associatedUnit.OnUltimatePointsAmountChanged -= UpdateUltimateCharges;
+            }
+            
             if (associatedAbility != null)
             {
                 //remove callbacks
@@ -45,20 +50,38 @@ namespace Battle.UIComponent
             associatedAbility = ability;
             associatedUnit = caster;
 
-            UpdateUltimateCharges();
-            UpdateCostCharges();
-            UpdateCooldown();
+            associatedUnit.OnUltimatePointsAmountChanged += UpdateUltimateCharges;
 
-            //add callbacks
+            UpdateAppearance();
         }
 
-        private void UpdateUltimateCharges()
+        public void UpdateAppearance()
+        {
+            UpdateUltimateChargesAmount();
+            UpdateCostCharges();
+            UpdateCooldown();
+            
+            Button.interactable = associatedUnit.CurrentUltimatePoints >= associatedAbility.UltimateCost && !(associatedAbility.CurrentCooldown > 0);
+        }
+
+        private void UpdateUltimateChargesAmount()
         {
             var cost = associatedAbility.UltimateCost;
             for (int i = 0; i < ultimateCharges.Length; i++)
             {
                 ultimateCharges[i].gameObject.SetActive(i < cost);
+                ultimateCharges[i].Charge(i < associatedUnit.CurrentUltimatePoints);
             }
+        }
+
+        private void UpdateUltimateCharges(int previous,int current)
+        {
+            for (int i = 0; i < ultimateCharges.Length; i++)
+            {
+                ultimateCharges[i].Charge(i < current);
+            }
+
+            Button.interactable = associatedUnit.CurrentUltimatePoints >= associatedAbility.UltimateCost && !(associatedAbility.CurrentCooldown > 0);
         }
 
         private void UpdateCostCharges()
@@ -71,7 +94,9 @@ namespace Battle.UIComponent
                 abilityCostCharges[i].gameObject.SetActive(invert ? i < -cost : i < cost);
                 abilityCostCharges[i].SetCost(cost);
             }
-            if(cost == 0) abilityCostCharges[0].gameObject.SetActive(true);
+            
+            //enable if represent with numbers (genshin tcg style)
+            //if(cost == 0) abilityCostCharges[0].gameObject.SetActive(true);
         }
 
         private void UpdateCooldown()

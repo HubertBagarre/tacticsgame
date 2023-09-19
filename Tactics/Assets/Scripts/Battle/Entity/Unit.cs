@@ -28,10 +28,13 @@ namespace Battle
         [field:SerializeField] public int Speed { get; protected set; }
         public float DecayRate => Speed / 100f;
         [field:SerializeField] public float DistanceFromTurnStart { get; protected set; }
-        
         [field:SerializeField] public int CurrentHp { get; protected set; }
         public bool IsDead => CurrentHp <= 0;
         
+        [field:SerializeField] public int CurrentUltimatePoints { get; protected set; }
+        public int MaxUltimatePoints => GetHighestCostUltimate();
+        public event Action<int, int> OnUltimatePointsAmountChanged;
+
         public List<UnitAbilityInstance> AbilityInstances { get; } = new ();
         private Coroutine behaviourRoutine;
 
@@ -50,6 +53,8 @@ namespace Battle
             Behaviour = so.Behaviour;
             CurrentHp = so.MaxHp;
 
+            CurrentUltimatePoints = 0;
+
             IsActive = true;
             
             AbilityInstances.Clear();
@@ -64,6 +69,8 @@ namespace Battle
             Speed = Stats.BaseSpeed;
             Behaviour = Stats.Behaviour;
             CurrentHp = Stats.MaxHp;
+            
+            CurrentUltimatePoints = 0;
 
             AbilityInstances.Clear();
             foreach (var ability in Stats.Abilities)
@@ -211,6 +218,18 @@ namespace Battle
             if(CurrentHp <= 0) KillEntityInBattle();
         }
 
+        public void HealDamage(int amount)
+        {
+            if (amount < 0) amount = 0;
+
+            var startHp = CurrentHp;
+            CurrentHp += amount;
+            
+            EventManager.Trigger(new UnitHealDamageEvent(this,startHp));
+
+            if (CurrentHp > Stats.MaxHp) CurrentHp = Stats.MaxHp; //No overheal (yet ?)
+        }
+        
         [ContextMenu("Kill")]
         public void KillEntityInBattle()
         {
@@ -224,16 +243,28 @@ namespace Battle
             gameObject.SetActive(false);
         }
 
-        public void HealDamage(int amount)
+        private int GetHighestCostUltimate()
         {
-            if (amount < 0) amount = 0;
+            if (AbilityInstances.Count <= 0) return 0;
+            return AbilityInstances.OrderByDescending(ability => ability.UltimateCost).First().UltimateCost;
+        }
 
-            var startHp = CurrentHp;
-            CurrentHp += amount;
+        public void GainUltimatePoint(int amount)
+        {
+            var previous = CurrentUltimatePoints;
+            CurrentUltimatePoints += amount;
+            if (CurrentUltimatePoints > MaxUltimatePoints) CurrentUltimatePoints = MaxUltimatePoints;
             
-            EventManager.Trigger(new UnitHealDamageEvent(this,startHp));
+            OnUltimatePointsAmountChanged?.Invoke(previous,CurrentUltimatePoints);
+        }
 
-            if (CurrentHp > Stats.MaxHp) CurrentHp = Stats.MaxHp; //No overheal (yet ?)
+        public void ConsumeUltimatePoint(int amount)
+        {
+            var previous = CurrentUltimatePoints;
+            CurrentUltimatePoints -= amount;
+            if (CurrentUltimatePoints < 0) CurrentUltimatePoints = 0;
+            
+            OnUltimatePointsAmountChanged?.Invoke(previous,CurrentUltimatePoints);
         }
     }
 }
