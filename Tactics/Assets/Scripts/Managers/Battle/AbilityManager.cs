@@ -115,11 +115,13 @@ namespace Battle
         {
             if(ability.IsUltimate) unit.ConsumeUltimatePoint(ability.UltimateCost);
             
-            ability.CastAbility(unit);
-
             ConsumeAbilityPoints(ability.Cost);
+
+            if (ability.SO.Cooldown > 0) ability.EnterCooldown();
             
             if(!ability.IsUltimate) unit.GainUltimatePoint(1);
+            
+            ability.CastAbility(unit);
         }
 
         private void InitAbilityPoints(StartRoundEvent ctx)

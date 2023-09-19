@@ -104,8 +104,6 @@ namespace Battle
 
         public void CastAbility(Unit caster)
         {
-            if(SO.Cooldown > 0) EnterCooldown();
-            
             EventManager.Trigger(new StartAbilityCastEvent(this, caster, currentSelectedTiles));
 
             caster.StartCoroutine(AbilityCast());
