@@ -191,7 +191,7 @@ MonoBehaviour:
     team: 1
   - so: {fileID: 11400000, guid: 8c798ae10bc978341b71cae74b691113, type: 2}
     position: {x: 3, y: 3}
-    team: 1
+    team: 0
   - so: {fileID: 11400000, guid: 9678e3581c87714498371f90fc482a9c, type: 2}
     position: {x: 7, y: 7}
     team: 0
@@ -5922,7 +5922,7 @@ PrefabInstance:
     - target: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
         type: 3}
       propertyPath: <Team>k__BackingField
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
         type: 3}
@@ -5954,7 +5954,7 @@ PrefabInstance:
         type: 3}
       propertyPath: <Behaviour>k__BackingField
       value: 
-      objectReference: {fileID: 11400000, guid: a8888626e5592c14a9491f3e5a01b5e3,
+      objectReference: {fileID: 11400000, guid: d70b7e818c234f34c9fb661ceb2610dd,
         type: 2}
     - target: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
         type: 3}

@@ -22,6 +22,6 @@ MonoBehaviour:
   <UltimateCost>k__BackingField: 2
   <SkipTargetSelection>k__BackingField: 0
   <SkipTargetConfirmation>k__BackingField: 0
-  <EndUnitTurnAfterCast>k__BackingField: 1
+  <EndUnitTurnAfterCast>k__BackingField: 0
   range: 7
   damage: 0
