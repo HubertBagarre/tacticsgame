@@ -24,30 +24,30 @@ namespace Battle
         [field: SerializeField] public bool IsUnmovable { get; private set; }
 
 
-        public IEnumerator AddPassive(Unit unit)
+        public IEnumerator AddPassive(Unit unit,UnitPassiveInstance instance)
         {
-            return OnAddedEffect(unit);
+            return OnAddedEffect(unit,instance);
         }
         
-        public IEnumerator RemovePassive(Unit unit)
+        public IEnumerator RemovePassive(Unit unit,UnitPassiveInstance instance)
         {
-            return OnRemovedEffect(unit);
+            return OnRemovedEffect(unit,instance);
         }
 
-        public IEnumerator EndTurnEffect(Unit unit)
+        public IEnumerator EndTurnEffect(Unit unit,UnitPassiveInstance instance)
         {
-            return OnTurnEndEffect(unit);
+            return OnTurnEndEffect(unit,instance);
         }
         
-        public IEnumerator StartTurnEffect(Unit unit)
+        public IEnumerator StartTurnEffect(Unit unit,UnitPassiveInstance instance)
         {
-            return OnTurnStartEvent(unit);
+            return OnTurnStartEvent(unit,instance);
         }
         
-        protected abstract IEnumerator OnAddedEffect(Unit unit);
-        protected abstract IEnumerator OnRemovedEffect(Unit unit);
-        protected abstract IEnumerator OnTurnEndEffect(Unit unit);
-        protected abstract IEnumerator OnTurnStartEvent(Unit unit);
+        protected abstract IEnumerator OnAddedEffect(Unit unit,UnitPassiveInstance instance);
+        protected abstract IEnumerator OnRemovedEffect(Unit unit,UnitPassiveInstance instance);
+        protected abstract IEnumerator OnTurnEndEffect(Unit unit,UnitPassiveInstance instance);
+        protected abstract IEnumerator OnTurnStartEvent(Unit unit,UnitPassiveInstance instance);
 
         public UnitPassiveInstance CreateInstance()
         {
@@ -74,22 +74,22 @@ namespace Battle
             if (SO.MaxStacks != 0 && CurrentStacks >= SO.MaxStacks) return null;
             CurrentStacks++;
             OnCurrentStacksChanged?.Invoke(CurrentStacks);
-            return SO.AddPassive(unit);
+            return SO.AddPassive(unit,this);
         }
         
         public IEnumerator RemovePassive(Unit unit)
         {
-            return SO.RemovePassive(unit);
+            return SO.RemovePassive(unit,this);
         }
 
         public IEnumerator EndTurnEffect(Unit unit)
         {
-            return SO.EndTurnEffect(unit);
+            return SO.EndTurnEffect(unit,this);
         }
         
         public IEnumerator StartTurnEffect(Unit unit)
         {
-            return SO.StartTurnEffect(unit);
+            return SO.StartTurnEffect(unit,this);
         }
     }
 }

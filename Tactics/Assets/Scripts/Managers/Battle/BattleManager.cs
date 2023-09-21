@@ -388,7 +388,8 @@ namespace Battle
             battleM = battleManager;
             Portrait = battleM.EndTurnImage;
 
-            Speed = speed;
+            Speed = speed > 100 ? 100 : speed;
+            
             Debug.Log($"End round speed is {Speed}");
             DistanceFromTurnStart = 0;
         }
@@ -405,7 +406,7 @@ namespace Battle
 
         public void SetSpeed(int newSpeed)
         {
-            Speed = newSpeed;
+            Speed = newSpeed > 100 ? 100 : newSpeed;
         }
 
         public void ResetTurnValue(float _)

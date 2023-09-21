@@ -115,13 +115,15 @@ namespace Battle
         public IEnumerator StartTurn(Action onBehaviourEnd)
         {
             MovementLeft = Movement;
-
-            yield return null; //apply effects
-
-            if (IsDead)
+            
+            foreach (var unitPassiveInstance in PassiveInstances)
             {
-                onBehaviourEnd.Invoke();
-                yield break;
+                if (unitPassiveInstance.SO.HasStartTurnEffect) yield return StartCoroutine(unitPassiveInstance.StartTurnEffect(this));
+                if (IsDead)
+                {
+                    onBehaviourEnd.Invoke();
+                    yield break;
+                }
             }
 
             foreach (var abilityInstance in AbilityInstances)
@@ -129,6 +131,7 @@ namespace Battle
                 abilityInstance.DecreaseCurrentCooldown(1);
             }
 
+            //Do the remove passive on turn start here instead on in the loop
             OnTurnStart?.Invoke();
 
             EventManager.Trigger(new StartUnitTurnEvent(this));
@@ -158,8 +161,12 @@ namespace Battle
 
         public IEnumerator EndTurn()
         {
-            yield return null; //apply effects
+            foreach (var unitPassiveInstance in PassiveInstances.Where(unitPassiveInstance => unitPassiveInstance.SO.HasEndTurnEffect))
+            {
+                yield return StartCoroutine(unitPassiveInstance.EndTurnEffect(this));
+            }
 
+            //Do the remove passive on turn end here instead on in the loop
             OnTurnEnd?.Invoke();
 
             EventManager.Trigger(new EndUnitTurnEvent(this));
@@ -315,15 +322,31 @@ namespace Battle
             return currentInstance.AddPassive(this);
         }
 
+        /// <summary>
+        /// CAN RETURN NULL
+        /// </summary>
+        /// <param name="passiveSo"></param>
+        /// <returns></returns>
         public IEnumerator RemovePassiveEffect(UnitPassiveSO passiveSo)
         {
             var currentInstance = GetPassiveInstance(passiveSo);
             if (currentInstance == null) return null;
-            PassiveInstances.Remove(currentInstance);
+            return RemovePassiveEffect(currentInstance);
+        }
+
+        /// <summary>
+        /// CAN RETURN NULL
+        /// </summary>
+        /// <param name="passiveInstance"></param>
+        /// <returns></returns>
+        public IEnumerator RemovePassiveEffect(UnitPassiveInstance passiveInstance)
+        {
+            if (!PassiveInstances.Contains(passiveInstance)) return null;
+            PassiveInstances.Remove(passiveInstance);
             
-            OnPassiveRemoved?.Invoke(currentInstance);
+            OnPassiveRemoved?.Invoke(passiveInstance);
             
-            return currentInstance.RemovePassive(this);
+            return passiveInstance.RemovePassive(this);
         }
     }
 }
