@@ -43,10 +43,13 @@ namespace Battle
         public List<UnitPassiveInstance> PassiveInstances { get; } = new();
 
         private Coroutine behaviourRoutine;
-
+        
+        public event Action<int> OnCurrentHealthChanged;
         public event Action OnTurnStart;
         public event Action OnTurnEnd;
         public event Action OnDeath;
+        public event Action<UnitPassiveInstance> OnPassiveAdded; 
+        public event Action<UnitPassiveInstance> OnPassiveRemoved; 
 
         public void InitUnit(Tile tile, int team, UnitStatsSO so)
         {
@@ -224,9 +227,11 @@ namespace Battle
             var startHp = CurrentHp;
             CurrentHp -= amount;
 
+            
             EventManager.Trigger(new UnitTakeDamageEvent(this, startHp));
 
             if (CurrentHp <= 0) KillEntityInBattle();
+            OnCurrentHealthChanged?.Invoke(CurrentHp);
         }
 
         public void HealDamage(int amount)
@@ -239,6 +244,7 @@ namespace Battle
             EventManager.Trigger(new UnitHealDamageEvent(this, startHp));
 
             if (CurrentHp > Stats.MaxHp) CurrentHp = Stats.MaxHp; //No overheal (yet ?)
+            OnCurrentHealthChanged?.Invoke(CurrentHp);
         }
         
         [ContextMenu("Execute")]
@@ -285,14 +291,39 @@ namespace Battle
             OnUltimatePointsAmountChanged?.Invoke(previous, CurrentUltimatePoints);
         }
 
-        public void AddPassiveEffect(UnitPassiveSO passiveSo)
+        public UnitPassiveInstance GetPassiveInstance(UnitPassiveSO passiveSo)
         {
-            //add passive instance to list
+            return PassiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
         }
 
-        public void RemovePassiveEffect(Unit passiveSo)
+        public IEnumerator AddPassiveEffect(UnitPassiveSO passiveSo)
         {
+            //add passive instance to list
+
+            var currentInstance = GetPassiveInstance(passiveSo);
+
+            //if current instance == null, no passive yet, creating new and adding to list
+            //if passive isn't stackable, creating new and adding to list
+            if (currentInstance == null || !passiveSo.IsStackable)
+            {
+                currentInstance = passiveSo.CreateInstance();
+                PassiveInstances.Add(currentInstance);
+            }
             
+            OnPassiveAdded?.Invoke(currentInstance);
+
+            return currentInstance.AddPassive(this);
+        }
+
+        public IEnumerator RemovePassiveEffect(UnitPassiveSO passiveSo)
+        {
+            var currentInstance = GetPassiveInstance(passiveSo);
+            if (currentInstance == null) return null;
+            PassiveInstances.Remove(currentInstance);
+            
+            OnPassiveRemoved?.Invoke(currentInstance);
+            
+            return currentInstance.RemovePassive(this);
         }
     }
 }

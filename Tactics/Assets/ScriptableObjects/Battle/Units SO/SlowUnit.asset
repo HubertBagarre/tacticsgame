@@ -17,10 +17,11 @@ MonoBehaviour:
   <Name>k__BackingField: 
   <Description>k__BackingField: 
   <MaxHp>k__BackingField: 10
+  <BaseAttack>k__BackingField: 1
+  <BaseSpeed>k__BackingField: 0
+  <Initiative>k__BackingField: 15
   <Behaviour>k__BackingField: {fileID: 11400000, guid: a8888626e5592c14a9491f3e5a01b5e3,
     type: 2}
   <Abilities>k__BackingField:
   - {fileID: 11400000, guid: 6d66f29768ebfd348ac9a0a509a6f556, type: 2}
   <BaseMovement>k__BackingField: 3
-  <Initiative>k__BackingField: 15
-  <BaseSpeed>k__BackingField: 50
