@@ -7,6 +7,11 @@ namespace Battle
 {
     using AbilityEvents;
 
+    public enum AbilityType
+    {
+        Movement,Offensive,Defensive
+    }
+
     public abstract class UnitAbilitySO : ScriptableObject
     {
         [field: Header("Ability Details")]
@@ -14,7 +19,8 @@ namespace Battle
         public Sprite Sprite { get; private set; }
 
         [field: SerializeField] public string Name { get; private set; }
-        [field: SerializeField,TextArea(10,10)] public string Description { get; private set; }
+        [field: SerializeField] public AbilityType Type { get; private set; }
+        [SerializeField, TextArea(10, 10)] protected string description;
         [field: SerializeField] public int ExpectedSelections { get; private set; }
         [field: SerializeField] public int Cooldown { get; private set; }
         [field: SerializeField] public int Cost { get; private set; }
@@ -25,6 +31,10 @@ namespace Battle
         [field: SerializeField] public bool SkipTargetConfirmation { get; private set; } = false;
         [field: SerializeField] public bool EndUnitTurnAfterCast { get; private set; } = true;
 
+        public virtual string ConvertedDescription(Unit caster)
+        {
+            return description;
+        }
         public bool IsTileSelectable(Unit caster, Tile tile, List<Tile> currentlySelectedTiles)
         {
             return TileSelectionMethod(caster, tile, currentlySelectedTiles);

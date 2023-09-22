@@ -11,7 +11,25 @@ namespace Battle.ScriptableObjects.Ability
         [SerializeField] private int damage = 2;
         [SerializeField] private List<UnitPassiveSO> passivesToAdd = new();
         [SerializeField] private List<UnitPassiveSO> passivesToRemove = new ();
-        
+
+        public override string ConvertedDescription(Unit caster)
+        {
+            var text = description.Replace("%range%", $"{range}");
+            
+            //Add text if damage > 0
+            //Deal <color=orange>%damage% damage</color> to it
+            
+            //Add text if passives to add > 0
+            
+            //Add text if passives to remove > 0
+            
+            //Inflict 1 stack of Burn to it.
+
+            return text;
+            
+            return base.ConvertedDescription(caster);
+        }
+
         protected override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
         {
             return caster.Tile.IsInSurroundingTileDistance(selectableTile,range) && selectableTile.HasUnit();
@@ -24,7 +42,7 @@ namespace Battle.ScriptableObjects.Ability
             //play animation
             yield return null;
             
-            var target = targetTiles[0].GetUnit();
+            var target = targetTiles[0].Unit;
             target.TakeDamage(damage);
             if (passivesToAdd.Count > 0)
             {

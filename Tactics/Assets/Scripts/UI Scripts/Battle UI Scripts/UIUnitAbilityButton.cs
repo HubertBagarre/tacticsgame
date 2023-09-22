@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using Battle;
 using Battle.AbilityEvents;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Battle.UIComponent
@@ -11,6 +13,13 @@ namespace Battle.UIComponent
     {
         [field: SerializeField] public Button Button { get; private set; }
         [SerializeField] private Image abilityImage;
+
+        [Header("Description")]
+        [SerializeField] private GameObject descriptionPanelGo;
+        [SerializeField] private RectTransform descriptionPanelTr;
+        [SerializeField] private TextMeshProUGUI abilityNameText;
+        [SerializeField] private TextMeshProUGUI abilityCooldownText;
+        [SerializeField] private TextMeshProUGUI abilityDescriptionText;
         
         [Header("Cooldown")]
         [SerializeField] private GameObject cooldownCoverGo;
@@ -25,7 +34,7 @@ namespace Battle.UIComponent
         [SerializeField] private GameObject ultimateChargesParentGo;
         private Transform ultimateChargesParent;
         [SerializeField] private UIUltimateCharge[] ultimateCharges;
-    
+
         private UnitAbilityInstance associatedAbility;
         private Unit associatedUnit;
 
@@ -33,6 +42,18 @@ namespace Battle.UIComponent
         {
             ultimateChargesParent = ultimateChargesParentGo.transform;
             Button.onClick.AddListener(StartAbilityTargetSelection);
+            
+            descriptionPanelGo.SetActive(false);
+        }
+
+        public void ShowDescription(BaseEventData _)
+        {
+            descriptionPanelGo.SetActive(true);
+        }
+        
+        public void HideDescription(BaseEventData _)
+        {
+            descriptionPanelGo.SetActive(false);
         }
 
         public void LinkAbility(UnitAbilityInstance ability,Unit caster)
@@ -60,8 +81,55 @@ namespace Battle.UIComponent
             UpdateUltimateChargesAmount();
             UpdateCostCharges();
             UpdateCooldown();
+
+            UpdateDescription();
             
             Button.interactable = associatedUnit.CurrentUltimatePoints >= associatedAbility.UltimateCost && !(associatedAbility.CurrentCooldown > 0);
+        }
+
+        private void UpdateDescription()
+        {
+            var so = associatedAbility.SO;
+
+            var color = Color.yellow;
+            var col = ColorUtility.ToHtmlStringRGB(color);
+            abilityNameText.text = $"{so.Name} <size=20><color=#{col}><i>[{so.Type}]</i></color></size>";
+
+            var cooldown = so.Cooldown;
+            abilityCooldownText.text = cooldown > 0 ? $"{so.Cooldown} turn{(cooldown > 1 ? "s":"")}" : "";
+            
+            StartCoroutine(AdjustPanelSizeRoutine());
+
+            IEnumerator AdjustPanelSizeRoutine()
+            {
+                var description = so.ConvertedDescription(associatedUnit);
+                abilityDescriptionText.text = $"{description}";
+                
+                abilityDescriptionText.ForceMeshUpdate();
+
+                yield return null;
+
+                var lineCount = abilityDescriptionText.textInfo.lineCount;
+                
+                Debug.Log($"{associatedAbility.SO.Name} has {lineCount} lines");
+                
+                var size = descriptionPanelTr.sizeDelta;
+                
+                if (lineCount <= 2)
+                {
+                    size.y = 100;
+                    descriptionPanelTr.sizeDelta = size;
+                    yield break;
+                }
+
+                lineCount -= 2;
+                var lineSize = abilityDescriptionText.fontSize;
+                var sizeIncrease = lineCount * lineSize + 2;
+
+                size.y = 100 + sizeIncrease;
+                descriptionPanelTr.sizeDelta = size;
+            }
+            
         }
 
         private void UpdateUltimateChargesAmount()

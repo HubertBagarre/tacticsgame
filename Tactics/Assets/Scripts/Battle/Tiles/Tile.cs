@@ -74,10 +74,7 @@ namespace Battle
             return currentUnit != null;
         }
 
-        public Unit GetUnit()
-        {
-            return currentUnit;
-        }
+        public Unit Unit => currentUnit;
 
         public List<Tile> GetAdjacentTiles(Func<Tile,bool> condition = null)
         {

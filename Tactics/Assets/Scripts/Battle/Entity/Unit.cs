@@ -27,6 +27,8 @@ namespace Battle
         public UnitBehaviourSO Behaviour { get; private set; }
 
         [field: SerializeField] public int Movement { get; private set; }
+        public int Attack => Stats.BaseAttack + bonusAttack;
+        [SerializeField] private int bonusAttack = 0;
 
         [field: SerializeField] public int MovementLeft { get; private set; }
         [field: SerializeField] public int Speed { get; protected set; }
@@ -79,6 +81,8 @@ namespace Battle
             Speed = Stats.BaseSpeed;
             Behaviour = Stats.Behaviour;
             CurrentHp = Stats.MaxHp;
+
+            bonusAttack = 0;
 
             CurrentUltimatePoints = 0;
 
