@@ -17,8 +17,8 @@ MonoBehaviour:
   <Name>k__BackingField: Dagger
   <Type>k__BackingField: 0
   <Description>k__BackingField: 
-  <IsStackable>k__BackingField: 1
+  <IsStackable>k__BackingField: 0
   <MaxStacks>k__BackingField: 0
-  <HasStartTurnEffect>k__BackingField: 0
-  <HasEndTurnEffect>k__BackingField: 0
+  <HasStartTurnEffect>k__BackingField: 1
+  <HasEndTurnEffect>k__BackingField: 1
   <IsUnmovable>k__BackingField: 0

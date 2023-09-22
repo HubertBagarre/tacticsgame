@@ -61,12 +61,16 @@ namespace Battle
         public UnitPassiveSO SO { get; }
         public bool IsStackable => SO.IsStackable;
         public int CurrentStacks { get; private set; } = 0;
+        public bool NeedRemoveOnTurnStart { get; private set; }
+        public bool NeedRemoveOnTurnEnd { get; private set; }
 
         public event Action<int> OnCurrentStacksChanged;
 
         public UnitPassiveInstance(UnitPassiveSO so)
         {
             SO = so;
+            NeedRemoveOnTurnEnd = false;
+            NeedRemoveOnTurnStart = false;
         }
         
         public IEnumerator AddPassive(Unit unit)
@@ -90,6 +94,16 @@ namespace Battle
         public IEnumerator StartTurnEffect(Unit unit)
         {
             return SO.StartTurnEffect(unit,this);
+        }
+
+        public void SetRemoveOnTurnStart(bool value)
+        {
+            NeedRemoveOnTurnStart = value;
+        }
+        
+        public void SetRemoveOnTurnEnd(bool value)
+        {
+            NeedRemoveOnTurnEnd = value;
         }
     }
 }

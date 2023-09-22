@@ -18,10 +18,10 @@ namespace Battle.ScriptableObjects.Passive
             Debug.Log("Removed Effect");
             yield return null;
         }
-
-        // REMOVING EFFECT ON TURN END GOES INTO THE UNIT.ONENDTURN event
+        
         protected override IEnumerator OnTurnEndEffect(Unit unit,UnitPassiveInstance instance)
         {
+            instance.SetRemoveOnTurnEnd(true);
             yield return null;
         }
 

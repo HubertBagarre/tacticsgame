@@ -41,6 +41,7 @@ namespace Battle
         
         public List<UnitAbilityInstance> AbilityInstances { get; } = new();
         public List<UnitPassiveInstance> PassiveInstances { get; } = new();
+        private List<UnitPassiveInstance> passivesToRemove = new();
 
         private Coroutine behaviourRoutine;
         
@@ -116,15 +117,19 @@ namespace Battle
         {
             MovementLeft = Movement;
             
-            foreach (var unitPassiveInstance in PassiveInstances)
+            passivesToRemove.Clear();
+            foreach (var passiveInstance in PassiveInstances)
             {
-                if (unitPassiveInstance.SO.HasStartTurnEffect) yield return StartCoroutine(unitPassiveInstance.StartTurnEffect(this));
+                if (passiveInstance.SO.HasStartTurnEffect) yield return StartCoroutine(passiveInstance.StartTurnEffect(this));
+                if(passiveInstance.NeedRemoveOnTurnStart) passivesToRemove.Add(passiveInstance);
                 if (IsDead)
                 {
                     onBehaviourEnd.Invoke();
                     yield break;
                 }
             }
+
+            yield return StartCoroutine(RemovePassives());
 
             foreach (var abilityInstance in AbilityInstances)
             {
@@ -161,12 +166,15 @@ namespace Battle
 
         public IEnumerator EndTurn()
         {
-            foreach (var unitPassiveInstance in PassiveInstances.Where(unitPassiveInstance => unitPassiveInstance.SO.HasEndTurnEffect))
+            passivesToRemove.Clear();
+            foreach (var passiveInstance in PassiveInstances.Where(unitPassiveInstance => unitPassiveInstance.SO.HasEndTurnEffect))
             {
-                yield return StartCoroutine(unitPassiveInstance.EndTurnEffect(this));
+                yield return StartCoroutine(passiveInstance.EndTurnEffect(this));
+                if(passiveInstance.NeedRemoveOnTurnEnd) passivesToRemove.Add(passiveInstance);
             }
+            
+            yield return StartCoroutine(RemovePassives());
 
-            //Do the remove passive on turn end here instead on in the loop
             OnTurnEnd?.Invoke();
 
             EventManager.Trigger(new EndUnitTurnEvent(this));
@@ -302,7 +310,12 @@ namespace Battle
         {
             return PassiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
         }
-
+        
+        /// <summary>
+        /// CAN RETURN NULL
+        /// </summary>
+        /// <param name="passiveSo"></param>
+        /// <returns></returns>
         public IEnumerator AddPassiveEffect(UnitPassiveSO passiveSo)
         {
             //add passive instance to list
@@ -330,8 +343,7 @@ namespace Battle
         public IEnumerator RemovePassiveEffect(UnitPassiveSO passiveSo)
         {
             var currentInstance = GetPassiveInstance(passiveSo);
-            if (currentInstance == null) return null;
-            return RemovePassiveEffect(currentInstance);
+            return currentInstance == null ? null : RemovePassiveEffect(currentInstance);
         }
 
         /// <summary>
@@ -347,6 +359,15 @@ namespace Battle
             OnPassiveRemoved?.Invoke(passiveInstance);
             
             return passiveInstance.RemovePassive(this);
+        }
+
+        private IEnumerator RemovePassives()
+        {
+            foreach (var passiveToRemove in passivesToRemove)
+            {
+                yield return StartCoroutine(RemovePassiveEffect(passiveToRemove)); 
+            }
+            passivesToRemove.Clear();
         }
     }
 }
