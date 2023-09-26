@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-using Battle;
-using Battle.AbilityEvents;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,6 +6,8 @@ using UnityEngine.UI;
 
 namespace Battle.UIComponent
 {
+    using AbilityEvents;
+    
     public class UIUnitAbilityButton : MonoBehaviour
     {
         [field: SerializeField] public Button Button { get; private set; }
@@ -38,6 +37,8 @@ namespace Battle.UIComponent
         private UnitAbilityInstance associatedAbility;
         private Unit associatedUnit;
 
+        private bool isHoveringDescription = false;
+
         private void Start()
         {
             ultimateChargesParent = ultimateChargesParentGo.transform;
@@ -48,14 +49,60 @@ namespace Battle.UIComponent
 
         public void ShowDescription(BaseEventData _)
         {
+            UIBattleManager.Tooltip.Hide();
+            
             descriptionPanelGo.SetActive(true);
         }
         
         public void HideDescription(BaseEventData _)
         {
-            descriptionPanelGo.SetActive(false);
+            StartCoroutine(WaitFrame());
+            
+            IEnumerator WaitFrame()
+            {
+                yield return null;
+                if(isHoveringDescription) yield break;
+
+                HideDescription();
+            }
         }
 
+        private void HideDescription()
+        {
+            UIBattleManager.Tooltip.Hide();
+            descriptionPanelGo.SetActive(isHoveringDescription);
+        }
+
+        public void HoverDescription(BaseEventData _)
+        {
+            isHoveringDescription = true;
+        }
+
+        public void ExitHoverDescription(BaseEventData _)
+        {
+            isHoveringDescription = false;
+            HideDescription();
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (UIBattleManager.Tooltip.IsEnabled)
+            {
+                UIBattleManager.Tooltip.Hide();
+                return;
+            }
+            
+            var mousePos = (Vector3) eventData.position;
+
+            var linkedTarget = TMP_TextUtilities.FindIntersectingLink(abilityDescriptionText, mousePos,null);
+            
+            if(linkedTarget == -1) return;
+            
+            var info = abilityDescriptionText.textInfo.linkInfo[linkedTarget];
+            
+            UIBattleManager.Tooltip.Show(mousePos,associatedAbility.SO.ConvertDescriptionLinks(associatedUnit,info.GetLinkID()));
+        }
+        
         public void LinkAbility(UnitAbilityInstance ability,Unit caster)
         {
             if (associatedUnit != null)
@@ -78,6 +125,8 @@ namespace Battle.UIComponent
 
         public void UpdateAppearance()
         {
+            abilityImage.sprite = associatedAbility.SO.Sprite;
+            
             UpdateUltimateChargesAmount();
             UpdateCostCharges();
             UpdateCooldown();

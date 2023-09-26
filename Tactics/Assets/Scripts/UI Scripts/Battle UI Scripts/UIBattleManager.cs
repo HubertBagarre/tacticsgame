@@ -19,7 +19,7 @@ namespace Battle
         [Header("Battle Timeline")] [SerializeField]
         private UIBattleEntityTimeline battleEntityTimelinePrefab;
         [SerializeField] private Transform battleTimelineParent;
-
+        
         [Header("Battle State")]
         [SerializeField] private RectTransform battleRoundIndicatorTr;
         [SerializeField] private TextMeshProUGUI battleRoundIndicatorText;
@@ -27,12 +27,15 @@ namespace Battle
 
         [Header("Player Controls")] [SerializeField]
         private Button endTurnButton;
-
         [SerializeField] private UIUnitAbilityButton abilityButtonPrefab;
         [SerializeField] private Transform abilityButtonParent;
         private List<UIUnitAbilityButton> abilityButtons = new();
         private Dictionary<Unit, List<UIUnitAbilityButton>> unitAbilitButtonsDict = new();
 
+        [Header("Tooltip")]
+        [SerializeField] private UITooltip tooltip;
+        public static UITooltip Tooltip { get; private set; }
+        
         [Header("Ability Tile Selection")]
         [SerializeField] private GameObject abilityTargetSelectionUIObj;
         [SerializeField] private Button confirmTileSelectionButton;
@@ -50,6 +53,8 @@ namespace Battle
         
         private void Start()
         {
+            AssignTooltip();
+            
             AddCallbacks();
 
             battleTimelineParent.gameObject.SetActive(false);
@@ -364,6 +369,16 @@ namespace Battle
             }
         }
 
+        #endregion
+
+        #region Tooltip
+
+        private void AssignTooltip()
+        {
+            Tooltip = tooltip;
+            Tooltip.Hide();
+        }
+        
         #endregion
     }
 }

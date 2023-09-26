@@ -390,7 +390,6 @@ namespace Battle
 
             Speed = speed > 100 ? 100 : speed;
             
-            Debug.Log($"End round speed is {Speed}");
             DistanceFromTurnStart = 0;
         }
 

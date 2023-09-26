@@ -35,6 +35,12 @@ namespace Battle
         {
             return description;
         }
+
+        public virtual string ConvertDescriptionLinks(Unit caster, string linkKey)
+        {
+            return linkKey;
+        }
+        
         public bool IsTileSelectable(Unit caster, Tile tile, List<Tile> currentlySelectedTiles)
         {
             return TileSelectionMethod(caster, tile, currentlySelectedTiles);

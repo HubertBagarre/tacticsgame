@@ -15,9 +15,9 @@ MonoBehaviour:
   <Sprite>k__BackingField: {fileID: 0}
   <Name>k__BackingField: Basic Attack
   <Type>k__BackingField: 1
-  description: Select <color=green>1 enemy within %range% rings</color>. Deal <color=orange>%damage%
-    damage</color> to it. If the enemy is on an adjacent tile, deal <color=orange>%crit%
-    damage</color> instead.
+  description: Select <color=green>1 enemy within <u><link="ring:%range%">%range%
+    rings</link></u></color>. Deal <color=orange>%damage% damage</color> to it. If
+    the enemy is on an adjacent tile, deal <color=orange>%crit% damage</color> instead.
   <ExpectedSelections>k__BackingField: 1
   <Cooldown>k__BackingField: 0
   <Cost>k__BackingField: -1
