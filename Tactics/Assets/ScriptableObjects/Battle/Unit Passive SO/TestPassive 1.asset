@@ -16,7 +16,7 @@ MonoBehaviour:
     type: 3}
   <Name>k__BackingField: PlaceholderBurn
   <Type>k__BackingField: 0
-  <Description>k__BackingField: 
+  <Description>k__BackingField: Deal 1 damage at the start of the turn.
   <IsStackable>k__BackingField: 1
   <MaxStacks>k__BackingField: 0
   <HasStartTurnEffect>k__BackingField: 0

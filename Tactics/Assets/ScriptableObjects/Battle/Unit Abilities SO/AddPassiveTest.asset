@@ -29,4 +29,5 @@ MonoBehaviour:
   passivesToAdd:
   - {fileID: 11400000, guid: 982021c890af1ae47bcba873d8994375, type: 2}
   - {fileID: 11400000, guid: a2db89b89e59d3444a080321e247a79b, type: 2}
+  - {fileID: 11400000, guid: a2db89b89e59d3444a080321e247a79b, type: 2}
   passivesToRemove: []

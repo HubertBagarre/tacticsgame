@@ -12,8 +12,32 @@ namespace Battle.ScriptableObjects.Ability
         [SerializeField] private List<UnitPassiveSO> passivesToAdd = new();
         [SerializeField] private List<UnitPassiveSO> passivesToRemove = new (); //not used
 
-        
-        
+        public override string ConvertDescriptionLinks(Unit caster, string linkKey)
+        {
+            var split = linkKey.Split(":");
+
+            switch (split[0])
+            {
+                case "ring":
+                    int.TryParse(split[1],out var ring);
+
+                    var tiles = 0;
+                    for (int i = 0; i < ring+1; i++)
+                    {
+                        tiles += 4 * (2*i-1) + 4;
+                    }
+                    
+                    return $"The {tiles} tiles surrounding the caster's tile"; //TODO - make generic ring shower (actually a shape shower)
+                case "passive":
+                    int.TryParse(split[1],out var passiveIndex);
+                    var passive = passivesToAdd[passiveIndex];
+
+                    return passive.Description;
+            }
+            
+            return base.ConvertDescriptionLinks(caster, linkKey);
+        }
+
         public override string ConvertedDescription(Unit caster)
         {
             var text = $"Select <color=green>1 enemy within <u><link=\"ring:{range}\">{range} rings</link></u></color>.";
@@ -33,7 +57,7 @@ namespace Battle.ScriptableObjects.Ability
                 
                 var passive = passivesToAdd[0];
                     
-                text += $"<color=yellow>{(passive.IsStackable ? " 1 stack of ":"")} <u><link=\"passive:{passive.Name}\">{passive.Name}</link></u></color>";
+                text += $"<color=yellow>{(passive.IsStackable ? " 1 stack of ":"")} <u><link=\"passive:{0}\">{passive.Name}</link></u></color>";
 
                 if (passivesCount >= 2)
                 {
@@ -42,7 +66,7 @@ namespace Battle.ScriptableObjects.Ability
                         passive = passivesToAdd[i];
 
                         text += i == passivesCount - 1 ? " and" : ",";
-                        text += $"<color=yellow>{(passive.IsStackable ? " 1 stack of ":"")} <u><link=\"passive:{passive.Name}\">{passive.Name}</link></u></color>";
+                        text += $"<color=yellow>{(passive.IsStackable ? " 1 stack of ":"")} <u><link=\"passive:{i}\">{passive.Name}</link></u></color>";
                     }
                 }
             }
