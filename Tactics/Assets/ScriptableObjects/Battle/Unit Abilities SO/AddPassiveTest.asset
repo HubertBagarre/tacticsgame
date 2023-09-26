@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: AddPassiveTest
   m_EditorClassIdentifier: 
   <Sprite>k__BackingField: {fileID: 0}
-  <Name>k__BackingField: 
-  <Description>k__BackingField: 
+  <Name>k__BackingField: Ignite
+  <Type>k__BackingField: 1
+  description: 
   <ExpectedSelections>k__BackingField: 1
   <Cooldown>k__BackingField: 0
   <Cost>k__BackingField: 0
@@ -23,8 +24,9 @@ MonoBehaviour:
   <SkipTargetSelection>k__BackingField: 0
   <SkipTargetConfirmation>k__BackingField: 0
   <EndUnitTurnAfterCast>k__BackingField: 0
-  range: 7
-  damage: 0
+  range: 3
+  damage: 1
   passivesToAdd:
   - {fileID: 11400000, guid: 982021c890af1ae47bcba873d8994375, type: 2}
+  - {fileID: 11400000, guid: a2db89b89e59d3444a080321e247a79b, type: 2}
   passivesToRemove: []

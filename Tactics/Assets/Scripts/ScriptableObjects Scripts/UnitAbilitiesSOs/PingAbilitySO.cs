@@ -10,24 +10,46 @@ namespace Battle.ScriptableObjects.Ability
         [SerializeField] private int range = 2;
         [SerializeField] private int damage = 2;
         [SerializeField] private List<UnitPassiveSO> passivesToAdd = new();
-        [SerializeField] private List<UnitPassiveSO> passivesToRemove = new ();
+        [SerializeField] private List<UnitPassiveSO> passivesToRemove = new (); //not used
 
+        
+        
         public override string ConvertedDescription(Unit caster)
         {
-            var text = description.Replace("%range%", $"{range}");
-            
-            //Add text if damage > 0
-            //Deal <color=orange>%damage% damage</color> to it
-            
-            //Add text if passives to add > 0
-            
-            //Add text if passives to remove > 0
-            
-            //Inflict 1 stack of Burn to it.
+            var text = $"Select <color=green>1 enemy within <u><link=\"ring:{range}\">{range} rings</link></u></color>.";
 
-            return text;
+            var passivesCount = passivesToAdd.Count;
+            var hasPassives = passivesCount > 0;
+
+            if (damage > 0)
+            {
+                text += $" Deal <color=orange>{damage} damage</color>";
+                if (hasPassives) text += ".";
+            }
+
+            if (hasPassives)
+            {
+                text += " Inflicts";
+                
+                var passive = passivesToAdd[0];
+                    
+                text += $"<color=yellow>{(passive.IsStackable ? " 1 stack of ":"")} <u><link=\"passive:{passive.Name}\">{passive.Name}</link></u></color>";
+
+                if (passivesCount >= 2)
+                {
+                    for (int i = 1; i < passivesCount; i++)
+                    {
+                        passive = passivesToAdd[i];
+
+                        text += i == passivesCount - 1 ? " and" : ",";
+                        text += $"<color=yellow>{(passive.IsStackable ? " 1 stack of ":"")} <u><link=\"passive:{passive.Name}\">{passive.Name}</link></u></color>";
+                    }
+                }
+            }
+
+            text += ".";
             
-            return base.ConvertedDescription(caster);
+            return text;
         }
 
         protected override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
