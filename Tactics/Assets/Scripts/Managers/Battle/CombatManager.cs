@@ -1,18 +1,30 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CombatManager : MonoBehaviour
+namespace Battle
 {
-    // Start is called before the first frame update
-    void Start()
+    public class CombatManager : MonoBehaviour
     {
+        public delegate IEnumerator UnitAttackDelegate(Unit a,Unit b);
         
-    }
+        public event UnitAttackDelegate OnUnitAttacked;
+        public event UnitAttackDelegate OnUnitAttack;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public IEnumerator UnitAttack(Unit attackingUnit,Unit attackedUnit,IEnumerator<Unit> effect)
+        {
+            var unitAttackRoutine = OnUnitAttack;
+            if (unitAttackRoutine != null) yield return StartCoroutine(unitAttackRoutine(attackingUnit,attackedUnit));
+            
+            if(attackingUnit.IsDead) yield break; //TODO maybe add an inactive/incapacitated bool
+            
+            var unitAttackedRoutine = OnUnitAttacked;
+            if (unitAttackedRoutine != null) yield return StartCoroutine(unitAttackedRoutine(attackingUnit,attackedUnit));
+            
+            
+        }
     }
 }
+
+
