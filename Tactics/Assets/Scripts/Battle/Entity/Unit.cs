@@ -46,8 +46,9 @@ namespace Battle
         private List<UnitPassiveInstance> passivesToRemove = new();
 
         private Coroutine behaviourRoutine;
-        public event UnitAttackInstanceDelegate OnAttackOtherUnit;
-        public event UnitAttackInstanceDelegate OnAttacked;
+
+        private List<IEnumerator> onAttackOtherUnitRoutines = new ();
+        private List<IEnumerator> onAttackedRoutines = new ();
         
         // TODO - use IEnumerator delegates instead of action;
         public event Action<int> OnCurrentHealthChanged;
@@ -246,19 +247,21 @@ namespace Battle
         {
             var attackInstance = new AttackInstance(damage);
             
-            var effects = OnAttackOtherUnit;
-            if (effects != null) yield return StartCoroutine(effects(attackedUnit,attackInstance));
+            foreach (var routine in onAttackOtherUnitRoutines)
+            {
+                yield return StartCoroutine(routine);
+                if(IsDead) yield break;
+            }
             
-            if(IsDead) yield break;
-            
-            yield return StartCoroutine(attackedUnit.AttackedUnitEffect(this,attackInstance));
+            yield return StartCoroutine(attackedUnit.AttackedUnitEffect(attackInstance));
         }
 
-        public IEnumerator AttackedUnitEffect(Unit attackingUnit,AttackInstance attackInstance)
+        public IEnumerator AttackedUnitEffect(AttackInstance attackInstance)
         {
-            var effects = OnAttacked;
-            
-            if (effects != null) yield return StartCoroutine(effects(attackingUnit,attackInstance));
+            foreach (var routine in onAttackedRoutines)
+            {
+                yield return StartCoroutine(routine);
+            }
             TakeDamage(attackInstance.Damage);
 
             yield return new WaitForSeconds(1f);
@@ -270,7 +273,6 @@ namespace Battle
 
             var startHp = CurrentHp;
             CurrentHp -= amount;
-
             
             EventManager.Trigger(new UnitTakeDamageEvent(this, startHp));
 
