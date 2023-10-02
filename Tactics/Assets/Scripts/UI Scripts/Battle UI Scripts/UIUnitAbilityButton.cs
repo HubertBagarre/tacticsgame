@@ -112,7 +112,7 @@ namespace Battle.UIComponent
             
             if (associatedAbility != null)
             {
-                //remove callbacks
+                //remove callbackslo
             }
             
             associatedAbility = ability;

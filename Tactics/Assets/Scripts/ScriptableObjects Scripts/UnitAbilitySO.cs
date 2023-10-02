@@ -80,6 +80,7 @@ namespace Battle
         public bool IsTileSelectable(Unit caster, Tile tile) => SO.IsTileSelectable(caster, tile, currentSelectedTiles);
 
         private List<Tile> currentSelectedTiles = new();
+        private List<Tile> currentAffectedTiles = new();
 
         public event Action<int> OnCurrentSelectedTilesUpdated;
         public event Action<int> OnCurrentCooldownUpdated;
@@ -88,6 +89,7 @@ namespace Battle
         {
             SO = unitAbilitySo;
             CurrentCooldown = 0;
+            currentAffectedTiles.Clear();
             currentSelectedTiles.Clear();
         }
 
@@ -115,25 +117,28 @@ namespace Battle
         public void ClearSelection()
         {
             currentSelectedTiles.Clear();
+            currentSelectedTiles.Clear();
         }
 
         public void CastAbility(Unit caster)
         {
-            EventManager.Trigger(new StartAbilityCastEvent(this, caster, currentSelectedTiles));
+            EventManager.Trigger(new StartAbilityCastEvent(this, caster, currentAffectedTiles));
 
             caster.StartCoroutine(AbilityCast());
 
             IEnumerator AbilityCast()
             {
-                yield return caster.StartCoroutine(SO.CastAbility(caster, currentSelectedTiles.ToArray()));
+                yield return caster.StartCoroutine(SO.CastAbility(caster, currentAffectedTiles.ToArray()));
 
-                currentSelectedTiles.Clear();
                 OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
+                currentSelectedTiles.Clear();
+                currentAffectedTiles.Clear();
                 
                 EventManager.Trigger(new EndAbilityCastEvent(SO));
             }
         }
 
+        //TODO - rework to update affected tiles (also visual), probably add overrides in the so
         public void AddTileToSelection(Unit caster, Tile tile)
         {
             if (!IsTileSelectable(caster, tile)) return;
