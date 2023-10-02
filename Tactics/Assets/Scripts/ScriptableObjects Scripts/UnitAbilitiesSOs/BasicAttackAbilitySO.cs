@@ -42,9 +42,7 @@ namespace Battle.ScriptableObjects.Ability
             Debug.Log($"Attacking {target} for {damage} damage");
             
             //play unit attack animation (changes if isCrit or not)
-            yield return null;
-            
-            target.TakeDamage(damage);
+            yield return target.AttackUnitEffect(target, damage);
         }
     }
 }

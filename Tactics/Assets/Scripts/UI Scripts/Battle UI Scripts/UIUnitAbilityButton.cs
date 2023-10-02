@@ -160,8 +160,6 @@ namespace Battle.UIComponent
 
                 var lineCount = abilityDescriptionText.textInfo.lineCount;
                 
-                Debug.Log($"{associatedAbility.SO.Name} has {lineCount} lines");
-                
                 var size = descriptionPanelTr.sizeDelta;
                 
                 if (lineCount <= 2)

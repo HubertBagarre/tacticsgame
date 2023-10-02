@@ -46,7 +46,10 @@ namespace Battle
         private List<UnitPassiveInstance> passivesToRemove = new();
 
         private Coroutine behaviourRoutine;
+        public event UnitAttackInstanceDelegate OnAttackOtherUnit;
+        public event UnitAttackInstanceDelegate OnAttacked;
         
+        // TODO - use IEnumerator delegates instead of action;
         public event Action<int> OnCurrentHealthChanged;
         public event Action OnTurnStart;
         public event Action OnTurnEnd;
@@ -239,6 +242,28 @@ namespace Battle
             DistanceFromTurnStart -= amount * DecayRate;
         }
 
+        public IEnumerator AttackUnitEffect(Unit attackedUnit,int damage)
+        {
+            var attackInstance = new AttackInstance(damage);
+            
+            var effects = OnAttackOtherUnit;
+            if (effects != null) yield return StartCoroutine(effects(attackedUnit,attackInstance));
+            
+            if(IsDead) yield break;
+            
+            yield return StartCoroutine(attackedUnit.AttackedUnitEffect(this,attackInstance));
+        }
+
+        public IEnumerator AttackedUnitEffect(Unit attackingUnit,AttackInstance attackInstance)
+        {
+            var effects = OnAttacked;
+            
+            if (effects != null) yield return StartCoroutine(effects(attackingUnit,attackInstance));
+            TakeDamage(attackInstance.Damage);
+
+            yield return new WaitForSeconds(1f);
+        }
+
         public void TakeDamage(int amount)
         {
             if (amount < 0) amount = 0; //No negative damage, negative damage doesn't heal, but can deal 0 damage
@@ -373,6 +398,38 @@ namespace Battle
             }
             passivesToRemove.Clear();
         }
+    }
+    
+    public class AttackInstance
+    {
+        public int OriginalDamage { get; }
+        public int Damage { get; private set; }
+
+        public AttackInstance(int damage)
+        {
+            OriginalDamage = damage;
+            Damage = damage;
+        }
+
+        public void ChangeDamage(int value)
+        {
+            Damage = value;
+        }
+
+        public void IncreaseDamage(int value)
+        {
+            Damage += value;
+        }
+
+        public void DecreaseDamage(int value)
+        {
+            Damage -= value;
+            if (Damage < 0) Damage = 0;
+        }
+        
+        
+        
+        
     }
 }
 

@@ -21,7 +21,6 @@ namespace Battle.ScriptableObjects
 
         public override IEnumerator RunBehaviour(Unit unit)
         {
-            Debug.Log("AI Behaviour");
             
             yield return unit.StartCoroutine(unit.MoveUnit(unit.Tile.GetAdjacentTiles().ToList()));
         }
