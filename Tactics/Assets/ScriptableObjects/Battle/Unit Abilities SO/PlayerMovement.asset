@@ -9,22 +9,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e47b55f978106c549a6398743d9e0290, type: 3}
-  m_Name: Ping
+  m_Script: {fileID: 11500000, guid: 9aee06dd214c82043a27b1dc41ab3dc7, type: 3}
+  m_Name: PlayerMovement
   m_EditorClassIdentifier: 
   <Sprite>k__BackingField: {fileID: 0}
-  <Name>k__BackingField: 
-  <Description>k__BackingField: 
-  <ExpectedSelections>k__BackingField: 1
+  <Name>k__BackingField: Movement
+  <Type>k__BackingField: 0
+  description: 
+  <Selector>k__BackingField: {fileID: 11400000, guid: 6824a522427953d44a6e615995658304,
+    type: 2}
+  <Effects>k__BackingField:
+  - {fileID: 11400000, guid: 204b6d5bad297ca43a95476b6dc9b812, type: 2}
   <Cooldown>k__BackingField: 0
   <Cost>k__BackingField: 0
   <IsUltimate>k__BackingField: 0
   <UltimateCost>k__BackingField: 0
   <SkipTargetSelection>k__BackingField: 0
-  <SkipTargetConfirmation>k__BackingField: 0
+  <SkipTargetConfirmation>k__BackingField: 1
   <EndUnitTurnAfterCast>k__BackingField: 0
-  range: 7
-  damage: 1
-  passivesToAdd:
-  - {fileID: 0}
-  passivesToRemove: []

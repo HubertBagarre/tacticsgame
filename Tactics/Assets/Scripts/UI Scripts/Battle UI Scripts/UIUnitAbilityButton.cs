@@ -7,6 +7,7 @@ using UnityEngine.UI;
 namespace Battle.UIComponent
 {
     using AbilityEvents;
+    using ScriptableObjects.Ability;
     
     public class UIUnitAbilityButton : MonoBehaviour
     {

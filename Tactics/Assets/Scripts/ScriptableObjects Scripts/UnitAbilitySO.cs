@@ -1,68 +1,71 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-namespace Battle
+namespace Battle.ScriptableObjects.Ability
 {
     using AbilityEvents;
+    using Selector;
+    using Effect;
 
     public enum AbilityType
     {
         Movement,Offensive,Defensive
     }
 
-    public abstract class UnitAbilitySO : ScriptableObject
+    [CreateAssetMenu(menuName = "Battle Scriptables/Ability")]
+    public class UnitAbilitySO : ScriptableObject
     {
-        [field: Header("Ability Details")]
+        [field: Header("Ability Description")]
         [field: SerializeField]
         public Sprite Sprite { get; private set; }
 
         [field: SerializeField] public string Name { get; private set; }
         [field: SerializeField] public AbilityType Type { get; private set; }
         [SerializeField, TextArea(10, 10)] protected string description;
-        [field: SerializeField] public int ExpectedSelections { get; private set; } = 1;
+        [field:SerializeField] public UnitAbilitySelectorSO Selector { get; private set; }
+        [field:SerializeField] public UnitAbilityEffectSO[] Effects { get; private set; }
+        
+        [field:Header("Costs")]
         [field: SerializeField] public int Cooldown { get; private set; }
         [field: SerializeField] public int Cost { get; private set; }
         [field: SerializeField] public bool IsUltimate { get; private set; } = false;
         [field: SerializeField] public int UltimateCost { get; private set; } = 0;
         
+        [field: Header("Special")]
         [field: SerializeField] public bool SkipTargetSelection { get; private set; } = false;
         [field: SerializeField] public bool SkipTargetConfirmation { get; private set; } = false;
         [field: SerializeField] public bool EndUnitTurnAfterCast { get; private set; } = true;
 
         public virtual string ConvertedDescription(Unit caster)
         {
-            return description;
+            //Maybe do something cleaner of multi effects
+            var effectsText = Effects.Aggregate(string.Empty, (current, effect) => current + $"{effect.ConvertedDescription(caster)} ");
+
+            return $"{Selector.ConvertedDescription(caster)}\n{effectsText}";
         }
 
-        public virtual string ConvertDescriptionLinks(Unit caster, string linkKey)
+        public string ConvertDescriptionLinks(Unit caster, string linkKey)
         {
-            return linkKey;
+            var text = linkKey;
+            if (Selector.ConvertDescriptionLinks(caster,linkKey, out var selectorText)) text = selectorText;
+            foreach (var effect in Effects)
+            {
+                if (effect.ConvertDescriptionLinks(caster,linkKey, out var effectText)) text = effectText;
+            }
+            return text;
         }
         
-        public bool IsTileSelectable(Unit caster, Tile tile, List<Tile> currentlySelectedTiles)
-        {
-            return TileSelectionMethod(caster, tile, currentlySelectedTiles);
-        }
-
-        protected virtual bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
-        {
-            return selectableTile != null;
-        }
-
         public IEnumerator CastAbility(Unit caster, Tile[] targetTiles)
         {
-            return AbilityEffect(caster, targetTiles);
+            foreach (var effect in Effects)
+            {
+                yield return caster.StartCoroutine(effect.AbilityEffect(caster, targetTiles));
+            }
         }
         
-        public virtual List<Tile> GetAffectedTiles(Unit caster,Tile lastSelected, List<Tile> selectedTiles)
-        {
-            return new List<Tile>{lastSelected};
-        }
-
-        protected abstract IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles);
-
         public UnitAbilityInstance CreateInstance()
         {
             return new UnitAbilityInstance(this);
@@ -72,8 +75,10 @@ namespace Battle
     public class UnitAbilityInstance
     {
         public UnitAbilitySO SO { get; }
-        public int ExpectedSelections => SO.ExpectedSelections;
-        public int SelectionsLeft => SO.ExpectedSelections - CurrentSelectionCount;
+        public UnitAbilitySelectorSO Selector { get; }
+        public UnitAbilityEffectSO[] Effects { get; }
+        public int ExpectedSelections => Selector.ExpectedSelections;
+        public int SelectionsLeft => Selector.ExpectedSelections - CurrentSelectionCount;
         private int costModifier = 0;
         public int Cost => SO.Cost + costModifier;
         public bool IsUltimate => SO.IsUltimate;
@@ -82,7 +87,7 @@ namespace Battle
         public int CurrentCooldown { get; private set; }
         public int CurrentSelectionCount => currentSelectedTiles.Count;
 
-        public bool IsTileSelectable(Unit caster, Tile tile) => SO.IsTileSelectable(caster, tile, currentSelectedTiles);
+        public bool IsTileSelectable(Unit caster, Tile tile) => Selector.IsTileSelectable(caster, tile, currentSelectedTiles);
 
         private List<Tile> currentSelectedTiles = new();
         public Tile[] CurrentSelectedTiles => currentSelectedTiles.ToArray();
@@ -96,6 +101,9 @@ namespace Battle
         public UnitAbilityInstance(UnitAbilitySO unitAbilitySo)
         {
             SO = unitAbilitySo;
+            Selector = SO.Selector;
+            Effects = SO.Effects;
+            
             CurrentCooldown = 0;
             currentAffectedTiles.Clear();
             currentSelectedTiles.Clear();
@@ -139,6 +147,7 @@ namespace Battle
 
             IEnumerator AbilityCast()
             {
+                
                 yield return caster.StartCoroutine(SO.CastAbility(caster, currentAffectedTiles.ToArray()));
 
                 OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
@@ -162,25 +171,16 @@ namespace Battle
             
             Debug.Log($"Adding tile {tile} to selection",caster);
 
-            var affectedTiles = SO.GetAffectedTiles(caster, tile, currentSelectedTiles);
+            var affectedTiles = Selector.GetAffectedTiles(caster, tile, currentSelectedTiles);
             
             affectedTilesDict.Add(tile,affectedTiles);
             currentAffectedTiles.AddRange(affectedTiles);
             
             currentSelectedTiles.Add(tile);
             
-            //TODO - find a way to show both selected and affected
-            /*
-            foreach (var affectedTile in currentAffectedTiles)
-            {
-                affectedTile.SetAppearance(Tile.Appearance.Affected);
-            }
-            tile.SetAppearance(Tile.Appearance.Selected);
-            */
-            
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
 
-            if (CurrentSelectionCount > SO.ExpectedSelections) RemoveTileFromSelection(caster, currentSelectedTiles[0]);
+            if (CurrentSelectionCount > Selector.ExpectedSelections) RemoveTileFromSelection(caster, currentSelectedTiles[0]);
 
             if (SO.SkipTargetConfirmation)
             {

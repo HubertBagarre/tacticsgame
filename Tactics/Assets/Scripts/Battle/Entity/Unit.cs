@@ -8,6 +8,7 @@ namespace Battle
 {
     using UnitEvents;
     using ScriptableObjects;
+    using ScriptableObjects.Ability;
 
     public class Unit : MonoBehaviour, BattleEntity
     {
@@ -197,7 +198,7 @@ namespace Battle
             Tile.SetUnit(this);
         }
 
-        public IEnumerator MoveUnit(List<Tile> path) //PATH DOESN'T INCLUDE STARTING TILE
+        public IEnumerator MoveUnit(List<Tile> path,bool isForced) //PATH DOESN'T INCLUDE STARTING TILE
         {
             if (!path.Any())
             {
@@ -217,13 +218,13 @@ namespace Battle
             for (var index = 0; index < path.Count && CanContinueMovement(); index++)
             {
                 var tile = path[index];
-
-                //play movement animation
+                
+                //TODO - play animation, different is isForced
                 yield return new WaitForSeconds(0.1f);
 
                 transform.position = tile.transform.position;
 
-                MovementLeft--;
+                if(!isForced) MovementLeft--;
                 SetTile(tile);
             }
 

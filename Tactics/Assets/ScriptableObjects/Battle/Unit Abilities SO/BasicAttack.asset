@@ -9,22 +9,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3732e966a24e6b41b327d31855ea659, type: 3}
+  m_Script: {fileID: 11500000, guid: 9aee06dd214c82043a27b1dc41ab3dc7, type: 3}
   m_Name: BasicAttack
   m_EditorClassIdentifier: 
   <Sprite>k__BackingField: {fileID: 0}
   <Name>k__BackingField: Basic Attack
   <Type>k__BackingField: 1
-  description: Select <color=green>1 enemy within <u><link="ring:%range%">%range%
-    rings</link></u></color>. Deal <color=orange>%damage% damage</color>. If the
-    enemy is on an adjacent tile, deal <color=orange>%crit% damage</color> instead.
-  <ExpectedSelections>k__BackingField: 1
+  description: 
+  <Selector>k__BackingField: {fileID: 11400000, guid: b496c5c3b59a5f94192dd5d26b70848d,
+    type: 2}
+  <Effects>k__BackingField:
+  - {fileID: 11400000, guid: 2a84ab598746c3446a8f57915d1179f7, type: 2}
+  - {fileID: 11400000, guid: 2a84ab598746c3446a8f57915d1179f7, type: 2}
   <Cooldown>k__BackingField: 0
-  <Cost>k__BackingField: -1
+  <Cost>k__BackingField: 0
   <IsUltimate>k__BackingField: 0
   <UltimateCost>k__BackingField: 0
   <SkipTargetSelection>k__BackingField: 0
   <SkipTargetConfirmation>k__BackingField: 0
   <EndUnitTurnAfterCast>k__BackingField: 1
-  range: 7
-  critDamageMultiplier: 2

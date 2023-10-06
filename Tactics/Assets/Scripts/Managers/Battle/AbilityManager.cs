@@ -5,6 +5,7 @@ using UnityEngine;
 namespace Battle
 {
     using AbilityEvents;
+    using ScriptableObjects.Ability;
     using InputEvent;
     using BattleEvents;
 
@@ -163,6 +164,8 @@ namespace Battle
 
 namespace Battle.AbilityEvents
 {
+    using ScriptableObjects.Ability;
+    
     public class StartAbilityTargetSelectionEvent
     {
         public UnitAbilityInstance Ability { get; }

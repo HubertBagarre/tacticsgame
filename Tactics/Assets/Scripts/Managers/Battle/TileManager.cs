@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Battle.UIEvents;
+
 using UnityEngine;
 
 namespace Battle
@@ -8,6 +8,7 @@ namespace Battle
     using UnitEvents;
     using InputEvent;
     using AbilityEvents;
+    using ScriptableObjects.Ability;
 
     /// <summary>
     /// Handles Tiles
@@ -82,6 +83,7 @@ namespace Battle
                 tile.SetAppearance(ability.IsTileSelectable(caster,tile) ? Tile.Appearance.Selectable : Tile.Appearance.Unselectable );
             }
             
+            //TODO - find a way to show both selected and affected tiles
             foreach (var tile in ability.CurrentAffectedTiles)
             {
                 tile.SetAppearance(Tile.Appearance.Affected);

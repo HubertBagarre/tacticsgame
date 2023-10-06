@@ -1,30 +1,29 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Battle
+namespace Battle.ScriptableObjects.Ability.Selector
 {
-    [CreateAssetMenu(menuName = "Battle Scriptables/Unit Ability/Area Selector")]
-    public class AreaSelectorAbilitySO : UnitAbilitySO
+    [CreateAssetMenu(menuName = "Battle Scriptables/Ability Selector/Area Selector")]
+    public class AreaSelectorAbilitySO : UnitAbilitySelectorSO
     {
+        //TODO: Add a range to this selector
+
+        public override string ConvertedDescription(Unit caster)
+        {
+            return "Select an area.";
+        }
+
+        protected override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
+        {
+            return true;
+        }
+
         public override List<Tile> GetAffectedTiles(Unit caster, Tile lastSelected, List<Tile> selectedTiles)
         {
             var tiles = lastSelected.GetSurroundingTiles();
             tiles.Add(lastSelected);
             
             return tiles;
-        }
-
-        protected override IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles)
-        {
-            foreach (var tile in targetTiles)
-            {
-                var unit = tile.Unit;
-                if(unit != null) unit.TakeDamage(1);
-            }
-            
-            
-            yield return null;
         }
     }
 

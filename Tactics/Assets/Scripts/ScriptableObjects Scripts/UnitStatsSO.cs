@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace Battle.ScriptableObjects
 {
+    using Ability;
+    
     [CreateAssetMenu(menuName = "Unit")]
     public class UnitStatsSO : ScriptableObject
     {

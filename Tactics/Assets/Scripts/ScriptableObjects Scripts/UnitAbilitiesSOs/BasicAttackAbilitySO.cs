@@ -1,37 +1,22 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace Battle.ScriptableObjects.Ability
+namespace Battle.ScriptableObjects.Ability.Effect
 {
-    [CreateAssetMenu(menuName = "Battle Scriptables/Unit Ability/Special/Basic Attack")]
-    public class BasicAttackAbilitySO : UnitAbilitySO
+    [CreateAssetMenu(menuName = "Battle Scriptables/Ability Effect/Basic Attack")]
+    public class BasicAttackAbilitySO : UnitAbilityEffectSO
     {
-        [SerializeField] private int range = 3;
         [SerializeField] private int critDamageMultiplier = 2;
         
         public override string ConvertedDescription(Unit caster)
         {
             var damage = caster.Attack;
             var crit = damage * critDamageMultiplier;
-
-            var text = description.Replace("%range%", $"{range}")
-                .Replace("%damage%",$"{damage}")
-                .Replace("%crit%",$"{crit}");
             
-            return text;
+            return $"Deal <color=orange>{damage} damage</color>. If the enemy is on an adjacent tile, deal <color=orange>{crit} damage</color> instead.";
         }
-
-        protected override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
-        {
-            if (!selectableTile.HasUnit()) return false;
-
-            if (selectableTile.Unit.Team == 0) return false;
-
-            return caster.Tile.IsInSurroundingTileDistance(selectableTile, range);
-        }
-
-        protected override IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles)
+        
+        public override IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles)
         {
             var damage = caster.Attack;
             var isCrit = caster.Tile.GetAdjacentTiles().Contains(targetTiles[0]);
@@ -42,7 +27,7 @@ namespace Battle.ScriptableObjects.Ability
             Debug.Log($"Attacking {target} for {damage} damage");
             
             //play unit attack animation (changes if isCrit or not)
-            yield return target.AttackUnitEffect(target, damage);
+            yield return caster.AttackUnitEffect(target, damage);
         }
     }
 }
