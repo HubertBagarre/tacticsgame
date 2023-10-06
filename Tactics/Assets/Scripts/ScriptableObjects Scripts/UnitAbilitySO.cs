@@ -21,7 +21,7 @@ namespace Battle
         [field: SerializeField] public string Name { get; private set; }
         [field: SerializeField] public AbilityType Type { get; private set; }
         [SerializeField, TextArea(10, 10)] protected string description;
-        [field: SerializeField] public int ExpectedSelections { get; private set; }
+        [field: SerializeField] public int ExpectedSelections { get; private set; } = 1;
         [field: SerializeField] public int Cooldown { get; private set; }
         [field: SerializeField] public int Cost { get; private set; }
         [field: SerializeField] public bool IsUltimate { get; private set; } = false;
@@ -55,6 +55,11 @@ namespace Battle
         {
             return AbilityEffect(caster, targetTiles);
         }
+        
+        public virtual List<Tile> GetAffectedTiles(Unit caster,Tile lastSelected, List<Tile> selectedTiles)
+        {
+            return new List<Tile>{lastSelected};
+        }
 
         protected abstract IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles);
 
@@ -80,7 +85,10 @@ namespace Battle
         public bool IsTileSelectable(Unit caster, Tile tile) => SO.IsTileSelectable(caster, tile, currentSelectedTiles);
 
         private List<Tile> currentSelectedTiles = new();
+        public Tile[] CurrentSelectedTiles => currentSelectedTiles.ToArray();
         private List<Tile> currentAffectedTiles = new();
+        public Tile[] CurrentAffectedTiles => currentAffectedTiles.ToArray();
+        private Dictionary<Tile,List<Tile>> affectedTilesDict = new();
 
         public event Action<int> OnCurrentSelectedTilesUpdated;
         public event Action<int> OnCurrentCooldownUpdated;
@@ -117,8 +125,11 @@ namespace Battle
         public void ClearSelection()
         {
             currentSelectedTiles.Clear();
-            currentSelectedTiles.Clear();
+            currentAffectedTiles.Clear();
+            affectedTilesDict.Clear();
         }
+        
+        //TODO - Separate ability selection and effect (and ability should have a selectorSO and a castSO
 
         public void CastAbility(Unit caster)
         {
@@ -148,11 +159,25 @@ namespace Battle
                 RemoveTileFromSelection(caster, tile);
                 return;
             }
+            
+            Debug.Log($"Adding tile {tile} to selection",caster);
 
+            var affectedTiles = SO.GetAffectedTiles(caster, tile, currentSelectedTiles);
+            
+            affectedTilesDict.Add(tile,affectedTiles);
+            currentAffectedTiles.AddRange(affectedTiles);
+            
             currentSelectedTiles.Add(tile);
-
+            
+            //TODO - find a way to show both selected and affected
+            /*
+            foreach (var affectedTile in currentAffectedTiles)
+            {
+                affectedTile.SetAppearance(Tile.Appearance.Affected);
+            }
             tile.SetAppearance(Tile.Appearance.Selected);
-
+            */
+            
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
 
             if (CurrentSelectionCount > SO.ExpectedSelections) RemoveTileFromSelection(caster, currentSelectedTiles[0]);
@@ -168,10 +193,31 @@ namespace Battle
             if (!currentSelectedTiles.Contains(tile)) return;
             currentSelectedTiles.Remove(tile);
 
+            if (affectedTilesDict.TryGetValue(tile, out var tilesToRemove))
+            {
+                foreach (var affectedTile in tilesToRemove)
+                {
+                    if (!currentAffectedTiles.Contains(affectedTile)) continue;
+                    
+                    currentAffectedTiles.Remove(affectedTile);
+                    
+                    /*
+                    affectedTile.SetAppearance(IsTileSelectable(caster, tile)
+                        ? Tile.Appearance.Selectable
+                        : Tile.Appearance.Unselectable);
+                        */
+                }
+
+                affectedTilesDict.Remove(tile);
+            }
+            
+            /*
             tile.SetAppearance(IsTileSelectable(caster, tile)
                 ? Tile.Appearance.Selectable
                 : Tile.Appearance.Unselectable);
 
+            */
+            
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
         }
 

@@ -30,6 +30,7 @@ namespace Battle
         [SerializeField] private Material defaultMat;
         [SerializeField] private Material selectableMat;
         [SerializeField] private Material selectedMat;
+        [SerializeField] private Material affectedMat;
         [SerializeField] private Material unselectableMat;
 
         [field: Header("Debug")]
@@ -41,6 +42,7 @@ namespace Battle
             Default,
             Selectable,
             Selected,
+            Affected,
             Unselectable,
         }
 
@@ -213,15 +215,16 @@ namespace Battle
 
         public void SetAppearance(Appearance appearance)
         {
-            Material mat = appearance switch
+            var mat = appearance switch
             {
                 Appearance.Default => defaultMat,
                 Appearance.Selectable => selectableMat,
                 Appearance.Selected => selectedMat,
+                Appearance.Affected => affectedMat,
                 Appearance.Unselectable => unselectableMat,
                 _ => defaultMat
             };
-
+            
             modelRenderer.material = mat;
         }
 

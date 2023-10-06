@@ -222,6 +222,8 @@ namespace Battle
             {
                 ShowAbilityTargetSelectionButtons(false);
 
+                if (currentAbilityInTargetSelection == null) return;
+                
                 currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated -= UpdateAbilitySelectionLeftText;
                 currentAbilityInTargetSelection.OnCurrentSelectedTilesUpdated -= UpdateConfirmAbilityTargetSelectionButton;
                 
@@ -242,11 +244,13 @@ namespace Battle
 
         private void UpdateConfirmAbilityTargetSelectionButton(int _)
         {
+            if(currentAbilityInTargetSelection == null) return;
             confirmTileSelectionButton.interactable = currentAbilityInTargetSelection.SelectionsLeft == 0 || currentAbilityInTargetSelection.ExpectedSelections == 0;
         }
 
         private void UpdateAbilitySelectionLeftText(int _)
         {
+            if(currentAbilityInTargetSelection == null) return;
             selectionsLeftText.text = $"Select {currentAbilityInTargetSelection.SelectionsLeft} Target{(currentAbilityInTargetSelection.SelectionsLeft > 0 ? "s":"")}"; //Select 66 Targets
         }
         

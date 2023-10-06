@@ -81,6 +81,16 @@ namespace Battle
             {
                 tile.SetAppearance(ability.IsTileSelectable(caster,tile) ? Tile.Appearance.Selectable : Tile.Appearance.Unselectable );
             }
+            
+            foreach (var tile in ability.CurrentAffectedTiles)
+            {
+                tile.SetAppearance(Tile.Appearance.Affected);
+            }
+            
+            foreach (var tile in ability.CurrentSelectedTiles)
+            {
+                tile.SetAppearance(Tile.Appearance.Selected);
+            }
         }
         
         private void ShowSelectedTilesOnStartAbilityCast(StartAbilityCastEvent ctx)

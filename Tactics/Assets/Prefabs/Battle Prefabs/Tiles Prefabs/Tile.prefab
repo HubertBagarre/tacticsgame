@@ -396,5 +396,6 @@ MonoBehaviour:
   defaultMat: {fileID: 2100000, guid: 35f88edf3851c9b44bfd57ff363c8bf6, type: 2}
   selectableMat: {fileID: 2100000, guid: e3bd85f4b2d20fd4f99caffc811fe899, type: 2}
   selectedMat: {fileID: 2100000, guid: 3fddec1670a946f4f9f94d222426a5a7, type: 2}
+  affectedMat: {fileID: 2100000, guid: b05c6e12d61f56445983db13cc18181a, type: 2}
   unselectableMat: {fileID: 2100000, guid: 317868c7db5d55346afb50823e09b1c5, type: 2}
   <DebugText>k__BackingField: {fileID: 902476225510808331}
