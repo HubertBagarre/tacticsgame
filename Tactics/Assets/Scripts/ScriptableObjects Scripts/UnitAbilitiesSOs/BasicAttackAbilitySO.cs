@@ -27,9 +27,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
                 var target = tile.Unit;
             
                 if (isCrit) damage *= critDamageMultiplier;
-            
-                Debug.Log($"Attacking {target} for {damage} damage");
-            
+                
                 //play unit attack animation (changes if isCrit or not)
                 yield return caster.AttackUnitEffect(target, damage);
             }
