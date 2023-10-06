@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -159,7 +160,8 @@ namespace Battle.UIComponent
 
                 yield return null;
 
-                var lineCount = abilityDescriptionText.textInfo.lineCount;
+                var textInfo = abilityDescriptionText.textInfo;
+                var lineCount = textInfo.lineCount;
                 
                 var size = descriptionPanelTr.sizeDelta;
                 
@@ -169,12 +171,10 @@ namespace Battle.UIComponent
                     descriptionPanelTr.sizeDelta = size;
                     yield break;
                 }
+                
+                var sizeIncrease = textInfo.lineInfo.Sum(line => line.lineHeight);
 
-                lineCount -= 2;
-                var lineSize = abilityDescriptionText.fontSize;
-                var sizeIncrease = lineCount * lineSize + 2;
-
-                size.y = 100 + sizeIncrease;
+                size.y = 40 + sizeIncrease + 5; //cuz the text is at Y = -40
                 descriptionPanelTr.sizeDelta = size;
             }
             

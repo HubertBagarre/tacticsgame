@@ -414,6 +414,11 @@ namespace Battle
             Damage = damage;
         }
 
+        public override string ToString()
+        {
+            return $"AttackInstance: {OriginalDamage} -> {Damage}";
+        }
+
         public void ChangeDamage(int value)
         {
             Damage = value;

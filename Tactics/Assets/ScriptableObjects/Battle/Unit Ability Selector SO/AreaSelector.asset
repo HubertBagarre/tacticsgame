@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb3f515fc230be94f9658926689dc166, type: 3}
   m_Name: AreaSelector
   m_EditorClassIdentifier: 
-  <ExpectedSelections>k__BackingField: 1
+  <ExpectedSelections>k__BackingField: 2

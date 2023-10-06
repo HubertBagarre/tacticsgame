@@ -107,6 +107,7 @@ namespace Battle.ScriptableObjects.Ability
             CurrentCooldown = 0;
             currentAffectedTiles.Clear();
             currentSelectedTiles.Clear();
+            affectedTilesDict.Clear();
         }
 
         public override string ToString()
@@ -137,8 +138,6 @@ namespace Battle.ScriptableObjects.Ability
             affectedTilesDict.Clear();
         }
         
-        //TODO - Separate ability selection and effect (and ability should have a selectorSO and a castSO
-
         public void CastAbility(Unit caster)
         {
             EventManager.Trigger(new StartAbilityCastEvent(this, caster, currentAffectedTiles));
@@ -147,8 +146,7 @@ namespace Battle.ScriptableObjects.Ability
 
             IEnumerator AbilityCast()
             {
-                
-                yield return caster.StartCoroutine(SO.CastAbility(caster, currentAffectedTiles.ToArray()));
+                yield return caster.StartCoroutine(SO.CastAbility(caster, currentAffectedTiles.Distinct().ToArray()));
 
                 OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
                 currentSelectedTiles.Clear();
@@ -198,25 +196,11 @@ namespace Battle.ScriptableObjects.Ability
                 foreach (var affectedTile in tilesToRemove)
                 {
                     if (!currentAffectedTiles.Contains(affectedTile)) continue;
-                    
                     currentAffectedTiles.Remove(affectedTile);
-                    
-                    /*
-                    affectedTile.SetAppearance(IsTileSelectable(caster, tile)
-                        ? Tile.Appearance.Selectable
-                        : Tile.Appearance.Unselectable);
-                        */
                 }
 
                 affectedTilesDict.Remove(tile);
             }
-            
-            /*
-            tile.SetAppearance(IsTileSelectable(caster, tile)
-                ? Tile.Appearance.Selectable
-                : Tile.Appearance.Unselectable);
-
-            */
             
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
         }

@@ -18,16 +18,22 @@ namespace Battle.ScriptableObjects.Ability.Effect
         
         public override IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles)
         {
-            var damage = caster.Attack;
-            var isCrit = caster.Tile.GetAdjacentTiles().Contains(targetTiles[0]);
-            var target = targetTiles[0].Unit;
+            foreach (var tile in targetTiles)
+            {
+                if(!tile.HasUnit()) continue;
+                
+                var damage = caster.Attack;
+                var isCrit = caster.Tile.GetAdjacentTiles().Contains(tile);
+                var target = tile.Unit;
             
-            if (isCrit) damage *= critDamageMultiplier;
+                if (isCrit) damage *= critDamageMultiplier;
             
-            Debug.Log($"Attacking {target} for {damage} damage");
+                Debug.Log($"Attacking {target} for {damage} damage");
             
-            //play unit attack animation (changes if isCrit or not)
-            yield return caster.AttackUnitEffect(target, damage);
+                //play unit attack animation (changes if isCrit or not)
+                yield return caster.AttackUnitEffect(target, damage);
+            }
+            
         }
     }
 }
