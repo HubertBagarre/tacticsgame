@@ -18,8 +18,18 @@ namespace Battle.ScriptableObjects.Ability.Effect
         public override IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles)
         {
             var destination = targetTiles[0];
+
+
+            var hasPath = caster.Tile.GetPath(destination,out var path);
+
+            if (hasPath)
+            {
+                caster.Tile.SetPath(path);
+                caster.Tile.ShowPath();
+            }
             
-            var path = new List<Tile>() {targetTiles[0]};
+            /*
+            path = new List<Tile>() {targetTiles[0]};
             var lastAdded = destination;
 
             for (int i = destination.PathRing - 1; i >= 1; i--)
@@ -30,6 +40,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
             }
 
             path.Reverse();
+            */
 
             yield return caster.StartCoroutine(caster.MoveUnit(path,forced));
         }

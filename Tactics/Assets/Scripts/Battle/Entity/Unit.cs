@@ -214,10 +214,6 @@ namespace Battle
             {
                 yield break;
             }
-
-            var rendering = Tile;
-            rendering.SetPath(path);
-            rendering.ShowPath();
             
             for (var index = 0; index < path.Count && CanContinueMovement(); index++)
             {

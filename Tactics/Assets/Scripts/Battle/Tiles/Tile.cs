@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -261,6 +262,54 @@ namespace Battle
             };
             
             modelRenderer.material = mat;
+        }
+
+        //A* pathfinding
+        public bool GetPath(Tile destination, out List<Tile> path, bool includeDiag = false)
+        {
+            var start = this;
+            
+            var frontier = new Queue<Tile>();
+            frontier.Enqueue(start);
+
+            var reached = new List<Tile> { start };
+
+            var cameFromDict = new Dictionary<Tile, Tile>();
+
+            path = new List<Tile>{destination};
+            while (frontier.Count > 0)
+            {
+                var current = frontier.Dequeue();
+
+                if (current == destination)
+                {
+                    current = destination;
+
+                    while (current != start)
+                    {
+                        path.Add(current);
+                        current = cameFromDict[current];
+                    }
+
+                    path.Reverse();
+                    
+                    return true;
+                }
+                
+                foreach (var next in current.GetAdjacentTiles())
+                {
+                    if (!reached.Contains(next))
+                    {
+                        cameFromDict[next] = current;
+                        
+                        frontier.Enqueue(next);
+                        reached.Add(next);
+                        
+                    }
+                }
+            }
+            
+            return false; 
         }
 
         public void SetPathRing(int value)
