@@ -9,8 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6f68ec4413a45742964943abed6c58a, type: 3}
-  m_Name: Any Tile Selector
+  m_Script: {fileID: 11500000, guid: 5c921bfce05f7a745a0998089f4e4cd0, type: 3}
+  m_Name: TargetAlly
   m_EditorClassIdentifier: 
-  <ExpectedSelections>k__BackingField: 1
+  expectedSelections: 1
   <UseSelectionOrder>k__BackingField: 0
+  range: -1
+  targetAllies: 1
+  targetEnemies: 0

@@ -5,8 +5,14 @@ namespace Battle.ScriptableObjects.Ability.Selector
 {
     public abstract class UnitAbilitySelectorSO : ScriptableObject
     {
-        [field: SerializeField] public int ExpectedSelections { get; private set; } = 1;
+        [SerializeField] private int expectedSelections = 1;
+        public int ExpectedSelections => OverrideExpectedSelections() >= 0 ? OverrideExpectedSelections() : expectedSelections;
         [field: SerializeField] public bool UseSelectionOrder { get; private set; } = false;
+
+        protected virtual int OverrideExpectedSelections()
+        {
+            return -1;
+        }
         
         public virtual bool ConvertDescriptionLinks(Unit caster,string linkKey,out string text)
         {
@@ -21,7 +27,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
             return TileSelectionMethod(caster, tile, currentlySelectedTiles);
         }
 
-        protected abstract bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles);
+        public abstract bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles);
         
         public virtual List<Tile> GetAffectedTiles(Unit caster,Tile lastSelected, List<Tile> selectedTiles)
         {

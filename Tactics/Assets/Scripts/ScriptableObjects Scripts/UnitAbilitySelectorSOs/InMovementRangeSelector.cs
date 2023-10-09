@@ -11,7 +11,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
             return "Select a tile within Movement range.";
         }
 
-        protected override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
+        public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
         {
             var startTile = caster.Tile;
             if (startTile == selectableTile) return false;

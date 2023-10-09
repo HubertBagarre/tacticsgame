@@ -43,12 +43,12 @@ namespace Battle.ScriptableObjects.Ability.Selector
             
             var targetText = $"Select <color=green>{ExpectedSelections} {unitType}{targetType}{(ExpectedSelections > 1 ? "s":"")}";
             
-            var rangeText =  $"within <u><link=\"ring:{range}\">{range} rings</link></u></color>.";
+            var rangeText = range > 0 ? $" within <u><link=\"ring:{range}\">{range} rings</link></u></color>." : "</color>.";
             
-            return $"{targetText} {rangeText}";
+            return $"{targetText}{rangeText}";
         }
         
-        protected override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
+        public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
         {
             if (range >= 0 && !caster.Tile.IsInSurroundingTileDistance(selectableTile, range)) return false;
 

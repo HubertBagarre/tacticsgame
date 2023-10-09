@@ -187,12 +187,11 @@ namespace Battle.ScriptableObjects.Ability
                 RemoveTileFromSelection(caster, currentSelectedTiles[^1]);
             }
             
+            currentSelectedTiles.Add(tile);
             var affectedTiles = Selector.GetAffectedTiles(caster, tile, currentSelectedTiles);
             
             affectedTilesDict.Add(tile,affectedTiles);
             currentAffectedTiles.AddRange(affectedTiles);
-            
-            currentSelectedTiles.Add(tile);
             
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
 

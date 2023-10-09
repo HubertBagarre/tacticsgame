@@ -13,7 +13,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
             return "Select an area.";
         }
 
-        protected override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
+        public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
         {
             return true;
         }

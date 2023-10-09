@@ -6,16 +6,22 @@ namespace Battle.ScriptableObjects.Ability.Selector
     [CreateAssetMenu(menuName = "Battle Scriptables/Ability Selector/Direction Selector")]
     public class DirectionSelectorSO : UnitAbilitySelectorSO
     {
+        [SerializeField] private int expectedDirections = 1;
         [SerializeField] private UnitAbilitySelectorSO startTileSelector;
         [SerializeField] private bool includeDiag = false;
-        
+
+        protected override int OverrideExpectedSelections()
+        {
+            return startTileSelector != null ? expectedDirections : expectedDirections + 1;
+        }
+
         public override string ConvertedDescription(Unit caster)
         {
-            if (startTileSelector != null) return $"{startTileSelector.ConvertedDescription(caster)} Then Select a direction";
+            if (startTileSelector != null) return $"{startTileSelector.ConvertedDescription(caster)} Then select a direction.";
             return "Select a direction";
         }
 
-        protected override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
+        public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
         {
             var startingTile = caster.Tile;
             if (startTileSelector != null)
