@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4c4697e66d2df6a48a45e55c8a37d37f, type: 3}
-  m_Name: EnemyAndAlly
+  m_Name: Any3Tiles
   m_EditorClassIdentifier: 
-  expectedSelections: 1
+  expectedSelections: 3
   <UseSelectionOrder>k__BackingField: 1
   selectors:
-  - {fileID: 11400000, guid: b496c5c3b59a5f94192dd5d26b70848d, type: 2}
-  - {fileID: 11400000, guid: 9723554e690c6fe4188f330213a61339, type: 2}
-  - {fileID: 11400000, guid: b458b08808b914f46b2a7ce89bc5a9d3, type: 2}
+  - {fileID: 11400000, guid: 6b0d3f9de65f75840a15063d42d68574, type: 2}
+  - {fileID: 11400000, guid: 6b0d3f9de65f75840a15063d42d68574, type: 2}
+  - {fileID: 11400000, guid: 6b0d3f9de65f75840a15063d42d68574, type: 2}

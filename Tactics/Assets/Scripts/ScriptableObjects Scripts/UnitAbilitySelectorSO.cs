@@ -7,7 +7,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
     {
         [SerializeField,Min(0)] private int expectedSelections = 1;
         public int ExpectedSelections => OverrideExpectedSelections() >= 0 ? OverrideExpectedSelections() : expectedSelections;
-        [field: SerializeField] public bool UseSelectionOrder { get; private set; } = false;
+        [field: SerializeField] public bool UseSelectionOrder { get; private set; } = true;
 
         protected virtual int OverrideExpectedSelections()
         {

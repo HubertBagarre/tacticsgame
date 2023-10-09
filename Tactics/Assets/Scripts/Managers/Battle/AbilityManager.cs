@@ -107,6 +107,8 @@ namespace Battle
                 var tile = clickEvent.Tile;
 
                 if (tile == null) return;
+                
+                
 
                 currentCastingAbilityInstance.AddTileToSelection(caster, tile);
                 
