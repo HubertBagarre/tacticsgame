@@ -9,11 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c921bfce05f7a745a0998089f4e4cd0, type: 3}
-  m_Name: Any Tile
+  m_Script: {fileID: 11500000, guid: 8add83dd023b34143bd3bfba658ab646, type: 3}
+  m_Name: Closest 3 enemy
   m_EditorClassIdentifier: 
   expectedSelections: 1
   <UseSelectionOrder>k__BackingField: 0
-  range: -1
+  selector: {fileID: 11400000, guid: 6b0d3f9de65f75840a15063d42d68574, type: 2}
+  range: 3
+  useAdjacentTiles: 0
+  targetUnits: 3
   targetAllies: 0
-  targetEnemies: 0

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Battle;
 using UnityEngine;
@@ -11,6 +12,10 @@ namespace Battle.ScriptableObjects
         protected static TileManager tileM;
         protected static UnitManager unitM;
         protected static AbilityManager abilityM;
+        
+        // See UnitAbilitySO if can't be overriden (use a virtual bool func(Unit,Tile) instead)
+        public virtual Func<Tile, bool> WalkableTileSelector {  get; protected set; } =
+            tile => tile.IsWalkable && !tile.HasUnit();
 
         public static void SetBattleManager(BattleManager battleManager)
         {

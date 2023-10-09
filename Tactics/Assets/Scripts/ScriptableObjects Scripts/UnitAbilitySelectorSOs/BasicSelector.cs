@@ -52,7 +52,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
         {
             if (range >= 0 && !caster.Tile.GetSurroundingTiles(range).Contains(selectableTile)) return false;
 
-            if (!TargetUnits) return false;
+            if (!TargetUnits) return true;
             
             if (!selectableTile.HasUnit()) return false;
             

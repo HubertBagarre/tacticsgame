@@ -5,7 +5,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
 {
     public abstract class UnitAbilitySelectorSO : ScriptableObject
     {
-        [SerializeField] private int expectedSelections = 1;
+        [SerializeField,Min(0)] private int expectedSelections = 1;
         public int ExpectedSelections => OverrideExpectedSelections() >= 0 ? OverrideExpectedSelections() : expectedSelections;
         [field: SerializeField] public bool UseSelectionOrder { get; private set; } = false;
 

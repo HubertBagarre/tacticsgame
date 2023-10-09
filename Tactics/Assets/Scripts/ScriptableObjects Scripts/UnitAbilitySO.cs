@@ -29,7 +29,7 @@ namespace Battle.ScriptableObjects.Ability
         [field:SerializeField] public UnitAbilityEffectSO[] Effects { get; private set; }
         
         [field:Header("Costs")]
-        [field: SerializeField] public int Cooldown { get; private set; }
+        [field: SerializeField,Min(0)] public int Cooldown { get; private set; }
         [field: SerializeField] public int Cost { get; private set; }
         [field: SerializeField] public bool IsUltimate { get; private set; } = false;
         [field: SerializeField] public int UltimateCost { get; private set; } = 0;
@@ -46,6 +46,8 @@ namespace Battle.ScriptableObjects.Ability
             var effectsText = Effects.Aggregate(string.Empty, (current, effect) => current + $"{effect.ConvertedDescription(caster)} ");
 
             effectsText = effectsText.Replace("%AFFECTED%", Selector.AffectedDescription(caster));
+
+            if (descriptionText.Length == 0) return $"{effectsText}";
             
             return $"Select {descriptionText}.\n{effectsText}";
         }
