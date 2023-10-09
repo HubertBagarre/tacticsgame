@@ -29,6 +29,13 @@ namespace Battle.ScriptableObjects.Ability.Selector
 
         public abstract bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles);
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="caster"></param>
+        /// <param name="lastSelected"></param>
+        /// <param name="selectedTiles"> includes lastSelected</param>
+        /// <returns></returns>
         public virtual List<Tile> GetAffectedTiles(Unit caster,Tile lastSelected, List<Tile> selectedTiles)
         {
             return new List<Tile>{lastSelected};

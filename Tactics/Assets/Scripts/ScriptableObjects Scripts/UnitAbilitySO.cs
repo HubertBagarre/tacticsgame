@@ -75,8 +75,8 @@ namespace Battle.ScriptableObjects.Ability
     public class UnitAbilityInstance
     {
         public UnitAbilitySO SO { get; }
-        public UnitAbilitySelectorSO Selector { get; }
-        public UnitAbilityEffectSO[] Effects { get; }
+        private UnitAbilitySelectorSO Selector { get; }
+        private UnitAbilityEffectSO[] Effects { get; }
         public int ExpectedSelections => Selector.ExpectedSelections;
         public int SelectionsLeft => Selector.ExpectedSelections - CurrentSelectionCount;
         private int costModifier = 0;
@@ -87,7 +87,12 @@ namespace Battle.ScriptableObjects.Ability
         public int CurrentCooldown { get; private set; }
         public int CurrentSelectionCount => currentSelectedTiles.Count;
 
-        public bool IsTileSelectable(Unit caster, Tile tile) => Selector.IsTileSelectable(caster, tile, currentSelectedTiles);
+        public bool IsTileSelectable(Unit caster, Tile tile)
+        {
+            if (CurrentSelectionCount >= ExpectedSelections && Selector.UseSelectionOrder) return false;
+            
+            return Selector.IsTileSelectable(caster, tile, currentSelectedTiles);
+        } 
 
         private List<Tile> currentSelectedTiles = new();
         public Tile[] CurrentSelectedTiles => currentSelectedTiles.ToArray();

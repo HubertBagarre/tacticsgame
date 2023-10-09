@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects.Ability.Effect
@@ -31,17 +32,21 @@ namespace Battle.ScriptableObjects.Ability.Effect
             var dmg = useCasterAttack ? caster.Attack : damage;
             
             yield return null;
-            
-            var target = targetTiles[0].Unit;
 
-            if (isAttack)
+            foreach (var targetTile in targetTiles.Where(tile => tile.HasUnit()))
             {
-                yield return caster.AttackUnitEffect(target, dmg);
+                var target = targetTile.Unit;
+
+                if (isAttack)
+                {
+                    yield return caster.AttackUnitEffect(target, dmg);
+                }
+                else
+                {
+                    target.TakeDamage(dmg);
+                }
             }
-            else
-            {
-                target.TakeDamage(dmg);
-            }
+            
             
             yield return null;
         }
