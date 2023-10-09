@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -26,6 +25,7 @@ namespace Battle
         [SerializeField] private float lineRendererHeight = 0.07f;
         [field:Header("Pathing")]
         [field: SerializeField] public bool IsWalkable { get; private set; }
+        private int CostToMove => 1; // If we need weights its here lmao (not used btw)
         [SerializeField] private Tile[] neighbors; //0 is top (x,y+1), then clockwise, adjacent before diag
         [field: SerializeField] public int PathRing { get; private set; }
         
@@ -96,6 +96,39 @@ namespace Battle
             return new List<Tile> {neighbors[0], neighbors[1], neighbors[2], neighbors[3]}.Where(tile => tile != null).Where(condition).ToList();
         }
 
+        public List<Tile> GetAdjacentTiles(int range,Func<Tile,bool> condition = null)
+        {
+            condition ??= _ => true;
+            
+            var start = this;
+            
+            var frontier = new Queue<Tile>();
+            var distanceDict= new Dictionary<Tile,int>();
+
+            frontier.Enqueue(start);
+            distanceDict.Add(start,0);
+            
+            while (frontier.Count > 0)
+            {
+                var current = frontier.Dequeue();
+
+                var distance = distanceDict[current] + 1;
+                
+                if (distance > range) return distanceDict.Keys.Where(key => key != start).ToList();
+                
+                foreach (var next in current.GetAdjacentTiles(condition))
+                {
+                    if (!distanceDict.ContainsKey(next))
+                    {
+                        frontier.Enqueue(next);
+                        distanceDict.Add(next,distance);
+                    }
+                }
+            }
+            
+            return distanceDict.Keys.Where(key => key != start).ToList();
+        }
+
         public List<Tile> GetSurroundingTiles(Func<Tile,bool> condition = null)
         {
             condition ??= _ => true;
@@ -106,124 +139,36 @@ namespace Battle
         public List<Tile> GetSurroundingTiles(int range,Func<Tile,bool> condition = null)
         {
             condition ??= _ => true;
+            
+            var start = this;
+            
+            var frontier = new Queue<Tile>();
+            var distanceDict= new Dictionary<Tile,int>();
 
-            var tiles = new List<Tile>();
-
-            if (range <= 0) return tiles;
-            if (range == 1)
+            frontier.Enqueue(start);
+            distanceDict.Add(start,0);
+            
+            while (frontier.Count > 0)
             {
-                tiles.AddRange(GetSurroundingTiles().Where(condition));
-                return tiles;
-            }
-            
-            // TODO - do kinda of the same as below, but return list instead of bool (return already visited xd)
-            
-            return tiles;
-        }
+                var current = frontier.Dequeue();
 
-        /// <summary>
-        /// Tries to path from this to targetTile
-        /// </summary>
-        /// <param name="targetTile"></param>
-        /// <param name="range"></param>
-        /// <param name="condition"></param>
-        /// <returns></returns>
-        public bool IsInSurroundingTileDistance(Tile targetTile,int range,Func<Tile,bool> condition = null)
-        {
-            if (range <= 0 && this != targetTile) return false;
-            
-            if (this == targetTile) return true;
-            
-            condition ??= _ => true;
-            
-            var iteration = 1;
-            var alreadyvisited = new List<Tile>();
-            var surroundingTiles = GetSurroundingTiles(condition);
-            
-            UpdatePathRing();
-
-            return surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
-
-            bool SearchInTiles(List<Tile> previouslySearchedTiles)
-            {
-                iteration++;
-                if (iteration > range) return false;
-                alreadyvisited.AddRange(surroundingTiles);
-                surroundingTiles = new List<Tile>();
+                var distance = distanceDict[current] + 1;
                 
-                foreach (var previouslySearchedTile in previouslySearchedTiles)
-                {
-                    surroundingTiles.AddRange(previouslySearchedTile.GetSurroundingTiles(condition)
-                        .Where(tile => !alreadyvisited.Contains(tile))
-                        .Where(tile => !surroundingTiles.Contains(tile)));
-                }
+                if (distance > range) return distanceDict.Keys.Where(key => key != start).ToList();
                 
-                UpdatePathRing();
-
-                return surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
+                foreach (var next in current.GetSurroundingTiles(condition))
+                {
+                    if (!distanceDict.ContainsKey(next))
+                    {
+                        frontier.Enqueue(next);
+                        distanceDict.Add(next,distance);
+                    }
+                }
             }
             
-            void UpdatePathRing()
-            {
-                foreach (var tile in surroundingTiles)
-                {
-                    tile.SetPathRing(iteration);
-                }
-                SetPathRing(0);
-            }
+            return distanceDict.Keys.Where(key => key != start).ToList();
         }
         
-        /// <summary>
-        /// Tries to path from this to targetTile
-        /// </summary>
-        /// <param name="targetTile"></param>
-        /// <param name="range"></param>
-        /// <param name="condition"></param>
-        /// <returns></returns>
-        public bool IsInAdjacentTileDistance(Tile targetTile,int range,Func<Tile,bool> condition = null)
-        {
-            if (range <= 0 && this != targetTile) return false;
-            
-            if (this == targetTile) return true;
-            
-            condition ??= _ => true;
-            
-            var iteration = 1;
-            var alreadyvisited = new List<Tile>();
-            var surroundingTiles = GetAdjacentTiles(condition);
-
-            UpdatePathRing();
-            
-            return surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
-
-            bool SearchInTiles(List<Tile> previouslySearchedTiles)
-            {
-                iteration++;
-                if (iteration > range) return false;
-                alreadyvisited.AddRange(surroundingTiles);
-                surroundingTiles = new List<Tile>();
-
-                foreach (var previouslySearchedTile in previouslySearchedTiles)
-                {
-                    surroundingTiles.AddRange(previouslySearchedTile.GetAdjacentTiles(condition)
-                        .Where(tile => !alreadyvisited.Contains(tile))
-                        .Where(tile => !surroundingTiles.Contains(tile)));
-                }
-                
-                UpdatePathRing();
-                
-                return surroundingTiles.Contains(targetTile) || SearchInTiles(surroundingTiles);
-            }
-
-            void UpdatePathRing()
-            {
-                foreach (var tile in surroundingTiles)
-                {
-                    tile.SetPathRing(iteration);
-                }
-            }
-        }
-
         public int GetNeighborIndex(Tile tile)
         {
             if(tile == null) return -1;
@@ -264,17 +209,17 @@ namespace Battle
             modelRenderer.material = mat;
         }
 
-        //A* pathfinding
+        // A* pathfinding, nvm its BFS xd
+        // https://www.redblobgames.com/pathfinding/a-star/introduction.html
         public bool GetPath(Tile destination, out List<Tile> path, bool includeDiag = false)
         {
             var start = this;
             
             var frontier = new Queue<Tile>();
-            frontier.Enqueue(start);
-
-            var reached = new List<Tile> { start };
-
             var cameFromDict = new Dictionary<Tile, Tile>();
+
+            frontier.Enqueue(start);
+            cameFromDict.Add(start,null);
 
             path = new List<Tile>{destination};
             while (frontier.Count > 0)
@@ -298,13 +243,11 @@ namespace Battle
                 
                 foreach (var next in current.GetAdjacentTiles())
                 {
-                    if (!reached.Contains(next))
+                    if (!cameFromDict.ContainsKey(next))
                     {
-                        cameFromDict[next] = current;
-                        
                         frontier.Enqueue(next);
-                        reached.Add(next);
                         
+                        cameFromDict.Add(next,current);
                     }
                 }
             }

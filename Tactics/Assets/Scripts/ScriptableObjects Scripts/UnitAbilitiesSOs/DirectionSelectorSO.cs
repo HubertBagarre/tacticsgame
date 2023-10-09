@@ -42,8 +42,8 @@ namespace Battle.ScriptableObjects.Ability.Selector
             */
 
             return includeDiag
-                ? startingTile.IsInSurroundingTileDistance(selectableTile, 1)
-                : startingTile.IsInAdjacentTileDistance(selectableTile, 1);
+                ? startingTile.GetSurroundingTiles(1).Contains(selectableTile)
+                : startingTile.GetAdjacentTiles(1).Contains(selectableTile);
 
         }
 

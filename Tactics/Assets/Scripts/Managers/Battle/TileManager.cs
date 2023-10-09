@@ -29,7 +29,6 @@ namespace Battle
             
             EventManager.AddListener<EndUnitTurnEvent>(ClearSelectableTilesOnTurnEnd);
             
-            EventManager.AddListener<EndAbilityTargetSelectionEvent>(ResetRingPathOnTargetSelectionCanceled);
             AbilityManager.OnUpdatedCastingAbility += UpdateAbilityTargetSelection;
             
             EventManager.AddListener<StartAbilityCastEvent>(ShowSelectedTilesOnStartAbilityCast);
@@ -37,22 +36,12 @@ namespace Battle
 
             void ClearSelectableTilesOnTurnEnd(EndUnitTurnEvent _)
             {
-                ResetTileAppearance(true);
+                ResetTileAppearance();
             }
             
             void ClearSelectedTilesOnCastEnd(EndAbilityCastEvent _)
             {
-                ResetTileAppearance(true);
-            }
-
-            void ResetRingPathOnTargetSelectionCanceled(EndAbilityTargetSelectionEvent ctx)
-            {
-                if(!ctx.Canceled) return;
-
-                foreach (var tile in AllTiles)
-                {
-                    tile.SetPathRing(0);
-                }
+                ResetTileAppearance();
             }
         }
 
@@ -61,12 +50,11 @@ namespace Battle
             tiles = list;
         }
         
-        private void ResetTileAppearance(bool resetPathRing)
+        private void ResetTileAppearance()
         {
             foreach (var tile in AllTiles)
             {
                 tile.SetAppearance(Tile.Appearance.Default);
-                if(resetPathRing) tile.SetPathRing(0);
             }
         }
         
@@ -74,7 +62,7 @@ namespace Battle
         {
             if (ability == null)
             {
-                ResetTileAppearance(false);
+                ResetTileAppearance();
                 return;
             }
             
@@ -97,7 +85,7 @@ namespace Battle
         
         private void ShowSelectedTilesOnStartAbilityCast(StartAbilityCastEvent ctx)
         {
-            ResetTileAppearance(false);
+            ResetTileAppearance();
 
             var selected = ctx.SelectedTiles;
             if(selected.Count <= 0) return;

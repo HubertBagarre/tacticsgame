@@ -24,7 +24,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
             var movesLeft = caster.MovementLeft;
             if (movesLeft <= 0) return false;
 
-            return startTile.IsInAdjacentTileDistance(selectableTile,movesLeft,caster.Stats.WalkableTileSelector);
+            return startTile.GetAdjacentTiles(movesLeft).Contains(selectableTile);
         }
     }
 }

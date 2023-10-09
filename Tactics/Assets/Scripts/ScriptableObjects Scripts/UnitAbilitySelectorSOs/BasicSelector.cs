@@ -50,7 +50,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
         
         public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
         {
-            if (range >= 0 && !caster.Tile.IsInSurroundingTileDistance(selectableTile, range)) return false;
+            if (range >= 0 && !caster.Tile.GetSurroundingTiles(range).Contains(selectableTile)) return false;
 
             if (!TargetUnits) return false;
             
