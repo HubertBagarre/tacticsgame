@@ -37,6 +37,6 @@ namespace Battle.ScriptableObjects
     
         public abstract IEnumerator RunBehaviour(Unit unit);
 
-        public abstract void InterruptBehaviour(Unit unit);
+        public abstract void OnBehaviourInterrupted(Unit unit);
     }
 }

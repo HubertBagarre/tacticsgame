@@ -21,10 +21,14 @@ namespace Battle.ScriptableObjects
 
         public override IEnumerator RunBehaviour(Unit unit)
         {
-            yield return unit.StartCoroutine(unit.MoveUnit(unit.Tile.GetAdjacentTiles().ToList(),false));
+            var path = unit.Tile.GetAdjacentTiles().ToList();
+            
+            unit.SetMovement(path.Count);
+            
+            yield return unit.StartCoroutine(unit.MoveUnit(path,false));
         }
 
-        public override void InterruptBehaviour(Unit unit)
+        public override void OnBehaviourInterrupted(Unit unit)
         {
             
         }

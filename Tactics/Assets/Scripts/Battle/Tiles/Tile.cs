@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Battle
@@ -13,20 +12,26 @@ namespace Battle
     /// </summary>
     public class Tile : MonoBehaviour
     {
-        //identification
+        //generation
         [SerializeField] private Vector2Int position;
         public Vector2Int Position => position;
 
         [SerializeField] private Unit currentUnit;
 
         //pathing
+        [Header("Path Rendering")]
+        [SerializeField] private LineRenderer lineRenderer;
+        [SerializeField] private GameObject lineRendererGo;
+        [SerializeField] private float lineRendererHeight = 0.07f;
+        [field:Header("Pathing")]
         [field: SerializeField] public bool IsWalkable { get; private set; }
         [SerializeField] private Tile[] neighbors; //0 is top (x,y+1), then clockwise, adjacent before diag
         [field: SerializeField] public int PathRing { get; private set; }
-
+        
+        
         //viusal
-        [Header("Visual")] [SerializeField] private Renderer modelRenderer;
-
+        [Header("Visual")]
+        [SerializeField] private Renderer modelRenderer;
         [SerializeField] private Material defaultMat;
         [SerializeField] private Material selectableMat;
         [SerializeField] private Material selectedMat;
@@ -263,5 +268,30 @@ namespace Battle
             PathRing = value;
             DebugText.text = $"{PathRing}";
         }
+
+        public void ShowPath()
+        {
+            lineRendererGo.SetActive(true);
+        }
+
+        public void HidePath()
+        {
+            lineRendererGo.SetActive(false);
+        }
+
+        public void SetPath(List<Tile> path)
+        {
+            var list = path.ToList();
+            list.Insert(0,this);
+            lineRenderer.positionCount = list.Count;
+            for (var i = 0; i < list.Count; i++)
+            {
+                var pos = list[i].transform.position;
+                pos.y = lineRendererHeight;
+                
+                lineRenderer.SetPosition(i, pos);
+            }
+        }
+        
     }
 }

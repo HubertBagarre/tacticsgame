@@ -39,7 +39,7 @@ namespace Battle.ScriptableObjects
             EventManager.RemoveListener<EndAbilityCastEvent>(EndTurnAfterAbilityCast);
         }
         
-        public override void InterruptBehaviour(Unit unit)
+        public override void OnBehaviourInterrupted(Unit unit)
         {
             EventManager.RemoveListener<EndAbilityCastEvent>(EndTurnAfterAbilityCast);
             

@@ -116,7 +116,7 @@ namespace Battle
 
             Debug.Log("Interrupting behaviour");
 
-            Behaviour.InterruptBehaviour(this);
+            Behaviour.OnBehaviourInterrupted(this);
 
             StopCoroutine(behaviourRoutine);
             behaviourRoutine = null;
@@ -215,6 +215,10 @@ namespace Battle
                 yield break;
             }
 
+            var rendering = Tile;
+            rendering.SetPath(path);
+            rendering.ShowPath();
+            
             for (var index = 0; index < path.Count && CanContinueMovement(); index++)
             {
                 var tile = path[index];
@@ -242,6 +246,11 @@ namespace Battle
         public void DecayTurnValue(float amount)
         {
             DistanceFromTurnStart -= amount * DecayRate;
+        }
+
+        public void SetMovement(int value)
+        {
+            MovementLeft = value;
         }
 
         public IEnumerator AttackUnitEffect(Unit attackedUnit,int damage)
