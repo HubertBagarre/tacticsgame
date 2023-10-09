@@ -13,9 +13,17 @@ namespace Battle.ScriptableObjects.Ability.Effect
             var damage = caster.Attack;
             var crit = damage * critDamageMultiplier;
             
-            return $"Deal <color=orange>{damage} damage</color>. If the enemy is on an adjacent tile, deal <color=orange>{crit} damage</color> instead.";
+            return $"<color=yellow><u><link=\"attack\">Attack</link></u></color> for <color=orange>{damage} damage</color>. If the enemy is on an adjacent tile, " +
+                   $"<color=yellow><u><link=\"attack\">attack</link></u></color> for <color=orange>{crit} damage</color> instead.";
         }
-        
+
+        public override bool ConvertDescriptionLinks(Unit caster, string linkKey, out string text)
+        {
+            text = "Attack";
+            
+            return (linkKey == "attack");
+        }
+
         public override IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles)
         {
             foreach (var tile in targetTiles)

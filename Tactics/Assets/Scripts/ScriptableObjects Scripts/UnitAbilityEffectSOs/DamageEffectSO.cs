@@ -7,30 +7,40 @@ namespace Battle.ScriptableObjects.Ability.Effect
     public class DamageEffectSO : UnitAbilityEffectSO
     {
         [SerializeField] private int damage = 2;
+        [SerializeField] private bool useCasterAttack = false;
         [SerializeField] private bool isAttack = false;
         
         public override string ConvertedDescription(Unit caster)
         {
             // TODO - damage type ?, maybe attack keyword?
-            return isAttack ? $" Attack for <color=orange>{damage} damage</color>." : $" Deal <color=orange>{damage} damage</color>.";
+            var dmg = useCasterAttack ? caster.Attack : damage;
+            
+            return isAttack ? $" <color=yellow><u><link=\"attack\">Attack</link></u></color> for <color=orange>{dmg} damage</color>." : $" Deal <color=orange>{dmg} damage</color>.";
+        }
+        
+        public override bool ConvertDescriptionLinks(Unit caster, string linkKey, out string text)
+        {
+            text = "Attack";
+            
+            return (linkKey == "attack" && isAttack);
         }
         
         public override IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles)
         {
-            Debug.Log($"Ping on {targetTiles[0]}");
-            
             //play animation
+            var dmg = useCasterAttack ? caster.Attack : damage;
+            
             yield return null;
             
             var target = targetTiles[0].Unit;
 
             if (isAttack)
             {
-                yield return caster.AttackUnitEffect(target, damage);
+                yield return caster.AttackUnitEffect(target, dmg);
             }
             else
             {
-                target.TakeDamage(damage);
+                target.TakeDamage(dmg);
             }
             
             yield return null;

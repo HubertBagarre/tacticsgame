@@ -44,7 +44,7 @@ namespace Battle.ScriptableObjects.Ability
             //Maybe do something cleaner of multi effects
             var effectsText = Effects.Aggregate(string.Empty, (current, effect) => current + $"{effect.ConvertedDescription(caster)} ");
 
-            return $"{Selector.ConvertedDescription(caster)}\n{effectsText}";
+            return $"Select {Selector.SelectionDescription(caster)}.\n{effectsText}";
         }
 
         public string ConvertDescriptionLinks(Unit caster, string linkKey)

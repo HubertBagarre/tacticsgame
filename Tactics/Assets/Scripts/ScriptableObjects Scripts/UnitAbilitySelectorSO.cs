@@ -20,7 +20,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
             return false;
         }
 
-        public abstract string ConvertedDescription(Unit caster);
+        public abstract string SelectionDescription(Unit caster);
         
         public bool IsTileSelectable(Unit caster, Tile tile, List<Tile> currentlySelectedTiles)
         {

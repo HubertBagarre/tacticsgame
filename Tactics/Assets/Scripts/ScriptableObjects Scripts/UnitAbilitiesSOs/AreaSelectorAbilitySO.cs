@@ -8,9 +8,9 @@ namespace Battle.ScriptableObjects.Ability.Selector
     {
         //TODO: Add a range to this selector
 
-        public override string ConvertedDescription(Unit caster)
+        public override string SelectionDescription(Unit caster)
         {
-            return "Select an area.";
+            return "an area";
         }
 
         public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)

@@ -9,11 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c921bfce05f7a745a0998089f4e4cd0, type: 3}
-  m_Name: TargetEnemy
+  m_Script: {fileID: 11500000, guid: e47b55f978106c549a6398743d9e0290, type: 3}
+  m_Name: Deal 1
   m_EditorClassIdentifier: 
-  expectedSelections: 1
-  <UseSelectionOrder>k__BackingField: 0
-  range: -1
-  targetAllies: 0
-  targetEnemies: 1
+  damage: 1
+  isAttack: 0

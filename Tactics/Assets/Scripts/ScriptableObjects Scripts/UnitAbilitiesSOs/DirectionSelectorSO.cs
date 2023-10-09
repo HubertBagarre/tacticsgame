@@ -15,10 +15,11 @@ namespace Battle.ScriptableObjects.Ability.Selector
             return startTileSelector != null ? expectedDirections : expectedDirections + 1;
         }
 
-        public override string ConvertedDescription(Unit caster)
+        public override string SelectionDescription(Unit caster)
         {
-            if (startTileSelector != null) return $"{startTileSelector.ConvertedDescription(caster)} Then select a direction.";
-            return "Select a direction";
+            var text = $" {expectedDirections} direction{(expectedDirections > 1 ? "s" : "")}.";
+            if (startTileSelector != null) return $"{startTileSelector.SelectionDescription(caster)}, then {text}";
+            return text;
         }
 
         public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)

@@ -30,7 +30,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
             return true;
         }
 
-        public override string ConvertedDescription(Unit caster)
+        public override string SelectionDescription(Unit caster)
         {
             var unitType = string.Empty;
             if (!(targetAllies && targetEnemies))
@@ -41,9 +41,9 @@ namespace Battle.ScriptableObjects.Ability.Selector
             
             var targetType = TargetUnits ? "unit" : "tile";
             
-            var targetText = $"Select <color=green>{ExpectedSelections} {unitType}{targetType}{(ExpectedSelections > 1 ? "s":"")}";
+            var targetText = $"<color=green>{ExpectedSelections} {unitType}{targetType}{(ExpectedSelections > 1 ? "s":"")}";
             
-            var rangeText = range > 0 ? $" within <u><link=\"ring:{range}\">{range} rings</link></u></color>." : "</color>.";
+            var rangeText = range > 0 ? $" within <u><link=\"ring:{range}\">{range} rings</link></u></color>" : "</color>";
             
             return $"{targetText}{rangeText}";
         }

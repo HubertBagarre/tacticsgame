@@ -53,6 +53,7 @@ namespace Battle.UIComponent
         {
             UIBattleManager.Tooltip.Hide();
             
+            UpdateDescription();
             descriptionPanelGo.SetActive(true);
         }
         

@@ -6,9 +6,14 @@ namespace Battle.ScriptableObjects.Ability.Selector
     [CreateAssetMenu(menuName = "Battle Scriptables/Ability Selector/In Movement Range")]
     public class InMovementRangeSelector : UnitAbilitySelectorSO
     {
-        public override string ConvertedDescription(Unit caster)
+        protected override int OverrideExpectedSelections()
         {
-            return "Select a tile within Movement range.";
+            return 1;
+        }
+
+        public override string SelectionDescription(Unit caster)
+        {
+            return "a tile within Movement range";
         }
 
         public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)

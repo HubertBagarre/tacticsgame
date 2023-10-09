@@ -15,15 +15,15 @@ namespace Battle.ScriptableObjects.Ability.Selector
             return selectors.Count;
         }
 
-        public override string ConvertedDescription(Unit caster)
+        public override string SelectionDescription(Unit caster)
         {
             var text = "";
             for (var index = 0; index < selectors.Count; index++)
             {
                 var selector = selectors[index];
-                var returnChar = (index != 0 ? " Then " : "");
+                var returnChar = (index != 0 ? ", then " : "");
                 
-                var selectorText = selector.ConvertedDescription(caster);
+                var selectorText = selector.SelectionDescription(caster);
                 if(index != 0) selectorText = selectorText.ToLower();
                 
                 text += $"{returnChar}{selectorText}";

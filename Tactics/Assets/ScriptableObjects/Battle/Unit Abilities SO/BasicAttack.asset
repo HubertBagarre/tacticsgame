@@ -20,7 +20,6 @@ MonoBehaviour:
     type: 2}
   <Effects>k__BackingField:
   - {fileID: 11400000, guid: 2a84ab598746c3446a8f57915d1179f7, type: 2}
-  - {fileID: 11400000, guid: 2a84ab598746c3446a8f57915d1179f7, type: 2}
   <Cooldown>k__BackingField: 0
   <Cost>k__BackingField: 0
   <IsUltimate>k__BackingField: 0
