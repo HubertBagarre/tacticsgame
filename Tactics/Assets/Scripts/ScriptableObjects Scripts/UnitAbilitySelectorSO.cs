@@ -21,6 +21,11 @@ namespace Battle.ScriptableObjects.Ability.Selector
         }
 
         public abstract string SelectionDescription(Unit caster);
+
+        public virtual string AffectedDescription(Unit caster)
+        {
+            return string.Empty;
+        }
         
         public bool IsTileSelectable(Unit caster, Tile tile, List<Tile> currentlySelectedTiles)
         {
