@@ -55,6 +55,11 @@ namespace Battle
         {
             neighbors = tiles;
         }
+        
+        public Tile GetNeighbor(int direction)
+        {
+            return direction is < 0 or >= 8 ? null : neighbors[direction];
+        }
 
         public void SetWalkable(bool value)
         {
@@ -211,6 +216,31 @@ namespace Battle
                     tile.SetPathRing(iteration);
                 }
             }
+        }
+
+        public int GetNeighborIndex(Tile tile)
+        {
+            if(tile == null) return -1;
+            if (!GetSurroundingTiles(1).Contains(tile)) return -1;
+            for (var i = 0; i < 8; i++)
+            {
+                if (neighbors[i] == tile) return i;
+            }
+            return -1;
+        }
+
+        public List<Tile> GetTilesInDirection(int direction)
+        {
+            var startingTile = this;
+            var neighborInDirection = startingTile.GetNeighbor(direction);
+            var list = new List<Tile>();
+            while (neighborInDirection != null)
+            {
+                list.Add(neighborInDirection);
+                neighborInDirection = neighborInDirection.GetNeighbor(direction);
+            }
+
+            return list;
         }
 
         public void SetAppearance(Appearance appearance)

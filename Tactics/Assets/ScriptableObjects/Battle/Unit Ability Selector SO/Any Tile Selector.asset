@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb3f515fc230be94f9658926689dc166, type: 3}
-  m_Name: AreaSelector
+  m_Script: {fileID: 11500000, guid: e6f68ec4413a45742964943abed6c58a, type: 3}
+  m_Name: Any Tile Selector
   m_EditorClassIdentifier: 
-  <ExpectedSelections>k__BackingField: 3
+  <ExpectedSelections>k__BackingField: 1
   <UseSelectionOrder>k__BackingField: 0

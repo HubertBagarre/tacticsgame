@@ -9,8 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb3f515fc230be94f9658926689dc166, type: 3}
-  m_Name: AreaSelector
+  m_Script: {fileID: 11500000, guid: 324c5062f9ee8c043b7bf4e512566ed7, type: 3}
+  m_Name: AnyDirection
   m_EditorClassIdentifier: 
   <ExpectedSelections>k__BackingField: 3
   <UseSelectionOrder>k__BackingField: 0
+  startTileSelector: {fileID: 11400000, guid: 63c243d20ab25394db5fd510f1b8e561, type: 2}
+  includeDiag: 1
