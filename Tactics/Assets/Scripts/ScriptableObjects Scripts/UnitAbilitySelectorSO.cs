@@ -6,6 +6,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
     public abstract class UnitAbilitySelectorSO : ScriptableObject
     {
         [field: SerializeField] public int ExpectedSelections { get; private set; } = 1;
+        [field: SerializeField] public bool UseSelectionOrder { get; private set; } = false;
         
         public virtual bool ConvertDescriptionLinks(Unit caster,string linkKey,out string text)
         {

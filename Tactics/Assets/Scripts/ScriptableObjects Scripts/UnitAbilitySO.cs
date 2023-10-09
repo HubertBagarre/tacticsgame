@@ -161,14 +161,32 @@ namespace Battle.ScriptableObjects.Ability
         {
             if (!IsTileSelectable(caster, tile)) return;
 
+            var useSelectionOrder = SO.Selector.UseSelectionOrder;
+            
+            // remove tile if already selected
             if (currentSelectedTiles.Contains(tile))
             {
-                RemoveTileFromSelection(caster, tile);
+                if (!useSelectionOrder)
+                {
+                    RemoveTileFromSelection(caster, tile);
+                    return;
+                }
+
+                var index = currentSelectedTiles.IndexOf(tile);
+                for (var i = CurrentSelectionCount - 1; i >= index; i--)
+                {
+                    RemoveTileFromSelection(caster, currentSelectedTiles[i]);
+                }
                 return;
             }
             
-            Debug.Log($"Adding tile {tile} to selection",caster);
-
+            // if max selection reached
+            if (CurrentSelectionCount >= Selector.ExpectedSelections)
+            {
+                if(useSelectionOrder) return;
+                RemoveTileFromSelection(caster, currentSelectedTiles[^1]);
+            }
+            
             var affectedTiles = Selector.GetAffectedTiles(caster, tile, currentSelectedTiles);
             
             affectedTilesDict.Add(tile,affectedTiles);
@@ -177,8 +195,6 @@ namespace Battle.ScriptableObjects.Ability
             currentSelectedTiles.Add(tile);
             
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
-
-            if (CurrentSelectionCount > Selector.ExpectedSelections) RemoveTileFromSelection(caster, currentSelectedTiles[0]);
 
             if (SO.SkipTargetConfirmation)
             {
