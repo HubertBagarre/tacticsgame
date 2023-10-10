@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c921bfce05f7a745a0998089f4e4cd0, type: 3}
   m_Name: Any Tile
   m_EditorClassIdentifier: 
-  expectedSelections: 1
+  expectedSelections: 5
   <UseSelectionOrder>k__BackingField: 0
   range: -1
   targetAllies: 0
