@@ -48,6 +48,7 @@ namespace Battle
         public void SetTiles(List<Tile> list)
         {
             tiles = list;
+            ResetTileAppearance();
         }
         
         private void ResetTileAppearance()
@@ -55,6 +56,8 @@ namespace Battle
             foreach (var tile in AllTiles)
             {
                 tile.SetAppearance(Tile.Appearance.Default);
+                tile.HideBorders();
+                tile.HidePath();
             }
         }
         

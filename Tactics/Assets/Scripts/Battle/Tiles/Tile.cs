@@ -28,7 +28,12 @@ namespace Battle
         private int CostToMove => 1; // If we need weights its here lmao (not used btw)
         [SerializeField] private Tile[] neighbors; //0 is top (x,y+1), then clockwise, adjacent before diag
         [field: SerializeField] public int PathRing { get; private set; }
-        
+
+        [Header("Border")]
+        [SerializeField] private GameObject topBorderGo;
+        [SerializeField] private GameObject rightBorderGo;
+        [SerializeField] private GameObject botBorderGo;
+        [SerializeField] private GameObject leftBorderGo;
         
         //viusal
         [Header("Visual")]
@@ -261,6 +266,34 @@ namespace Battle
             DebugText.text = $"{PathRing}";
         }
 
+        public void HideBorders()
+        {
+            ShowBorderTop(false);
+            ShowBorderRight(false);
+            ShowBorderBot(false);
+            ShowBorderLeft(false);
+        }
+
+        public void ShowBorderTop(bool value)
+        {
+            topBorderGo.SetActive(value);
+        }
+        
+        public void ShowBorderRight(bool value)
+        {
+            rightBorderGo.SetActive(value);
+        }
+        
+        public void ShowBorderBot(bool value)
+        {
+            botBorderGo.SetActive(value);
+        }
+        
+        public void ShowBorderLeft(bool value)
+        {
+            leftBorderGo.SetActive(value);
+        }
+
         public void ShowPath()
         {
             lineRendererGo.SetActive(true);
@@ -283,6 +316,11 @@ namespace Battle
                 
                 lineRenderer.SetPosition(i, pos);
             }
+        }
+
+        public void ClearPath()
+        {
+            lineRenderer.positionCount = 0;
         }
         
     }

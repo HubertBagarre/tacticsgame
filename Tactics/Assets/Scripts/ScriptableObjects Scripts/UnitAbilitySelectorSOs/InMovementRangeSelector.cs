@@ -18,6 +18,8 @@ namespace Battle.ScriptableObjects.Ability.Selector
 
         public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
         {
+            caster.Tile.ClearPath();
+            
             var startTile = caster.Tile;
             if (startTile == selectableTile) return false;
 
@@ -27,6 +29,19 @@ namespace Battle.ScriptableObjects.Ability.Selector
             var func = caster.Behaviour.WalkableTileSelector;
             
             return startTile.GetAdjacentTiles(movesLeft,func).Contains(selectableTile);
+        }
+
+        public override List<Tile> GetAffectedTiles(Unit caster, Tile lastSelected, List<Tile> selectedTiles)
+        {
+            var tile = caster.Tile;
+            tile.ClearPath();
+            if (tile.GetPath(lastSelected, out var path))
+            {
+                tile.SetPath(path);
+                tile.ShowPath();
+            }
+            
+            return base.GetAffectedTiles(caster, lastSelected, selectedTiles);
         }
     }
 }
