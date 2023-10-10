@@ -167,7 +167,7 @@ namespace Battle.ScriptableObjects.Ability
         }
 
         //TODO - rework to update affected tiles (also visual), probably add overrides in the so
-        public void AddTileToSelection(Unit caster, Tile tile)
+        public void AddTileToSelection(Unit caster, Tile tile, bool force = false)
         {
             var useSelectionOrder = SO.Selector.UseSelectionOrder;
             
@@ -188,7 +188,7 @@ namespace Battle.ScriptableObjects.Ability
                 return;
             }
             
-            if (!IsTileSelectable(caster, tile)) return;
+            if (!IsTileSelectable(caster, tile) && !force) return;
             
             // if max selection reached
             if (CurrentSelectionCount >= Selector.ExpectedSelections)

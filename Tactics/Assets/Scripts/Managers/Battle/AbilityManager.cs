@@ -67,15 +67,18 @@ namespace Battle
             caster.OnDeath += CancelAbilityTargetSelection;
 
             EventManager.AddListener<ClickTileEvent>(SelectTile);
-
-            OnUpdatedCastingAbility?.Invoke(caster, currentCastingAbilityInstance);
-
+            
             if (currentCastingAbilityInstance.SO.SkipTargetSelection)
             {
+                currentCastingAbilityInstance.AddTileToSelection(caster,caster.Tile,true);
                 caster.OnDeath -= CancelAbilityTargetSelection;
-
-                EventManager.Trigger(new EndAbilityTargetSelectionEvent(false));
+                EventManager.RemoveListener<ClickTileEvent>(SelectTile);
+                
+                //EventManager.Trigger(new EndAbilityTargetSelectionEvent(false));
             }
+            
+            OnUpdatedCastingAbility?.Invoke(caster, currentCastingAbilityInstance);
+            return;
 
             void CancelAbilityTargetSelection()
             {
@@ -108,8 +111,6 @@ namespace Battle
 
                 if (tile == null) return;
                 
-                
-
                 currentCastingAbilityInstance.AddTileToSelection(caster, tile);
                 
                 OnUpdatedCastingAbility?.Invoke(caster, currentCastingAbilityInstance);

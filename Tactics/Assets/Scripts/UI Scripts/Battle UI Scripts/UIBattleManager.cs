@@ -240,7 +240,8 @@ namespace Battle
             UpdateAbilitySelectionLeftText(0);
             UpdateConfirmAbilityTargetSelectionButton(0);
             
-            ShowAbilityTargetSelectionButtons(!currentAbilityInTargetSelection.SO.SkipTargetSelection);
+            ShowAbilityTargetSelectionButtons(!currentAbilityInTargetSelection.SO.SkipTargetConfirmation);
+            //ShowAbilityTargetSelectionButtons(!currentAbilityInTargetSelection.SO.SkipTargetSelection);
         }
 
         private void UpdateConfirmAbilityTargetSelectionButton(int _)
