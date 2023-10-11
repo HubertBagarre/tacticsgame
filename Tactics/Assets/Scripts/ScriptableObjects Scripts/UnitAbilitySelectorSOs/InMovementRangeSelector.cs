@@ -39,6 +39,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
             {
                 tile.SetPath(path);
                 tile.ShowPath();
+                tile.ShowBorder(path);
             }
             
             return base.GetAffectedTiles(caster, lastSelected, selectedTiles);

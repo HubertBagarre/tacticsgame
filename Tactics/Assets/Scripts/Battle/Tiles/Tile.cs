@@ -30,10 +30,7 @@ namespace Battle
         [field: SerializeField] public int PathRing { get; private set; }
 
         [Header("Border")]
-        [SerializeField] private GameObject topBorderGo;
-        [SerializeField] private GameObject rightBorderGo;
-        [SerializeField] private GameObject botBorderGo;
-        [SerializeField] private GameObject leftBorderGo;
+        [SerializeField] private List<GameObject> bordersGo;
         
         //viusal
         [Header("Visual")]
@@ -268,30 +265,45 @@ namespace Battle
 
         public void HideBorders()
         {
-            ShowBorderTop(false);
-            ShowBorderRight(false);
-            ShowBorderBot(false);
-            ShowBorderLeft(false);
+            foreach (var borderGo in bordersGo)
+            {
+                borderGo.SetActive(false);
+            }
+        }
+        
+        public void ShowBorder(int direction, bool value)
+        {
+            if(direction < 0 || direction >= bordersGo.Count) return;
+            bordersGo[direction].SetActive(value);
         }
 
-        public void ShowBorderTop(bool value)
+        public void ShowBorder(List<Tile> tiles)
         {
-            topBorderGo.SetActive(value);
-        }
-        
-        public void ShowBorderRight(bool value)
-        {
-            rightBorderGo.SetActive(value);
-        }
-        
-        public void ShowBorderBot(bool value)
-        {
-            botBorderGo.SetActive(value);
-        }
-        
-        public void ShowBorderLeft(bool value)
-        {
-            leftBorderGo.SetActive(value);
+            foreach (var tile in tiles)
+            {
+                for (int direction = 0; direction < 8; direction++)
+                {
+                    TryShowBorder(direction);
+                }
+                continue;
+
+                void TryShowBorder(int direction)
+                {
+                    var adjacentTile = tile.neighbors[direction];
+                    if (adjacentTile == null)
+                    {
+                        tile.ShowBorder(direction,true);
+                        return;
+                    }
+
+                    if (!tiles.Contains(adjacentTile))
+                    {
+                        tile.ShowBorder(direction,true);
+                    }
+                }
+            }
+            
+            
         }
 
         public void ShowPath()
