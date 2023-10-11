@@ -148,24 +148,11 @@ namespace Battle.ScriptableObjects.Ability
             affectedTilesDict.Clear();
         }
         
-        public void CastAbility(Unit caster)
+        public void StartTileSelection(Unit caster)
         {
-            EventManager.Trigger(new StartAbilityCastEvent(this, caster, currentAffectedTiles));
-
-            caster.StartCoroutine(AbilityCast());
-
-            IEnumerator AbilityCast()
-            {
-                yield return caster.StartCoroutine(SO.CastAbility(caster, currentAffectedTiles.Distinct().ToArray()));
-
-                OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
-                currentSelectedTiles.Clear();
-                currentAffectedTiles.Clear();
-                
-                EventManager.Trigger(new EndAbilityCastEvent(SO));
-            }
+            Selector.ChangeAppearanceForTileSelectionStart(caster);
         }
-
+        
         //TODO - rework to update affected tiles (also visual), probably add overrides in the so
         public void AddTileToSelection(Unit caster, Tile tile, bool force = false)
         {
@@ -203,6 +190,7 @@ namespace Battle.ScriptableObjects.Ability
             affectedTilesDict.Add(tile,affectedTiles);
             currentAffectedTiles.AddRange(affectedTiles);
             
+            Selector.ChangeAppearanceForTileSelectionChanged(caster,currentSelectedTiles);
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
 
             if (SO.SkipTargetConfirmation)
@@ -228,6 +216,24 @@ namespace Battle.ScriptableObjects.Ability
             }
             
             OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
+        }
+        
+        public void CastAbility(Unit caster)
+        {
+            EventManager.Trigger(new StartAbilityCastEvent(this, caster, currentAffectedTiles));
+
+            caster.StartCoroutine(AbilityCast());
+
+            IEnumerator AbilityCast()
+            {
+                yield return caster.StartCoroutine(SO.CastAbility(caster, currentAffectedTiles.Distinct().ToArray()));
+
+                OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
+                currentSelectedTiles.Clear();
+                currentAffectedTiles.Clear();
+                
+                EventManager.Trigger(new EndAbilityCastEvent(SO));
+            }
         }
 
         public void ResetCost()

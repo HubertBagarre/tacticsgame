@@ -16,6 +16,14 @@ namespace Battle.ScriptableObjects.Ability.Selector
             return "a tile within Movement range";
         }
 
+        public override void ChangeAppearanceForTileSelectionStart(Unit caster)
+        {
+            var accessible = caster.Tile.GetAdjacentTiles(caster.MovementLeft, caster.Behaviour.WalkableTileSelector);
+            accessible.Add(caster.Tile);
+            
+            Tile.ShowBorder(accessible);
+        }
+
         public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
         {
             caster.Tile.ClearPath();
@@ -39,7 +47,6 @@ namespace Battle.ScriptableObjects.Ability.Selector
             {
                 tile.SetPath(path);
                 tile.ShowPath();
-                tile.ShowBorder(path);
             }
             
             return base.GetAffectedTiles(caster, lastSelected, selectedTiles);

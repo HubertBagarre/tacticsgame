@@ -26,6 +26,9 @@ namespace Battle.ScriptableObjects.Ability.Selector
         {
             return string.Empty;
         }
+
+        public virtual void ChangeAppearanceForTileSelectionStart(Unit caster){}
+        public virtual void ChangeAppearanceForTileSelectionChanged(Unit caster,List<Tile> currentlySelectedTiles){}
         
         public bool IsTileSelectable(Unit caster, Tile tile, List<Tile> currentlySelectedTiles)
         {

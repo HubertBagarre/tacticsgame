@@ -232,7 +232,7 @@ namespace Battle
                 {
                     current = destination;
 
-                    while (current != start)
+                    while (cameFromDict[current] != start)
                     {
                         path.Add(current);
                         current = cameFromDict[current];
@@ -277,7 +277,7 @@ namespace Battle
             bordersGo[direction].SetActive(value);
         }
 
-        public void ShowBorder(List<Tile> tiles)
+        public static void ShowBorder(List<Tile> tiles)
         {
             foreach (var tile in tiles)
             {

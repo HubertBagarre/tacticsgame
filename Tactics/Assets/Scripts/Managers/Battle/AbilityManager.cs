@@ -67,6 +67,8 @@ namespace Battle
             caster.OnDeath += CancelAbilityTargetSelection;
 
             EventManager.AddListener<ClickTileEvent>(SelectTile);
+
+            currentCastingAbilityInstance.StartTileSelection(caster);
             
             if (currentCastingAbilityInstance.SO.SkipTargetSelection)
             {
