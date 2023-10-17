@@ -22,8 +22,20 @@ namespace Battle
 
         [field: SerializeField] public bool CanMove { get; private set; } = true;
 
-        [field: Header("Current Stats")]
-        [field: SerializeField] public int MovementLeft { get; private set; }
+        [Header("Current Stats")]
+        [SerializeField] private int movementLeft;
+
+        public int MovementLeft
+        {
+            get => movementLeft;
+            private set
+            {
+                movementLeft = value;
+                OnMovementLeftChanged?.Invoke(movementLeft);
+            }
+        }
+
+        public event Action<int> OnMovementLeftChanged;
 
         public int Speed => Stats.Speed;
         public float DecayRate => Speed / 100f;
@@ -200,12 +212,12 @@ namespace Battle
             {
                 var tile = path[index];
                 
+                if(!isForced) MovementLeft--;
+                
                 //TODO - play animation, different is isForced
                 yield return new WaitForSeconds(0.5f);
 
                 transform.position = tile.transform.position;
-
-                if(!isForced) MovementLeft--;
                 SetTile(tile);
             }
 

@@ -12,6 +12,7 @@ namespace Battle
     using BattleEvents;
     using UIEvents;
     using UIComponent;
+    using InputEvent;
 
     public class UIBattleManager : MonoBehaviour
     {
@@ -26,8 +27,11 @@ namespace Battle
         [SerializeField] private TextMeshProUGUI battleRoundIndicatorText;
         [SerializeField] private RectTransform battleStartIndicatorTr;
 
-        [Header("Player Controls")] [SerializeField]
-        private Button endTurnButton;
+        [Header("Unit Tooltip")]
+        [SerializeField] private UIUnitTooltip unitTooltip;
+        
+        [Header("Player Controls")]
+        [SerializeField] private Button endTurnButton;
         [SerializeField] private UIUnitAbilityButton abilityButtonPrefab;
         [SerializeField] private Transform abilityButtonParent;
         private List<UIUnitAbilityButton> abilityButtons = new();
@@ -77,6 +81,9 @@ namespace Battle
             EventManager.AddListener<EntityLeaveBattleEvent>(RemoveBattleEntityTimelineUI);
             EventManager.AddListener<UpdateTurnValuesEvent>(ReorderBattleEntityTimeline);
 
+            //Unit Tooltip
+            EventManager.AddListener<ClickUnitEvent>(ShowUnitTooltip);
+            
             //Player Abilities Buttons events
             EventManager.AddListener<StartPlayerControlEvent>(ShowPlayerButtonsOnPlayerTurnStart);
             EventManager.AddListener<EndPlayerControlEvent>(HidePlayerButtonsOnPlayerTurnEnd);
@@ -117,6 +124,18 @@ namespace Battle
             {
                 if(ctx.Canceled) ShowEndTurnButton(true);
             }
+        }
+        
+        private void ShowUnitTooltip(ClickUnitEvent ctx)
+        {
+            var unit = ctx.Unit;
+            if (unit == null)
+            {
+                unitTooltip.Hide();
+            }
+            
+            unitTooltip.DisplayUnitTooltip(ctx.Unit);
+            unitTooltip.Show();
         }
         
         private void ShowPlayerButtonsOnPlayerTurnStart(StartPlayerControlEvent ctx)

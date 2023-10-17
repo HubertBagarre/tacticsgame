@@ -40,8 +40,15 @@ namespace Battle
         public int BaseMaxHp => StatsSo.MaxHp;
         public int MaxHpModifier { get; private set; }
         public int MaxHp => BaseMaxHp + MaxHpModifier < 0 ? 0 : BaseMaxHp + MaxHpModifier;
+        public event Action<UnitStatsInstance> OnMaxHpModified;
+        public void IncreaseMaxHpModifier(int amount)
+        {
+            MaxHpModifier += amount;
+            OnMaxHpModified?.Invoke(this);
+        }
+        
         private int currentHp;
-
+        public event Action<UnitStatsInstance> OnCurrentHpModified;
         public int CurrentHp
         {
             get
@@ -49,28 +56,56 @@ namespace Battle
                 if (currentHp > MaxHp) currentHp = MaxHp;
                 return currentHp;
             }
-            set => currentHp = value;
+            set
+            {
+                currentHp = value;
+                OnCurrentHpModified?.Invoke(this);
+            } 
         }
 
         // Attack
         public int BaseAttack => StatsSo.Attack;
         public int AttackModifier { get; private set; }
         public int Attack => BaseAttack + AttackModifier < 0 ? 0 : BaseAttack + AttackModifier;
+        public event Action<UnitStatsInstance> OnAttackModified;
+        public void IncreaseAttackModifier(int amount)
+        {
+            AttackModifier += amount;
+            OnAttackModified?.Invoke(this);
+        }
         
         // Attack Range
         public int BaseAttackRange => StatsSo.AttackRange;
         public int AttackRangeModifier { get; private set; }
         public int AttackRange => BaseAttackRange + AttackRangeModifier < 0 ? 0 : BaseAttackRange + AttackRangeModifier;
+        public event Action<UnitStatsInstance> OnAttackRangeModified;
+        public void IncreaseAttackRangeModifier(int amount)
+        {
+            AttackRangeModifier += amount;
+            OnAttackRangeModified?.Invoke(this);
+        }
         
         // Movement
         public int BaseMovement => StatsSo.BaseMovement;
         public int MovementModifier { get; private set; }
         public int Movement => BaseMovement + MovementModifier < 0 ? 0 : BaseMovement + MovementModifier;
+        public event Action<UnitStatsInstance> OnMovementModified;
+        public void IncreaseMovementModifier(int amount)
+        {
+            MovementModifier += amount;
+            OnMovementModified?.Invoke(this);
+        }
         
         // Turn Order
         public int BaseSpeed { get; }
         public int SpeedModifier { get; private set; }
         public int Speed => BaseSpeed + SpeedModifier < 0 ? 0 : BaseSpeed + SpeedModifier;
+        public event Action<UnitStatsInstance> OnSpeedModified;
+        public void IncreaseSpeedModifier(int amount)
+        {
+            SpeedModifier += amount;
+            OnSpeedModified?.Invoke(this);
+        }
         public float Initiative { get; }
         
         // Behaviour
@@ -98,6 +133,12 @@ namespace Battle
             AttackRangeModifier = 0;
             MovementModifier = 0;
             SpeedModifier = 0;
+            
+            OnMaxHpModified?.Invoke(this);
+            OnAttackModified?.Invoke(this);
+            OnAttackRangeModified?.Invoke(this);
+            OnMovementModified?.Invoke(this);
+            OnSpeedModified?.Invoke(this);
         }
     }
 }

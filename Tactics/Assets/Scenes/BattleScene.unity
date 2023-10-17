@@ -345,6 +345,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: Battle UI
       objectReference: {fileID: 0}
+    - target: {fileID: 5416762041665628991, guid: 76ad99dba751f0a4d89a48420db208e7,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5416762041665628991, guid: 76ad99dba751f0a4d89a48420db208e7,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5416762041665628991, guid: 76ad99dba751f0a4d89a48420db208e7,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5416762041665628991, guid: 76ad99dba751f0a4d89a48420db208e7,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6404596229130321947, guid: 76ad99dba751f0a4d89a48420db208e7,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -361,6 +381,26 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6404596229130321947, guid: 76ad99dba751f0a4d89a48420db208e7,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6565099340769682986, guid: 76ad99dba751f0a4d89a48420db208e7,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6565099340769682986, guid: 76ad99dba751f0a4d89a48420db208e7,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6565099340769682986, guid: 76ad99dba751f0a4d89a48420db208e7,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6565099340769682986, guid: 76ad99dba751f0a4d89a48420db208e7,
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0

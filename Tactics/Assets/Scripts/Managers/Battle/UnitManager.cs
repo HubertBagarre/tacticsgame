@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Battle.InputEvent;
 using UnityEngine;
 
 namespace Battle
@@ -18,11 +19,20 @@ namespace Battle
 
         [Header("Debug")] [SerializeField] private List<Unit> units = new List<Unit>();
         public List<Unit> AllUnits => units.ToList();
-        
+
+        public void Start()
+        {
+            InputManager.RightClickEvent += ClickUnit;
+        }
 
         public void SetUnits(List<Unit> list)
         {
             units = list;
+        }
+        
+        private void ClickUnit()
+        {
+            EventManager.Trigger(new ClickUnitEvent(GetClickUnit()));
         }
 
         public Unit GetClickUnit()
