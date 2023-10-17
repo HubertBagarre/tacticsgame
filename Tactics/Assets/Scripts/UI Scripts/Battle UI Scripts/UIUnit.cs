@@ -58,8 +58,8 @@ namespace Battle.UIComponent
 
         private void UpdateHpBar(int hp)
         {
-            hpText.text = $"{hp}/{associatedUnit.Stats.MaxHp}";
-            hpBarImage.fillAmount = hp / (float)associatedUnit.Stats.MaxHp;
+            hpText.text = $"{hp}/{associatedUnit.Stats.StatsSo.MaxHp}";
+            hpBarImage.fillAmount = hp / (float)associatedUnit.Stats.StatsSo.MaxHp;
             hpBarImageBack.DOFillAmount(hpBarImage.fillAmount, hpLerpTime);
         }
 

@@ -18,7 +18,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
 
         public override void ChangeAppearanceForTileSelectionStart(Unit caster)
         {
-            var accessible = caster.Tile.GetAdjacentTiles(caster.MovementLeft, caster.Behaviour.WalkableTileSelector);
+            var accessible = caster.Tile.GetAdjacentTiles(caster.MovementLeft, caster.Stats.Behaviour.WalkableTileSelector);
             accessible.Add(caster.Tile);
             
             Tile.ShowBorder(accessible);
@@ -34,7 +34,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
             var movesLeft = caster.MovementLeft;
             if (movesLeft <= 0) return false;
 
-            var func = caster.Behaviour.WalkableTileSelector;
+            var func = caster.Stats.Behaviour.WalkableTileSelector;
             
             return startTile.GetAdjacentTiles(movesLeft,func).Contains(selectableTile);
         }

@@ -10,7 +10,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
         
         public override string ConvertedDescription(Unit caster)
         {
-            var damage = caster.Attack;
+            var damage = caster.Stats.Attack;
             var crit = damage * critDamageMultiplier;
             
             return $"<color=yellow><u><link=\"attack\">Attack</link></u></color>%AFFECTED% for <color=orange>{damage} damage</color>. If the enemy is on an adjacent tile, " +
@@ -30,7 +30,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
             {
                 if(!tile.HasUnit()) continue;
                 
-                var damage = caster.Attack;
+                var damage = caster.Stats.Attack;
                 var isCrit = caster.Tile.GetAdjacentTiles().Contains(tile);
                 var target = tile.Unit;
             

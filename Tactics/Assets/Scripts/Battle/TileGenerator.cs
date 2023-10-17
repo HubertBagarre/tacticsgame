@@ -22,18 +22,6 @@ public class TileGenerator : MonoBehaviour
     [SerializeField] private Tile tilePrefab;
     [SerializeField] private Vector2Int gridSize;
     [SerializeField] private Vector2 tileSpacing;
-
-    [Header("Unit Parameters")]
-    [SerializeField] private Unit unitPrefab;
-    [SerializeField] private List<PlacedUnit> placedUnits;
-
-    [Serializable]
-    private class PlacedUnit
-    {
-        public UnitStatsSO so;
-        public Vector2Int position;
-        public int team;
-    }
     
     [Header("Lists")]
     [SerializeField] private List<Tile> tiles;
@@ -101,24 +89,6 @@ public class TileGenerator : MonoBehaviour
         {
             tile.SetWalkable(true);
         }
-        
-        foreach (var placedUnit in placedUnits)
-        {
-            var tile = grid[placedUnit.position.x, placedUnit.position.y];
-            
-            var unit = PrefabUtility.InstantiatePrefab(unitPrefab) as Unit;
-            var unitTr = unit.transform;
-            unitTr.position = tile.transform.position;
-            unitTr.rotation = Quaternion.identity;
-            unitTr.SetParent(transformParent);
-
-            unit.name = placedUnit.so.name;
-            unit.InitUnit(tile,placedUnit.team,placedUnit.so);
-            
-            units.Add(unit);
-        }
-
-        battleLevel.SetUnits(units);
         
         EditorUtility.SetDirty(transformParent);
     }

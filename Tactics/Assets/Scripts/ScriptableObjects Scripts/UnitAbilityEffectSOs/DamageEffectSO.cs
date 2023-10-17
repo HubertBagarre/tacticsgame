@@ -14,7 +14,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
         public override string ConvertedDescription(Unit caster)
         {
             // TODO - damage type ?, maybe attack keyword?
-            var dmg = useCasterAttack ? caster.Attack : damage;
+            var dmg = useCasterAttack ? caster.Stats.Attack : damage;
             
             return isAttack ? $"<color=yellow><u><link=\"attack\">Attack</link></u></color>%AFFECTED% for <color=orange>{dmg} damage</color>." : $"Deal <color=orange>{dmg} damage</color>%toAFFECTED%.";
         }
@@ -29,7 +29,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
         public override IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles)
         {
             //play animation
-            var dmg = useCasterAttack ? caster.Attack : damage;
+            var dmg = useCasterAttack ? caster.Stats.Attack : damage;
             
             yield return null;
 

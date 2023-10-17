@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Battle.ScriptableObjects;
 using UnityEngine;
 
 namespace Battle
@@ -9,8 +10,9 @@ namespace Battle
     
     public class BattleLevel : MonoBehaviour
     {
-        public List<BattleEntity> StartingEntities => GetStartingEntities();
-
+        [SerializeField] private UnitPlacementSO unitPlacement;
+        public List<BattleEntity> StartingEntities => SetupStartingEntities();
+        
         [field:SerializeField] public List<Tile> Tiles { get; private set; }
         [field:SerializeField] public List<Unit> Units { get; private set; }
 
@@ -60,9 +62,28 @@ namespace Battle
         {
             Units = units;
         }
-
-        protected virtual List<BattleEntity> GetStartingEntities()
+        
+        protected virtual List<BattleEntity> SetupStartingEntities()
         {
+            var units = new List<Unit>();
+            foreach (var placedUnit in unitPlacement.PlacedUnits)
+            {
+                var tile = Tiles.FirstOrDefault(tile => tile.Position == placedUnit.position);
+                
+                var unit = Instantiate(placedUnit.prefab);
+                var unitTr = unit.transform;
+                unitTr.position = tile.transform.position;
+                unitTr.rotation = Quaternion.identity;
+                unitTr.SetParent(transform);
+
+                unit.name = placedUnit.so.name;
+                unit.InitUnit(tile,placedUnit.team,placedUnit.so);
+            
+                units.Add(unit);
+            }
+
+            SetUnits(units);
+            
             return Units.Cast<BattleEntity>().ToList();
         }
     }

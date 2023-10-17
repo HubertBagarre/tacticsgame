@@ -14,29 +14,21 @@ namespace Battle
     {
         [field: SerializeField] public Tile Tile { get; private set; }
         [field: SerializeField] public int Team { get; private set; } //0 is player
-        [field: SerializeField] public UnitStatsSO Stats { get; private set; }
-        public Sprite Portrait => Stats.Portrait;
+        public UnitStatsInstance Stats { get; private set; }
+        public Sprite Portrait => Stats.StatsSo.Portrait;
 
         [field: Header("Current Flags")]
-        [field: SerializeField]
-        public bool IsActive { get; private set; }
+        [field: SerializeField] public bool IsActive { get; private set; }
 
         [field: SerializeField] public bool CanMove { get; private set; } = true;
 
         [field: Header("Current Stats")]
-        [field: SerializeField]
-        public UnitBehaviourSO Behaviour { get; private set; }
-
-        [field: SerializeField] public int Movement { get; private set; }
-        public int Attack => Stats.BaseAttack + bonusAttack;
-        [SerializeField] private int bonusAttack = 0;
-
         [field: SerializeField] public int MovementLeft { get; private set; }
-        [field: SerializeField] public int Speed { get; protected set; }
+
+        public int Speed => Stats.Speed;
         public float DecayRate => Speed / 100f;
         [field: SerializeField] public float DistanceFromTurnStart { get; protected set; }
-        [field: SerializeField] public int CurrentHp { get; protected set; }
-        public bool IsDead => CurrentHp <= 0;
+        public bool IsDead => Stats.CurrentHp <= 0;
 
         [field: SerializeField] public int CurrentUltimatePoints { get; protected set; }
         public int MaxUltimatePoints => GetHighestCostUltimate();
@@ -46,10 +38,13 @@ namespace Battle
         public List<UnitPassiveInstance> PassiveInstances { get; } = new();
         private List<UnitPassiveInstance> passivesToRemove = new();
 
-        private Coroutine behaviourRoutine;
 
         private List<IEnumerator> onAttackOtherUnitRoutines = new ();
         private List<IEnumerator> onAttackedRoutines = new ();
+
+        private UnitBehaviourSO Behaviour => Stats.Behaviour;
+        private Coroutine behaviourRoutine;
+        
         
         // TODO - use IEnumerator delegates instead of action;
         public event Action<int> OnCurrentHealthChanged;
@@ -61,43 +56,29 @@ namespace Battle
 
         public void InitUnit(Tile tile, int team, UnitStatsSO so)
         {
+            Debug.Log("Init Unit");
+            
             Tile = tile;
             Team = team;
-            Stats = so;
-
-            Movement = so.BaseMovement;
-            Speed = so.BaseSpeed;
-            Behaviour = so.Behaviour;
-            CurrentHp = so.MaxHp;
-
-            CurrentUltimatePoints = 0;
-
-            IsActive = true;
-
-            AbilityInstances.Clear();
-            behaviourRoutine = null;
-
+            Stats = so.CreateInstance(this);
+            
             tile.SetUnit(this);
         }
 
         public void InitEntityForBattle()
         {
-            Movement = Stats.BaseMovement;
-            Speed = Stats.BaseSpeed;
-            Behaviour = Stats.Behaviour;
-            CurrentHp = Stats.MaxHp;
-
-            bonusAttack = 0;
-
             CurrentUltimatePoints = 0;
+            
+            Stats.ResetModifiers();
+            
+            IsActive = true;
 
             AbilityInstances.Clear();
-            foreach (var ability in Stats.Abilities)
+            foreach (var ability in Stats.StatsSo.Abilities)
             {
                 AbilityInstances.Add(ability.CreateInstance());
             }
-
-            Behaviour.InitBehaviour(this);
+            behaviourRoutine = null;
         }
 
         public IEnumerator StartRound()
@@ -124,7 +105,7 @@ namespace Battle
 
         public IEnumerator StartTurn(Action onBehaviourEnd)
         {
-            MovementLeft = Movement;
+            MovementLeft = Stats.Movement;
             
             passivesToRemove.Clear();
             foreach (var passiveInstance in PassiveInstances)
@@ -236,7 +217,8 @@ namespace Battle
 
         public void ResetTurnValue(float value)
         {
-            DistanceFromTurnStart = value < 0 ? Stats.Initiative : value;
+            if(Stats == null) return;
+            DistanceFromTurnStart = value < 0 ? Stats.StatsSo.Initiative : value;
         }
 
         public void DecayTurnValue(float amount)
@@ -277,45 +259,42 @@ namespace Battle
         {
             if (amount < 0) amount = 0; //No negative damage, negative damage doesn't heal, but can deal 0 damage
 
-            var startHp = CurrentHp;
-            CurrentHp -= amount;
+            var startHp = Stats.CurrentHp;
+            Stats.CurrentHp -= amount;
             
             EventManager.Trigger(new UnitTakeDamageEvent(this, startHp));
 
-            if (CurrentHp <= 0) KillEntityInBattle();
-            OnCurrentHealthChanged?.Invoke(CurrentHp);
+            if (Stats.CurrentHp <= 0) KillEntityInBattle();
+            OnCurrentHealthChanged?.Invoke(Stats.CurrentHp);
         }
 
         public void HealDamage(int amount)
         {
             if (amount < 0) amount = 0;
 
-            var startHp = CurrentHp;
-            CurrentHp += amount;
+            var startHp = Stats.CurrentHp;
+            Stats.CurrentHp += amount;
 
             EventManager.Trigger(new UnitHealDamageEvent(this, startHp));
-
-            if (CurrentHp > Stats.MaxHp) CurrentHp = Stats.MaxHp; //No overheal (yet ?)
-            OnCurrentHealthChanged?.Invoke(CurrentHp);
+            
+            OnCurrentHealthChanged?.Invoke(Stats.CurrentHp );
         }
         
         [ContextMenu("Execute")]
         public void Execute()
         {
-            TakeDamage(CurrentHp);
+            TakeDamage(Stats.CurrentHp);
         }
 
         public void KillEntityInBattle()
         {
             if(Tile != null) Tile.RemoveUnit();
-            Speed = 0;
 
             OnDeath?.Invoke();
             OnDeath = null;
 
             EventManager.Trigger(new UnitDeathEvent(this));
-
-
+            
             gameObject.SetActive(false);
         }
 
@@ -478,7 +457,7 @@ namespace Battle.UnitEvents
         {
             Unit = unit;
             StartHp = startHp;
-            Amount = StartHp - Unit.CurrentHp;
+            Amount = StartHp - Unit.Stats.CurrentHp;
         }
     }
 
@@ -492,7 +471,7 @@ namespace Battle.UnitEvents
         {
             Unit = unit;
             StartHp = startHp;
-            Amount = Unit.CurrentHp - StartHp;
+            Amount = Unit.Stats.CurrentHp - StartHp;
         }
     }
 

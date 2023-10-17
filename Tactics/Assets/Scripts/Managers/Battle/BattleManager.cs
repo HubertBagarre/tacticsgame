@@ -96,7 +96,8 @@ namespace Battle
                 entitiesInBattle.Clear();
                 deadUnits.Clear();
 
-                foreach (var battleEntity in level.StartingEntities)
+                var entities = battleLevel.StartingEntities;
+                foreach (var battleEntity in entities)
                 {
                     AddEntityToBattle(battleEntity, true);
                 }
