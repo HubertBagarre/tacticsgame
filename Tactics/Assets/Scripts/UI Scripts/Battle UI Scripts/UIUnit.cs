@@ -40,6 +40,8 @@ namespace Battle.UIComponent
             
             UpdateUIRotation();
             
+            // TODO - setup after unit gets initialized
+            associatedUnit.Stats.OnMaxHpModified += UpdateMaxHpBar;
             associatedUnit.OnCurrentHealthChanged += UpdateHpBar;
             associatedUnit.OnPassiveAdded += AddPassiveIcon;
             associatedUnit.OnPassiveRemoved += RemovePassiveIcon;
@@ -56,6 +58,15 @@ namespace Battle.UIComponent
             uiParent.LookAt(uiParent.position + camRot * Vector3.forward,camRot * Vector3.up);
         }
 
+        private void UpdateMaxHpBar(UnitStatsInstance statsInstance)
+        {
+            var hp = statsInstance.CurrentHp;
+            
+            hpText.text = $"{hp}/{associatedUnit.Stats.StatsSo.MaxHp}";
+            hpBarImage.fillAmount = hp / (float)associatedUnit.Stats.StatsSo.MaxHp;
+            hpBarImageBack.DOFillAmount(hpBarImage.fillAmount, hpLerpTime);
+        }
+        
         private void UpdateHpBar(int hp)
         {
             hpText.text = $"{hp}/{associatedUnit.Stats.StatsSo.MaxHp}";
