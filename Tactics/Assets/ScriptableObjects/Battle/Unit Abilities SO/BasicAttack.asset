@@ -16,7 +16,7 @@ MonoBehaviour:
   <Name>k__BackingField: Basic Attack
   <Type>k__BackingField: 1
   description: 
-  <Selector>k__BackingField: {fileID: 11400000, guid: b496c5c3b59a5f94192dd5d26b70848d,
+  <Selector>k__BackingField: {fileID: 11400000, guid: 1dd45802b6631b449b4abaece924e7b6,
     type: 2}
   <Effects>k__BackingField:
   - {fileID: 11400000, guid: 2a84ab598746c3446a8f57915d1179f7, type: 2}

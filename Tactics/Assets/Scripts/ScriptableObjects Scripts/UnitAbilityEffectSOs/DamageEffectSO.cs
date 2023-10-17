@@ -16,7 +16,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
             // TODO - damage type ?, maybe attack keyword?
             var dmg = useCasterAttack ? caster.Attack : damage;
             
-            return isAttack ? $"<color=yellow><u><link=\"attack\">Attack</link></u></color>%AFFECTED% for <color=orange>{dmg} damage</color>." : $"Deal <color=orange>{dmg} damage</color>%AFFECTED%.";
+            return isAttack ? $"<color=yellow><u><link=\"attack\">Attack</link></u></color>%AFFECTED% for <color=orange>{dmg} damage</color>." : $"Deal <color=orange>{dmg} damage</color>%toAFFECTED%.";
         }
         
         public override bool ConvertDescriptionLinks(Unit caster, string linkKey, out string text)

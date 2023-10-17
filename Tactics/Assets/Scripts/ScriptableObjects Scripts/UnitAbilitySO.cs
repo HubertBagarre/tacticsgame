@@ -44,7 +44,8 @@ namespace Battle.ScriptableObjects.Ability
             //Maybe do something cleaner of multi effects
             var descriptionText = Selector.SelectionDescription(caster);
             var effectsText = Effects.Aggregate(string.Empty, (current, effect) => current + $"{effect.ConvertedDescription(caster)} ");
-
+            
+            effectsText = effectsText.Replace("%toAFFECTED%", $" to{Selector.AffectedDescription(caster)}");
             effectsText = effectsText.Replace("%AFFECTED%", Selector.AffectedDescription(caster));
 
             if (descriptionText.Length == 0) return $"{effectsText}";

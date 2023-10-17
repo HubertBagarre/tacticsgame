@@ -62,7 +62,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
             var rangeText = string.Empty;
             if (range > 0) rangeText = $" within <u><link=\"ring:{range}\">{range} rings</link></u>"; //TODO - Add support for adjacent method
             
-            return $" to <color=green>the closest{countText} {teamText} unit{(targetUnits > 1 ? "s":"")}{rangeText}</color>.";
+            return $"<color=green> the closest{countText} {teamText} unit{(targetUnits > 1 ? "s":"")}{rangeText}</color>";
         }
 
         public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
