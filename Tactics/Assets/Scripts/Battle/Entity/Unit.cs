@@ -31,7 +31,6 @@ namespace Battle
             private set
             {
                 movementLeft = value;
-                Debug.Log(movementLeft);
                 OnMovementLeftChanged?.Invoke(movementLeft);
             }
         }

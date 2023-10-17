@@ -221,9 +221,7 @@ namespace Battle
         private void StartEntityTurn(BattleEntity unit)
         {
             CurrentTurnEntity = unit;
-
-            Debug.Log($"{CurrentTurnEntity}'s turn");
-
+            
             if (CurrentTurnEntity == endRoundEntity)
             {
                 EndRound();
