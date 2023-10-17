@@ -220,7 +220,7 @@ namespace Battle
                 var tile = path[index];
                 
                 //TODO - play animation, different is isForced
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.5f);
 
                 transform.position = tile.transform.position;
 

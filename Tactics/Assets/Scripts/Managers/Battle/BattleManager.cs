@@ -71,6 +71,8 @@ namespace Battle
         {
             battleLevel = level;
 
+            InputManager.SetupCamera(Camera.main);
+
             foreach (var tile in tileManager.AllTiles)
             {
                 tile.SetAppearance(Tile.Appearance.Default);

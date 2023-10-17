@@ -232,7 +232,7 @@ namespace Battle
                 {
                     current = destination;
 
-                    while (cameFromDict[current] != start)
+                    while (current != start)
                     {
                         path.Add(current);
                         current = cameFromDict[current];
@@ -242,8 +242,9 @@ namespace Battle
                     
                     return true;
                 }
-                
-                foreach (var next in current.GetAdjacentTiles())
+
+                var adjacentTiles = includeDiag ? current.GetSurroundingTiles() : current.GetAdjacentTiles();
+                foreach (var next in adjacentTiles)
                 {
                     if (!cameFromDict.ContainsKey(next))
                     {
@@ -306,17 +307,17 @@ namespace Battle
             
         }
 
-        public void ShowPath()
+        public void ShowLineRendererPath()
         {
             lineRendererGo.SetActive(true);
         }
 
-        public void HidePath()
+        public void HideLineRendererPath()
         {
             lineRendererGo.SetActive(false);
         }
 
-        public void SetPath(List<Tile> path)
+        public void SetLineRendererPath(List<Tile> path)
         {
             var list = path.ToList();
             list.Insert(0,this);

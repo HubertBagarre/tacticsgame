@@ -43,10 +43,13 @@ namespace Battle.ScriptableObjects.Ability.Selector
         {
             var tile = caster.Tile;
             tile.ClearPath();
+            
+            
             if (tile.GetPath(lastSelected, out var path))
             {
-                tile.SetPath(path);
-                tile.ShowPath();
+                Debug.Log(path.Count);
+                tile.SetLineRendererPath(path);
+                tile.ShowLineRendererPath();
             }
             
             return base.GetAffectedTiles(caster, lastSelected, selectedTiles);

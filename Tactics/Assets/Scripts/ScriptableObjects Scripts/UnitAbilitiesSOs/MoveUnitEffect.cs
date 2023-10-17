@@ -22,8 +22,8 @@ namespace Battle.ScriptableObjects.Ability.Effect
             if (hasPath)
             {
                 Debug.Log($"{path.Count}");
-                caster.Tile.SetPath(path);
-                caster.Tile.ShowPath();
+                caster.Tile.SetLineRendererPath(path);
+                caster.Tile.ShowLineRendererPath();
             }
             
             yield return caster.StartCoroutine(caster.MoveUnit(path,forced));

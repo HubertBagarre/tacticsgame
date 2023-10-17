@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 public class InputManager : MonoBehaviour
 {
     private Controls inputs;
+    private static Camera cam;
 
     public static event Action LeftClickEvent;
     public static event Action RightClickEvent;
@@ -31,10 +32,14 @@ public class InputManager : MonoBehaviour
         if(!ctx.started) return;
         RightClickEvent?.Invoke();
     }
+    
+    public static void SetupCamera(Camera camera)
+    {
+        cam = camera;
+    }
 
     public static void CastCamRay(out RaycastHit hit, LayerMask layerMask)
     {
-        var cam = Camera.main;
         if (cam == null)
         {
             hit = new RaycastHit();

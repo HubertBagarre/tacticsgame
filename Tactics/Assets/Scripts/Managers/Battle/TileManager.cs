@@ -57,7 +57,7 @@ namespace Battle
             {
                 tile.SetAppearance(Tile.Appearance.Default);
                 tile.HideBorders();
-                tile.HidePath();
+                tile.HideLineRendererPath();
             }
         }
         
@@ -71,7 +71,9 @@ namespace Battle
             
             foreach (var tile in AllTiles)
             {
-                tile.SetAppearance(ability.IsTileSelectable(caster,tile) ? Tile.Appearance.Selectable : Tile.Appearance.Unselectable );
+                var selectable = ability.IsTileSelectable(caster,tile);
+                tile.SetAppearance(selectable ? Tile.Appearance.Selectable : Tile.Appearance.Unselectable );
+                //if(selectable) Debug.Log($"{tile} is selectable",tile.gameObject);
             }
             
             //TODO - find a way to show both selected and affected tiles
@@ -107,6 +109,8 @@ namespace Battle
         private Tile GetClickTile()
         {
             InputManager.CastCamRay(out var tileHit, worldLayers);
+            
+            //Debug.Log($"Pew {tileHit.transform}",tileHit.transform);
 
             return tileHit.transform != null ? tileHit.transform.GetComponent<Tile>() : null;
         }
