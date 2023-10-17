@@ -31,6 +31,7 @@ namespace Battle
             private set
             {
                 movementLeft = value;
+                Debug.Log(movementLeft);
                 OnMovementLeftChanged?.Invoke(movementLeft);
             }
         }
@@ -68,8 +69,6 @@ namespace Battle
 
         public void InitUnit(Tile tile, int team, UnitStatsSO so)
         {
-            Debug.Log("Init Unit");
-            
             Tile = tile;
             Team = team;
             Stats = so.CreateInstance(this);
@@ -212,11 +211,10 @@ namespace Battle
             {
                 var tile = path[index];
                 
-                if(!isForced) MovementLeft--;
-                
                 //TODO - play animation, different is isForced
                 yield return new WaitForSeconds(0.5f);
 
+                if(!isForced) MovementLeft--;
                 transform.position = tile.transform.position;
                 SetTile(tile);
             }

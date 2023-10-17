@@ -40,6 +40,7 @@ namespace Battle
         public int BaseMaxHp => StatsSo.MaxHp;
         public int MaxHpModifier { get; private set; }
         public int MaxHp => BaseMaxHp + MaxHpModifier < 0 ? 0 : BaseMaxHp + MaxHpModifier;
+        public int MaxHpDiff => MaxHpModifier == 0 ? 0 : MaxHpModifier > 0 ? 1 : -1;
         public event Action<UnitStatsInstance> OnMaxHpModified;
         public void IncreaseMaxHpModifier(int amount)
         {
@@ -67,6 +68,7 @@ namespace Battle
         public int BaseAttack => StatsSo.Attack;
         public int AttackModifier { get; private set; }
         public int Attack => BaseAttack + AttackModifier < 0 ? 0 : BaseAttack + AttackModifier;
+        public int AttackDiff => AttackModifier == 0 ? 0 : AttackModifier > 0 ? 1 : -1;
         public event Action<UnitStatsInstance> OnAttackModified;
         public void IncreaseAttackModifier(int amount)
         {
@@ -78,6 +80,7 @@ namespace Battle
         public int BaseAttackRange => StatsSo.AttackRange;
         public int AttackRangeModifier { get; private set; }
         public int AttackRange => BaseAttackRange + AttackRangeModifier < 0 ? 0 : BaseAttackRange + AttackRangeModifier;
+        public int AttackRangeDiff => AttackRangeModifier == 0 ? 0 : AttackRangeModifier > 0 ? 1 : -1;
         public event Action<UnitStatsInstance> OnAttackRangeModified;
         public void IncreaseAttackRangeModifier(int amount)
         {
@@ -89,6 +92,7 @@ namespace Battle
         public int BaseMovement => StatsSo.BaseMovement;
         public int MovementModifier { get; private set; }
         public int Movement => BaseMovement + MovementModifier < 0 ? 0 : BaseMovement + MovementModifier;
+        public int MovementDiff => MovementModifier == 0 ? 0 : MovementModifier > 0 ? 1 : -1;
         public event Action<UnitStatsInstance> OnMovementModified;
         public void IncreaseMovementModifier(int amount)
         {
@@ -100,6 +104,7 @@ namespace Battle
         public int BaseSpeed { get; }
         public int SpeedModifier { get; private set; }
         public int Speed => BaseSpeed + SpeedModifier < 0 ? 0 : BaseSpeed + SpeedModifier;
+        public int SpeedDiff => SpeedModifier == 0 ? 0 : SpeedModifier > 0 ? 1 : -1;
         public event Action<UnitStatsInstance> OnSpeedModified;
         public void IncreaseSpeedModifier(int amount)
         {
