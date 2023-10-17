@@ -247,7 +247,8 @@ namespace Battle
         private void UpdateConfirmAbilityTargetSelectionButton(int _)
         {
             if(currentAbilityInTargetSelection == null) return;
-            confirmTileSelectionButton.interactable = currentAbilityInTargetSelection.SelectionsLeft == 0 || currentAbilityInTargetSelection.ExpectedSelections == 0;
+            confirmTileSelectionButton.interactable = currentAbilityInTargetSelection.SelectionsLeft == 0 ||
+                                                      currentAbilityInTargetSelection.ExpectedSelections == 0;
         }
 
         private void UpdateAbilitySelectionLeftText(int _)

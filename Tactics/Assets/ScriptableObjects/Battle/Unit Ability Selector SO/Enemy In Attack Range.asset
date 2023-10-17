@@ -9,14 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8add83dd023b34143bd3bfba658ab646, type: 3}
-  m_Name: Closest 3 enemy
+  m_Script: {fileID: 11500000, guid: f999c9865d29d604787c73a23e3a5e73, type: 3}
+  m_Name: Enemy In Attack Range
   m_EditorClassIdentifier: 
   expectedSelections: 1
-  minimumSelections: 1
   <UseSelectionOrder>k__BackingField: 1
-  selector: {fileID: 0}
-  range: 3
-  useAdjacentTiles: 0
-  targetUnits: 3
+  includeDiag: 1
   targetAllies: 0
+  targetEnemies: 1

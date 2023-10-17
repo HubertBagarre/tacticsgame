@@ -6,9 +6,14 @@ namespace Battle.ScriptableObjects.Ability.Selector
     public abstract class UnitAbilitySelectorSO : ScriptableObject
     {
         [SerializeField,Min(0)] private int expectedSelections = 1;
+        
+        // TODO - Si g le temps, basicaly, if available targets < expected targets && minimum selection, then Expected = available
+        /*
+        [field:SerializeField] public bool UseMinimumSelection { get; private set; }
+        */
         public int ExpectedSelections => OverrideExpectedSelections() >= 0 ? OverrideExpectedSelections() : expectedSelections;
         [field: SerializeField] public bool UseSelectionOrder { get; private set; } = true;
-
+        
         protected virtual int OverrideExpectedSelections()
         {
             return -1;
