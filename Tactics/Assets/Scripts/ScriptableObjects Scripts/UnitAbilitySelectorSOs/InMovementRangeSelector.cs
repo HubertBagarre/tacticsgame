@@ -45,9 +45,8 @@ namespace Battle.ScriptableObjects.Ability.Selector
             tile.ClearPath();
             
             
-            if (tile.GetPath(lastSelected, out var path))
+            if (tile.GetPath(lastSelected, out var path,false,caster.Stats.Behaviour.WalkableTileSelector))
             {
-                Debug.Log(path.Count);
                 tile.SetLineRendererPath(path);
                 tile.ShowLineRendererPath();
             }

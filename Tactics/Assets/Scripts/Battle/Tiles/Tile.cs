@@ -213,8 +213,10 @@ namespace Battle
 
         // A* pathfinding, nvm its BFS xd
         // https://www.redblobgames.com/pathfinding/a-star/introduction.html
-        public bool GetPath(Tile destination, out List<Tile> path, bool includeDiag = false)
+        public bool GetPath(Tile destination, out List<Tile> path, bool includeDiag = false,Func<Tile,bool> condition = null)
         {
+            condition ??= _ => true;
+            
             var start = this;
             
             var frontier = new Queue<Tile>();
@@ -244,7 +246,7 @@ namespace Battle
                 }
 
                 var adjacentTiles = includeDiag ? current.GetSurroundingTiles() : current.GetAdjacentTiles();
-                foreach (var next in adjacentTiles)
+                foreach (var next in adjacentTiles.Where(condition))
                 {
                     if (!cameFromDict.ContainsKey(next))
                     {

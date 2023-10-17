@@ -14,8 +14,7 @@ namespace Battle.ScriptableObjects
         protected static AbilityManager abilityM;
         
         // See UnitAbilitySO if can't be overriden (use a virtual bool func(Unit,Tile) instead)
-        public virtual Func<Tile, bool> WalkableTileSelector {  get; protected set; } =
-            tile => tile.IsWalkable && !tile.HasUnit();
+        public virtual Func<Tile, bool> WalkableTileSelector {  get; protected set; } = tile => tile.IsWalkable && !tile.HasUnit();
 
         public static void SetBattleManager(BattleManager battleManager)
         {

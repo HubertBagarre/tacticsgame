@@ -15,6 +15,8 @@ namespace Battle.ScriptableObjects
         [field: SerializeField] public int MaxHp { get; private set; }
         [field: SerializeField] public int Attack { get; private set; } = 1; // TODO - probably change name
         [field: SerializeField] public int AttackRange { get; private set; } = 3;
+        [field: SerializeField, Tooltip("Maximum Tiles that can be moved during a turn")]
+        public int BaseMovement { get; private set; } = 3;
         
         [field: SerializeField, Tooltip("Turn Value Decay Rate, higher is faster")]
         public int BaseSpeed { get; private set; } = 100;
@@ -22,10 +24,6 @@ namespace Battle.ScriptableObjects
         public float Initiative { get; private set; } = 1000;
         [field: SerializeField] public UnitBehaviourSO Behaviour { get; private set; }
         [field: SerializeField] public List<UnitAbilitySO> Abilities { get; private set; }
-
-        [field: SerializeField, Tooltip("Maximum Tiles that can be moved during a turn")]
-        public int BaseMovement { get; private set; } = 3;
-        
         public UnitStatsInstance CreateInstance(Unit unit) => new UnitStatsInstance(this,unit);
     }
 }

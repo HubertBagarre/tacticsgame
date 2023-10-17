@@ -17,7 +17,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
         {
             var destination = targetTiles[0];
 
-            var hasPath = caster.Tile.GetPath(destination,out var path);
+            var hasPath = caster.Tile.GetPath(destination,out var path,false,caster.Stats.Behaviour.WalkableTileSelector);
 
             if (hasPath)
             {
