@@ -7,11 +7,16 @@ namespace Battle.ScriptableObjects
     using Ability;
     
     [CreateAssetMenu(menuName = "Unit")]
-    public class UnitStatsSO : ScriptableObject
+    public class UnitSO : ScriptableObject
     {
+        [field:Header("Visual")]
         [field: SerializeField] public Sprite Portrait { get; private set; }
         [field: SerializeField] public string Name { get; private set; }
         [field: SerializeField] public string Description { get; private set; }
+        [field: SerializeField] public BattleModel model;
+        [field: SerializeField] public BattleModel ghostModel;
+        
+        [field:Header("Stats")]
         [field: SerializeField] public int MaxHp { get; private set; }
         [field: SerializeField] public int Attack { get; private set; } = 1; // TODO - probably change name
         [field: SerializeField] public int AttackRange { get; private set; } = 3;
@@ -34,10 +39,10 @@ namespace Battle
     
     public class UnitStatsInstance
     {
-        public UnitStatsSO StatsSo { get; }
+        public UnitSO So { get; }
         
         // Hp
-        public int BaseMaxHp => StatsSo.MaxHp;
+        public int BaseMaxHp => So.MaxHp;
         public int MaxHpModifier { get; private set; }
         public int MaxHp => BaseMaxHp + MaxHpModifier < 0 ? 0 : BaseMaxHp + MaxHpModifier;
         public int MaxHpDiff => MaxHpModifier == 0 ? 0 : MaxHpModifier > 0 ? 1 : -1;
@@ -65,7 +70,7 @@ namespace Battle
         }
 
         // Attack
-        public int BaseAttack => StatsSo.Attack;
+        public int BaseAttack => So.Attack;
         public int AttackModifier { get; private set; }
         public int Attack => BaseAttack + AttackModifier < 0 ? 0 : BaseAttack + AttackModifier;
         public int AttackDiff => AttackModifier == 0 ? 0 : AttackModifier > 0 ? 1 : -1;
@@ -77,7 +82,7 @@ namespace Battle
         }
         
         // Attack Range
-        public int BaseAttackRange => StatsSo.AttackRange;
+        public int BaseAttackRange => So.AttackRange;
         public int AttackRangeModifier { get; private set; }
         public int AttackRange => BaseAttackRange + AttackRangeModifier < 0 ? 0 : BaseAttackRange + AttackRangeModifier;
         public int AttackRangeDiff => AttackRangeModifier == 0 ? 0 : AttackRangeModifier > 0 ? 1 : -1;
@@ -89,7 +94,7 @@ namespace Battle
         }
         
         // Movement
-        public int BaseMovement => StatsSo.BaseMovement;
+        public int BaseMovement => So.BaseMovement;
         public int MovementModifier { get; private set; }
         public int Movement => BaseMovement + MovementModifier < 0 ? 0 : BaseMovement + MovementModifier;
         public int MovementDiff => MovementModifier == 0 ? 0 : MovementModifier > 0 ? 1 : -1;
@@ -116,13 +121,13 @@ namespace Battle
         // Behaviour
         public UnitBehaviourSO Behaviour { get; }
         
-        public UnitStatsInstance(UnitStatsSO so,Unit unit)
+        public UnitStatsInstance(UnitSO so,Unit unit)
         {
-            StatsSo = so;
+            So = so;
             
-            BaseSpeed = StatsSo.BaseSpeed;
-            Initiative = StatsSo.Initiative;
-            Behaviour = StatsSo.Behaviour;
+            BaseSpeed = So.BaseSpeed;
+            Initiative = So.Initiative;
+            Behaviour = So.Behaviour;
             
             ResetModifiers();
             

@@ -62,15 +62,15 @@ namespace Battle.UIComponent
         {
             var hp = statsInstance.CurrentHp;
             
-            hpText.text = $"{hp}/{associatedUnit.Stats.StatsSo.MaxHp}";
-            hpBarImage.fillAmount = hp / (float)associatedUnit.Stats.StatsSo.MaxHp;
+            hpText.text = $"{hp}/{associatedUnit.Stats.So.MaxHp}";
+            hpBarImage.fillAmount = hp / (float)associatedUnit.Stats.So.MaxHp;
             hpBarImageBack.DOFillAmount(hpBarImage.fillAmount, hpLerpTime);
         }
         
         private void UpdateHpBar(int hp)
         {
-            hpText.text = $"{hp}/{associatedUnit.Stats.StatsSo.MaxHp}";
-            hpBarImage.fillAmount = hp / (float)associatedUnit.Stats.StatsSo.MaxHp;
+            hpText.text = $"{hp}/{associatedUnit.Stats.So.MaxHp}";
+            hpBarImage.fillAmount = hp / (float)associatedUnit.Stats.So.MaxHp;
             hpBarImageBack.DOFillAmount(hpBarImage.fillAmount, hpLerpTime);
         }
 

@@ -13,10 +13,11 @@ namespace Battle.ScriptableObjects
         [Serializable]
         public class PlacedUnit
         {
-            public UnitStatsSO so;
-            public Vector2Int position;
-            public int team;
             public Unit prefab;
+            public UnitSO so;
+            public int team;
+            public Vector2Int position;
+            public Tile.Direction orientation;
         }
     }
 }

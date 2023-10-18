@@ -27,6 +27,11 @@ namespace Battle
         [field: SerializeField] public bool IsWalkable { get; private set; }
         private int CostToMove => 1; // If we need weights its here lmao (not used btw)
         [SerializeField] private Tile[] neighbors; //0 is top (x,y+1), then clockwise, adjacent before diag
+        public enum Direction
+        {
+            Top=0,Right=1,Down=2,Left=3,TopRight=4,DownRight=5,DownLeft=6,TopLeft=7
+        }
+        
         [field: SerializeField] public int PathRing { get; private set; }
 
         [Header("Border")]

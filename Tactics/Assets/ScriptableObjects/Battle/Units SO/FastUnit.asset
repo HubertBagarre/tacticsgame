@@ -16,6 +16,9 @@ MonoBehaviour:
     type: 3}
   <Name>k__BackingField: Fast
   <Description>k__BackingField: 
+  model: {fileID: 4388352513943310376, guid: 5210b2acf41cf464996b9abbddf49767, type: 3}
+  ghostModel: {fileID: 4388352513943310376, guid: 5210b2acf41cf464996b9abbddf49767,
+    type: 3}
   <MaxHp>k__BackingField: 10
   <Attack>k__BackingField: 1
   <AttackRange>k__BackingField: 4

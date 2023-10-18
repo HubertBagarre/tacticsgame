@@ -77,7 +77,7 @@ namespace Battle
                 unitTr.SetParent(transform);
 
                 unit.name = placedUnit.so.name;
-                unit.InitUnit(tile,placedUnit.team,placedUnit.so);
+                unit.InitUnit(tile,placedUnit.team,placedUnit.so,placedUnit.orientation);
             
                 units.Add(unit);
             }

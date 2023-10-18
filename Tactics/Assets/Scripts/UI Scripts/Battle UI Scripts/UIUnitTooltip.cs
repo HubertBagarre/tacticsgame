@@ -73,7 +73,7 @@ namespace Battle.UIComponent
         private void ShowUnitInfo()
         {
             if (currentDisplayingUnit == null) return;
-            var so = currentDisplayingUnit.Stats.StatsSo;
+            var so = currentDisplayingUnit.Stats.So;
             var color = currentDisplayingUnit.Team == 0 ? "<color=#00ffffff>" : "<color=red>";
             unitNameText.text = $"{color}{so.Name}</color>";
             unitTitleText.text = "";

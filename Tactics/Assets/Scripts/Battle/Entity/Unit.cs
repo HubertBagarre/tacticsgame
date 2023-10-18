@@ -12,19 +12,26 @@ namespace Battle
 
     public class Unit : MonoBehaviour, BattleEntity
     {
-        [field: SerializeField] public Tile Tile { get; private set; }
-        [field: SerializeField] public int Team { get; private set; } //0 is player
-        public UnitStatsInstance Stats { get; private set; }
-        public Sprite Portrait => Stats.StatsSo.Portrait;
+        [Header("Model")]
+        [SerializeField] private Transform modelParent;
+        private BattleModel battleModel;
+        private BattleModel ghostBattleModel;
+        private Transform ghostModelTr;
+        
 
         [field: Header("Current Flags")]
+        [field: SerializeField] public Tile Tile { get; private set; }
+        [field: SerializeField] public int Team { get; private set; } //0 is player
         [field: SerializeField] public bool IsActive { get; private set; }
 
         [field: SerializeField] public bool CanMove { get; private set; } = true;
 
+        public UnitStatsInstance Stats { get; private set; }
+        public Sprite Portrait => Stats.So.Portrait;
+        
         [Header("Current Stats")]
         [SerializeField] private int movementLeft;
-
+        
         public int MovementLeft
         {
             get => movementLeft;
@@ -50,7 +57,6 @@ namespace Battle
         public List<UnitPassiveInstance> PassiveInstances { get; } = new();
         private List<UnitPassiveInstance> passivesToRemove = new();
 
-
         private List<IEnumerator> onAttackOtherUnitRoutines = new ();
         private List<IEnumerator> onAttackedRoutines = new ();
 
@@ -66,8 +72,16 @@ namespace Battle
         public event Action<UnitPassiveInstance> OnPassiveAdded; 
         public event Action<UnitPassiveInstance> OnPassiveRemoved; 
 
-        public void InitUnit(Tile tile, int team, UnitStatsSO so)
+        public void InitUnit(Tile tile, int team, UnitSO so,Tile.Direction orientation)
         {
+            // TODO - Instantiate model
+            battleModel = Instantiate(so.model, modelParent);
+            battleModel.SetOrientation(orientation);
+            
+            ghostBattleModel = Instantiate(so.ghostModel, modelParent);
+            ghostBattleModel.SetOrientation(orientation);
+            ghostModelTr = ghostBattleModel.transform;
+            
             Tile = tile;
             Team = team;
             Stats = so.CreateInstance(this);
@@ -84,7 +98,7 @@ namespace Battle
             IsActive = true;
 
             AbilityInstances.Clear();
-            foreach (var ability in Stats.StatsSo.Abilities)
+            foreach (var ability in Stats.So.Abilities)
             {
                 AbilityInstances.Add(ability.CreateInstance());
             }
@@ -227,7 +241,7 @@ namespace Battle
         public void ResetTurnValue(float value)
         {
             if(Stats == null) return;
-            DistanceFromTurnStart = value < 0 ? Stats.StatsSo.Initiative : value;
+            DistanceFromTurnStart = value < 0 ? Stats.So.Initiative : value;
         }
 
         public void DecayTurnValue(float amount)
