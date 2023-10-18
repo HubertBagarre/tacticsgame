@@ -44,7 +44,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
             
             var targetText = $"<color=green>{ExpectedSelections} {unitType}{targetType}{(ExpectedSelections > 1 ? "s":"")}";
             
-            var rangeText = range > 0 ? $" within <u><link=\"ring:{range}\">{range} rings</link></u></color>" : "</color>";
+            var rangeText = range > 0 ? $" within attack range (<u><link=\"ring:{range}\">{range} rings</link></u>)</color>" : "</color>";
             
             return $"{targetText}{rangeText}";
         }

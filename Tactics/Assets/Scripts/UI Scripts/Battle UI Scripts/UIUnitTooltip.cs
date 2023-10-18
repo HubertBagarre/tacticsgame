@@ -74,7 +74,8 @@ namespace Battle.UIComponent
         {
             if (currentDisplayingUnit == null) return;
             var so = currentDisplayingUnit.Stats.StatsSo;
-            unitNameText.text = so.Name;
+            var color = currentDisplayingUnit.Team == 0 ? "<color=#00ffffff>" : "<color=red>";
+            unitNameText.text = $"{color}{so.Name}</color>";
             unitTitleText.text = "";
             unitPortraitImage.sprite = so.Portrait;
         }

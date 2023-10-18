@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Portrait>k__BackingField: {fileID: 21300000, guid: 00a0faf89c6574b4c9254d4f223bc99b,
     type: 3}
-  <Name>k__BackingField: 
+  <Name>k__BackingField: Fast
   <Description>k__BackingField: 
   <MaxHp>k__BackingField: 10
   <Attack>k__BackingField: 1
   <AttackRange>k__BackingField: 4
+  <BaseMovement>k__BackingField: 6
   <BaseSpeed>k__BackingField: 300
   <Initiative>k__BackingField: 1
   <Behaviour>k__BackingField: {fileID: 11400000, guid: d70b7e818c234f34c9fb661ceb2610dd,
@@ -28,4 +29,3 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fe1b7a72a3895764e973d8343a74755f, type: 2}
   - {fileID: 11400000, guid: ecaa7f573ece9db4ea3371c664f1b7b5, type: 2}
   - {fileID: 11400000, guid: d26599d138965b945b982e065c457548, type: 2}
-  <BaseMovement>k__BackingField: 6

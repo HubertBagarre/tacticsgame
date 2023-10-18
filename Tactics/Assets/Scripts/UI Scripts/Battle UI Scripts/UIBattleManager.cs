@@ -132,6 +132,7 @@ namespace Battle
             if (unit == null)
             {
                 unitTooltip.Hide();
+                return;
             }
             
             unitTooltip.DisplayUnitTooltip(ctx.Unit);
