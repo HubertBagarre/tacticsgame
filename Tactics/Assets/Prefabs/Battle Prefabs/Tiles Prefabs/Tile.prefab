@@ -1229,6 +1229,7 @@ MonoBehaviour:
   selectedMat: {fileID: 2100000, guid: 3fddec1670a946f4f9f94d222426a5a7, type: 2}
   affectedMat: {fileID: 2100000, guid: b05c6e12d61f56445983db13cc18181a, type: 2}
   unselectableMat: {fileID: 2100000, guid: 317868c7db5d55346afb50823e09b1c5, type: 2}
+  modelPosition: {x: 0, y: 0.05, z: 0}
   <DebugText>k__BackingField: {fileID: 902476225510808331}
 --- !u!1 &8483765426281386775
 GameObject:

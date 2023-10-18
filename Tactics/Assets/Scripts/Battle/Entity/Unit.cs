@@ -14,11 +14,8 @@ namespace Battle
     {
         [Header("Model")]
         [SerializeField] private Transform modelParent;
-        private BattleModel battleModel;
-        private BattleModel ghostBattleModel;
-        private Transform ghostModelTr;
+        public BattleModel BattleModel { get; private set; }
         
-
         [field: Header("Current Flags")]
         [field: SerializeField] public Tile Tile { get; private set; }
         [field: SerializeField] public int Team { get; private set; } //0 is player
@@ -75,12 +72,10 @@ namespace Battle
         public void InitUnit(Tile tile, int team, UnitSO so,Tile.Direction orientation)
         {
             // TODO - Instantiate model
-            battleModel = Instantiate(so.model, modelParent);
-            battleModel.SetOrientation(orientation);
-            
-            ghostBattleModel = Instantiate(so.ghostModel, modelParent);
-            ghostBattleModel.SetOrientation(orientation);
-            ghostModelTr = ghostBattleModel.transform;
+            BattleModel = Instantiate(so.model, modelParent);
+            BattleModel.SetOrientation(orientation);
+            BattleModel.SetPosition(transform.position);
+            BattleModel.ShowGhost(false);
             
             Tile = tile;
             Team = team;
@@ -229,6 +224,9 @@ namespace Battle
 
                 if(!isForced) MovementLeft--;
                 transform.position = tile.transform.position;
+                
+                BattleModel.SetPosition(transform.position);
+                
                 SetTile(tile);
             }
 

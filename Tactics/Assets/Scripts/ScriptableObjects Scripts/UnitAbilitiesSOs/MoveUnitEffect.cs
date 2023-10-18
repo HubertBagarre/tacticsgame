@@ -21,7 +21,6 @@ namespace Battle.ScriptableObjects.Ability.Effect
 
             if (hasPath)
             {
-                Debug.Log($"{path.Count}");
                 caster.Tile.SetLineRendererPath(path);
                 caster.Tile.ShowLineRendererPath();
             }

@@ -18,16 +18,16 @@ MonoBehaviour:
     so: {fileID: 11400000, guid: 9678e3581c87714498371f90fc482a9c, type: 2}
     team: 0
     position: {x: 0, y: 0}
-    orientation: 0
+    orientation: 4
   - prefab: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
       type: 3}
     so: {fileID: 11400000, guid: 8c798ae10bc978341b71cae74b691113, type: 2}
     team: 0
     position: {x: 2, y: 2}
-    orientation: 0
+    orientation: 4
   - prefab: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
       type: 3}
     so: {fileID: 11400000, guid: 8c798ae10bc978341b71cae74b691113, type: 2}
     team: 1
     position: {x: 6, y: 6}
-    orientation: 2
+    orientation: 6

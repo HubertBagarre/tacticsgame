@@ -45,6 +45,9 @@ namespace Battle
         [SerializeField] private Material selectedMat;
         [SerializeField] private Material affectedMat;
         [SerializeField] private Material unselectableMat;
+        
+        [SerializeField] private Vector3 modelPosition = new (0,0.05f,0);
+        public Vector3 ModelPosition => transform.position + modelPosition;
 
         [field: Header("Debug")]
         [field: SerializeField]
