@@ -7,7 +7,7 @@ using UnityEngine;
 ///
 /// 
 /// </summary>
-public interface BattleEntity
+public interface IBattleEntity
 {
     public Sprite Portrait { get; }
     public int Team { get; }

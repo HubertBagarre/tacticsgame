@@ -10,7 +10,7 @@ namespace Battle
     using ScriptableObjects;
     using ScriptableObjects.Ability;
 
-    public class Unit : MonoBehaviour, BattleEntity
+    public class Unit : MonoBehaviour, IBattleEntity
     {
         [Header("Anchors")]
         [SerializeField] private Transform modelParent;
@@ -44,7 +44,18 @@ namespace Battle
 
         public int Speed => Stats.Speed;
         public float DecayRate => Speed / 100f;
-        [field: SerializeField] public float DistanceFromTurnStart { get; protected set; }
+        [SerializeField] private float distanceFromTurnStart;
+        public float DistanceFromTurnStart
+        {
+            get => distanceFromTurnStart;
+            protected set
+            {
+                distanceFromTurnStart = value;
+                OnDistanceFromTurnStartChanged?.Invoke(this);
+            }
+        }
+        public static event Action<IBattleEntity> OnDistanceFromTurnStartChanged;
+        
         public bool IsDead => Stats.CurrentHp <= 0;
 
         [field: SerializeField] public int CurrentUltimatePoints { get; protected set; }
@@ -115,6 +126,11 @@ namespace Battle
             yield return null; //apply effects
         }
 
+        public void FastForwardTurn()
+        {
+            DistanceFromTurnStart = 0;
+        }
+
         public void InterruptBehaviour()
         {
             if (behaviourRoutine == null) return;
@@ -168,6 +184,7 @@ namespace Battle
             UIBattleManager.OnEndTurnButtonClicked -= InterruptBehaviour;
 
             onBehaviourEnd.Invoke();
+            yield break;
 
             IEnumerator RunBehaviour()
             {
@@ -234,6 +251,8 @@ namespace Battle
                 
                 SetTile(tile);
             }
+
+            yield break;
 
             bool CanContinueMovement()
             {

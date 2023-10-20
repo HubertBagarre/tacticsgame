@@ -57,7 +57,7 @@ namespace Battle
         [SerializeField] private Transform abilityPointChargeParent;
         private UIAbilityPointCharge[] abilityPointCharges;
         
-        private Dictionary<BattleEntity, UIBattleEntityTimeline> uibattleTimelineDict = new();
+        private Dictionary<IBattleEntity, UIBattleEntityTimeline> uibattleTimelineDict = new();
         public static event Action OnEndTurnButtonClicked;
 
         private void Awake()

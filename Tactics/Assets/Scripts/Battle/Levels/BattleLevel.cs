@@ -11,7 +11,7 @@ namespace Battle
     public class BattleLevel : MonoBehaviour
     {
         [SerializeField] private UnitPlacementSO unitPlacement;
-        public List<BattleEntity> StartingEntities => SetupStartingEntities();
+        public List<IBattleEntity> StartingEntities => SetupStartingEntities();
         
         [field:SerializeField] public List<Tile> Tiles { get; private set; }
         [field:SerializeField] public List<Unit> Units { get; private set; }
@@ -63,7 +63,7 @@ namespace Battle
             Units = units;
         }
         
-        protected virtual List<BattleEntity> SetupStartingEntities()
+        protected virtual List<IBattleEntity> SetupStartingEntities()
         {
             var units = new List<Unit>();
             foreach (var placedUnit in unitPlacement.PlacedUnits)
@@ -84,7 +84,7 @@ namespace Battle
 
             SetUnits(units);
             
-            return Units.Cast<BattleEntity>().ToList();
+            return Units.Cast<IBattleEntity>().ToList();
         }
     }
 }

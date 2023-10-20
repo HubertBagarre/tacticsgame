@@ -43,14 +43,15 @@ namespace Battle
         public event Action<Vector3> OnStartRound;
 
         private BattleLevel battleLevel;
-        public BattleEntity CurrentTurnEntity { get; private set; }
+        public IBattleEntity CurrentTurnEntity { get; private set; }
         private EndRoundEntity endRoundEntity;
 
-        private List<BattleEntity> entitiesInBattle = new();
-        public BattleEntity[] EntitiesInBattle => entitiesInBattle.Where(entity => entity.Team >= 0).ToArray();
-        private List<BattleEntity> deadUnits = new();
+        private List<IBattleEntity> entitiesInBattle = new();
+        public IBattleEntity[] EntitiesInBattle => entitiesInBattle.Where(entity => entity.Team >= 0).ToArray();
+        private List<IBattleEntity> deadUnits = new();
 
         private bool endBattle;
+        private bool doneSetup;
 
         private UpdateTurnValuesEvent updateTurnValuesEvent =>
             new(entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList(), endRoundEntity);
@@ -59,12 +60,15 @@ namespace Battle
 
         public void Start()
         {
+            doneSetup = false;
             AddCallbacks();
         }
 
         private void AddCallbacks()
         {
             EventManager.AddListener<UnitDeathEvent>(AddDeadUnitToList);
+
+            Unit.OnDistanceFromTurnStartChanged += UpdateTurnOrderOnEntityTurnOrderUpdated;
         }
 
         public void SetupBattle(BattleLevel level)
@@ -90,6 +94,9 @@ namespace Battle
             unitManager.SetUnits(battleLevel.Units);
 
             SetupStartingEntities();
+
+            doneSetup = true;
+            return;
 
             void SetupStartingEntities()
             {
@@ -218,9 +225,11 @@ namespace Battle
             EventManager.Trigger(updateTurnValuesEvent);
         }
 
-        private void StartEntityTurn(BattleEntity unit)
+        private void StartEntityTurn(IBattleEntity unit)
         {
             CurrentTurnEntity = unit;
+            
+            CurrentTurnEntity.ResetTurnValue(ResetTurnValue);
             
             if (CurrentTurnEntity == endRoundEntity)
             {
@@ -236,8 +245,6 @@ namespace Battle
 
         public void EndCurrentEntityTurn()
         {
-            CurrentTurnEntity.ResetTurnValue(ResetTurnValue);
-
             StartCoroutine(EndEntityTurn());
 
             IEnumerator EndEntityTurn()
@@ -270,7 +277,7 @@ namespace Battle
             StartEntityTurn(nextUnit);
         }
 
-        private void AddEntityToBattle(BattleEntity entity, bool createPreview)
+        private void AddEntityToBattle(IBattleEntity entity, bool createPreview)
         {
             entity.InitEntityForBattle();
 
@@ -297,7 +304,15 @@ namespace Battle
             EventManager.Trigger(updateTurnValuesEvent);
         }
 
-        private void RemoveEntityFromBattle(BattleEntity entity)
+        private void UpdateTurnOrderOnEntityTurnOrderUpdated(IBattleEntity entity)
+        {
+            if(!doneSetup) return;
+            if(!entitiesInBattle.Contains(entity)) return;
+                
+            EventManager.Trigger(updateTurnValuesEvent);
+        }
+
+        private void RemoveEntityFromBattle(IBattleEntity entity)
         {
             if (!entitiesInBattle.Contains(entity)) return;
             entitiesInBattle.Remove(entity);
@@ -313,7 +328,7 @@ namespace Battle
         }
     }
 
-    public class PreviewEntity : BattleEntity
+    public class PreviewEntity : IBattleEntity
     {
         public Sprite Portrait => associatedEntity.Portrait;
         public int Team => -associatedEntity.Team;
@@ -323,9 +338,9 @@ namespace Battle
         public event Action OnDeath;
 
         private BattleManager bm;
-        private BattleEntity associatedEntity;
+        private IBattleEntity associatedEntity;
 
-        public PreviewEntity(BattleManager battleManager, BattleEntity entity)
+        public PreviewEntity(BattleManager battleManager, IBattleEntity entity)
         {
             bm = battleManager;
             associatedEntity = entity;
@@ -373,7 +388,7 @@ namespace Battle
         }
     }
 
-    public class EndRoundEntity : BattleEntity
+    public class EndRoundEntity : IBattleEntity
     {
         public Sprite Portrait { get; }
         public int Team => -1;
@@ -487,9 +502,9 @@ namespace Battle.BattleEvents
 
     public class StartEntityTurnEvent
     {
-        public BattleEntity Entity { get; }
+        public IBattleEntity Entity { get; }
 
-        public StartEntityTurnEvent(BattleEntity entity)
+        public StartEntityTurnEvent(IBattleEntity entity)
         {
             Entity = entity;
         }
@@ -497,9 +512,9 @@ namespace Battle.BattleEvents
 
     public class EndEntityTurnEvent
     {
-        public BattleEntity Entity { get; }
+        public IBattleEntity Entity { get; }
 
-        public EndEntityTurnEvent(BattleEntity entity)
+        public EndEntityTurnEvent(IBattleEntity entity)
         {
             Entity = entity;
         }
@@ -507,10 +522,10 @@ namespace Battle.BattleEvents
 
     public class EntityJoinBattleEvent
     {
-        public BattleEntity Entity { get; }
+        public IBattleEntity Entity { get; }
         public bool Preview { get; }
 
-        public EntityJoinBattleEvent(BattleEntity entity, bool preview)
+        public EntityJoinBattleEvent(IBattleEntity entity, bool preview)
         {
             Entity = entity;
             Preview = preview;
@@ -519,9 +534,9 @@ namespace Battle.BattleEvents
 
     public class EntityLeaveBattleEvent
     {
-        public BattleEntity Entity { get; }
+        public IBattleEntity Entity { get; }
 
-        public EntityLeaveBattleEvent(BattleEntity entity)
+        public EntityLeaveBattleEvent(IBattleEntity entity)
         {
             Entity = entity;
         }
@@ -529,10 +544,10 @@ namespace Battle.BattleEvents
 
     public class UpdateTurnValuesEvent
     {
-        public List<BattleEntity> EntityTurnOrder { get; }
+        public List<IBattleEntity> EntityTurnOrder { get; }
         public int RoundEndIndex { get; }
 
-        public UpdateTurnValuesEvent(List<BattleEntity> entityTurnOrder, BattleEntity roundEndEntity)
+        public UpdateTurnValuesEvent(List<IBattleEntity> entityTurnOrder, IBattleEntity roundEndEntity)
         {
             EntityTurnOrder = entityTurnOrder;
             RoundEndIndex = entityTurnOrder.IndexOf(roundEndEntity);

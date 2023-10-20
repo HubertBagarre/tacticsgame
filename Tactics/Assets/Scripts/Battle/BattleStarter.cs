@@ -22,10 +22,14 @@ namespace Battle
 
             yield return null;
             
+            Debug.Log("Setting up level");
             battleManager.SetupBattle(level);
-
+            Debug.Log("Done Setting up level");
+            
+            
             yield return null;
             
+            Debug.Log("Starting Battle");
             battleManager.StartBattle();
         }
     }

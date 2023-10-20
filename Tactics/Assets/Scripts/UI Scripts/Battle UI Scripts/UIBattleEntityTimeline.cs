@@ -12,9 +12,9 @@ public class UIBattleEntityTimeline : MonoBehaviour
     [SerializeField] private GameObject obj;
     
     [field:Header("Debug")]
-    [field:SerializeField] public BattleEntity AssociatedEntity { get; private set; }
+    [field:SerializeField] public IBattleEntity AssociatedEntity { get; private set; }
     
-    public void ConnectToEntity(BattleEntity entity)
+    public void ConnectToEntity(IBattleEntity entity)
     {
         AssociatedEntity = entity;
         borderImage.color = AssociatedEntity.Team == 0 ? Color.cyan : Color.red;
