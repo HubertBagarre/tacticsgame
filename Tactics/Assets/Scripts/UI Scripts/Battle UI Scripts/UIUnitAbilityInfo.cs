@@ -1,11 +1,9 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace Battle.UIComponent
 {
@@ -25,12 +23,8 @@ namespace Battle.UIComponent
         private UnitAbilityInstance associatedAbility;
         private Unit associatedUnit;
 
+        public bool IsHovering { get; private set; }
         [SerializeField] private bool show = true;
-
-        private void Start()
-        {
-            descriptionPanelGo.SetActive(false);
-        }
         
         public void LinkAbility(UnitAbilityInstance ability,Unit caster)
         {
@@ -40,26 +34,19 @@ namespace Battle.UIComponent
             UpdateDescription();
         }
         
-        public void ShowDescription(BaseEventData _)
+        public void ShowDescription()
         {
             UIBattleManager.Tooltip.Hide();
             
-            UpdateDescription();
             descriptionPanelGo.SetActive(true);
+            UpdateDescription();
         }
         
-        public void HideDescription(BaseEventData _)
-        {
-            HideDescription();
-            
-        }
-        
-        private void HideDescription()
+        public void HideDescription()
         {
             UIBattleManager.Tooltip.Hide();
-            //descriptionPanelGo.SetActive(isHoveringDescription);
+            descriptionPanelGo.SetActive(false);
         }
-        
 
         public void OnPointerClick(PointerEventData eventData)
         {
@@ -121,20 +108,28 @@ namespace Battle.UIComponent
             }
             
         }
-
+        
         public void OnPointerEnter(PointerEventData eventData)
         {
-            // Showdescription
+            IsHovering = true;
             
-            ShowDescription(eventData);
+            ShowDescription();
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            // check if on shower info
-            //if not hide ability info
+            IsHovering = false;
             
-            HideDescription(eventData);
+            StartCoroutine(DelayedPointerExit());
+            return;
+
+            IEnumerator DelayedPointerExit()
+            {
+                yield return new WaitForSeconds(0.01f);
+                
+                if(abilityShower.IsHovering) yield break;
+                HideDescription();
+            }
         }
     }
 }
