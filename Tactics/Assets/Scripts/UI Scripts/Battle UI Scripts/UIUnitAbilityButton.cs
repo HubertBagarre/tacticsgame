@@ -3,7 +3,9 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
+using Button = UnityEngine.UI.Button;
+using Image = UnityEngine.UI.Image;
 
 namespace Battle.UIComponent
 {
@@ -16,11 +18,7 @@ namespace Battle.UIComponent
         [SerializeField] private Image abilityImage;
 
         [Header("Description")]
-        [SerializeField] private GameObject descriptionPanelGo;
-        [SerializeField] private RectTransform descriptionPanelTr;
-        [SerializeField] private TextMeshProUGUI abilityNameText;
-        [SerializeField] private TextMeshProUGUI abilityCooldownText;
-        [SerializeField] private TextMeshProUGUI abilityDescriptionText;
+        [SerializeField] private UIUnitAbilityInfo abilityInfo;
         
         [Header("Cooldown")]
         [SerializeField] private GameObject cooldownCoverGo;
@@ -39,71 +37,10 @@ namespace Battle.UIComponent
         private UnitAbilityInstance associatedAbility;
         private Unit associatedUnit;
 
-        private bool isHoveringDescription = false;
-
         private void Start()
         {
             ultimateChargesParent = ultimateChargesParentGo.transform;
             Button.onClick.AddListener(StartAbilityTargetSelection);
-            
-            descriptionPanelGo.SetActive(false);
-        }
-
-        public void ShowDescription(BaseEventData _)
-        {
-            UIBattleManager.Tooltip.Hide();
-            
-            UpdateDescription();
-            descriptionPanelGo.SetActive(true);
-        }
-        
-        public void HideDescription(BaseEventData _)
-        {
-            StartCoroutine(WaitFrame());
-            
-            IEnumerator WaitFrame()
-            {
-                yield return null;
-                if(isHoveringDescription) yield break;
-
-                HideDescription();
-            }
-        }
-
-        private void HideDescription()
-        {
-            UIBattleManager.Tooltip.Hide();
-            descriptionPanelGo.SetActive(isHoveringDescription);
-        }
-
-        public void HoverDescription(BaseEventData _)
-        {
-            isHoveringDescription = true;
-        }
-
-        public void ExitHoverDescription(BaseEventData _)
-        {
-            isHoveringDescription = false;
-            HideDescription();
-        }
-
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            if (UIBattleManager.Tooltip.IsEnabled)
-            {
-                UIBattleManager.Tooltip.Hide();
-                return;
-            }
-            
-            var mousePos = (Vector3) eventData.position;
-
-            var linkedTarget = TMP_TextUtilities.FindIntersectingLink(abilityDescriptionText, mousePos,null);
-            
-            if(linkedTarget == -1) return;
-            
-            var info = abilityDescriptionText.textInfo.linkInfo[linkedTarget];
-            
-            UIBattleManager.Tooltip.Show(mousePos,associatedAbility.SO.ConvertDescriptionLinks(associatedUnit,info.GetLinkID()));
         }
         
         public void LinkAbility(UnitAbilityInstance ability,Unit caster)
@@ -120,6 +57,8 @@ namespace Battle.UIComponent
             
             associatedAbility = ability;
             associatedUnit = caster;
+            
+            abilityInfo.LinkAbility(ability,caster);
 
             associatedUnit.OnUltimatePointsAmountChanged += UpdateUltimateCharges;
 
@@ -133,54 +72,10 @@ namespace Battle.UIComponent
             UpdateUltimateChargesAmount();
             UpdateCostCharges();
             UpdateCooldown();
-
-            UpdateDescription();
             
             Button.interactable = associatedUnit.CurrentUltimatePoints >= associatedAbility.UltimateCost && !(associatedAbility.CurrentCooldown > 0);
         }
-
-        private void UpdateDescription()
-        {
-            var so = associatedAbility.SO;
-
-            var color = Color.yellow;
-            var col = ColorUtility.ToHtmlStringRGB(color);
-            abilityNameText.text = $"{so.Name} <size=20><color=#{col}><i>[{so.Type}]</i></color></size>";
-
-            var cooldown = so.Cooldown;
-            abilityCooldownText.text = cooldown > 0 ? $"{so.Cooldown} turn{(cooldown > 1 ? "s":"")}" : "";
-            
-            StartCoroutine(AdjustPanelSizeRoutine());
-
-            IEnumerator AdjustPanelSizeRoutine()
-            {
-                var description = so.ConvertedDescription(associatedUnit);
-                abilityDescriptionText.text = $"{description}";
-                
-                abilityDescriptionText.ForceMeshUpdate();
-
-                yield return null;
-
-                var textInfo = abilityDescriptionText.textInfo;
-                var lineCount = textInfo.lineCount;
-                
-                var size = descriptionPanelTr.sizeDelta;
-                
-                if (lineCount <= 2)
-                {
-                    size.y = 100;
-                    descriptionPanelTr.sizeDelta = size;
-                    yield break;
-                }
-                
-                var sizeIncrease = textInfo.lineInfo.Sum(line => line.lineHeight);
-
-                size.y = 40 + sizeIncrease + 5; //cuz the text is at Y = -40
-                descriptionPanelTr.sizeDelta = size;
-            }
-            
-        }
-
+        
         private void UpdateUltimateChargesAmount()
         {
             var cost = associatedAbility.UltimateCost;

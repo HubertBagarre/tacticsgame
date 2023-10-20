@@ -9,8 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1004176146678979214}
+  - component: {fileID: 7210424471404578531}
+  - component: {fileID: 3674186966718793386}
   m_Layer: 5
-  m_Name: Description
+  m_Name: UI Unit Ablity Description
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,12 +32,51 @@ RectTransform:
   m_Children:
   - {fileID: 3306100749876975900}
   m_Father: {fileID: 5580004408684180871}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &7210424471404578531
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657294642424510121}
+  m_CullTransparentMesh: 1
+--- !u!114 &3674186966718793386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657294642424510121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &1004500014878484881
 GameObject:
   m_ObjectHideFlags: 0
@@ -70,6 +111,7 @@ RectTransform:
   - {fileID: 8488446590596177508}
   - {fileID: 5950461374946280381}
   m_Father: {fileID: 0}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -90,11 +132,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Button>k__BackingField: {fileID: 4165275796195270495}
   abilityImage: {fileID: 6395026858607372807}
-  descriptionPanelGo: {fileID: 657294642424510121}
-  descriptionPanelTr: {fileID: 3306100749876975900}
-  abilityNameText: {fileID: 2430982427074216961}
-  abilityCooldownText: {fileID: 8669916784899902656}
-  abilityDescriptionText: {fileID: 4718207711795644066}
+  abilityInfo: {fileID: 0}
   cooldownCoverGo: {fileID: 5959723899256808626}
   cooldownText: {fileID: 2391639769786257103}
   abilityCostChargesParent: {fileID: 8488446590596177508}
@@ -140,6 +178,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3306100749876975900}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -275,6 +314,7 @@ RectTransform:
   m_Children:
   - {fileID: 2472739518404867211}
   m_Father: {fileID: 5580004408684180871}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -350,6 +390,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3848238913939140058}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
@@ -423,11 +464,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7646393167489443364}
+  - {fileID: 1280626829639893989}
   - {fileID: 636775406578394320}
   - {fileID: 2822509170294089761}
-  - {fileID: 1280626829639893989}
+  - {fileID: 7646393167489443364}
   m_Father: {fileID: 5580004408684180871}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -491,6 +533,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2472739518404867211}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -628,6 +671,7 @@ RectTransform:
   - {fileID: 2900572438220156509}
   - {fileID: 6321332994721619629}
   m_Father: {fileID: 7781270492352289100}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -696,8 +740,6 @@ GameObject:
   - component: {fileID: 3306100749876975900}
   - component: {fileID: 1608722069609304001}
   - component: {fileID: 5597255504644443049}
-  - component: {fileID: 3027701234127041643}
-  - component: {fileID: 5174092494797468682}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -722,6 +764,7 @@ RectTransform:
   - {fileID: 2321488610688191145}
   - {fileID: 3848238913939140058}
   m_Father: {fileID: 1004176146678979214}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -766,78 +809,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3027701234127041643
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6375768258370545148}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8edda467902f75547a3cc5bff875f072, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  clickEvents:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8884394064699142754}
-        m_TargetAssemblyTypeName: Battle.UIComponent.UIUnitAbilityButton, Assembly-CSharp
-        m_MethodName: OnPointerClick
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
---- !u!114 &5174092494797468682
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6375768258370545148}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 0
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 8884394064699142754}
-          m_TargetAssemblyTypeName: Battle.UIComponent.UIUnitAbilityButton, Assembly-CSharp
-          m_MethodName: HoverDescription
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 1
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 8884394064699142754}
-          m_TargetAssemblyTypeName: Battle.UIComponent.UIUnitAbilityButton, Assembly-CSharp
-          m_MethodName: ExitHoverDescription
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!1 &6411241016525588813
 GameObject:
   m_ObjectHideFlags: 0
@@ -870,6 +841,7 @@ RectTransform:
   m_Children:
   - {fileID: 8567909694573522916}
   m_Father: {fileID: 3306100749876975900}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -1004,11 +976,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3757605519724003606}
-  - {fileID: 8457748304558367053}
-  - {fileID: 6083152175159620200}
   - {fileID: 1279352811021499987}
+  - {fileID: 3757605519724003606}
+  - {fileID: 6083152175159620200}
+  - {fileID: 8457748304558367053}
   m_Father: {fileID: 5580004408684180871}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1072,6 +1045,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3306100749876975900}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -1206,6 +1180,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3306100749876975900}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
@@ -1283,6 +1258,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2472739518404867211}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1421,7 +1397,6 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 3
     m_TransformParent: {fileID: 8488446590596177508}
     m_Modifications:
     - target: {fileID: 1398403109905253280, guid: e56e2573878cd8049a257922f6e64609,
@@ -1530,9 +1505,6 @@ PrefabInstance:
       value: Ability Cost Charge (3)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e56e2573878cd8049a257922f6e64609, type: 3}
 --- !u!224 &1279352811021499987 stripped
 RectTransform:
@@ -1557,7 +1529,6 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 3
     m_TransformParent: {fileID: 5950461374946280381}
     m_Modifications:
     - target: {fileID: 1398403109905253280, guid: 0dcd1c3fb6a518146b84c3bbd04924fb,
@@ -1666,9 +1637,6 @@ PrefabInstance:
       value: Ultimate Charge (3)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0dcd1c3fb6a518146b84c3bbd04924fb, type: 3}
 --- !u!224 &1280626829639893989 stripped
 RectTransform:
@@ -1693,7 +1661,6 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 3
     m_TransformParent: {fileID: 5950461374946280381}
     m_Modifications:
     - target: {fileID: 1398403109905253280, guid: 0dcd1c3fb6a518146b84c3bbd04924fb,
@@ -1705,6 +1672,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1398403109905253280, guid: 0dcd1c3fb6a518146b84c3bbd04924fb,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1398403109905253280, guid: 0dcd1c3fb6a518146b84c3bbd04924fb,
         type: 3}
@@ -1802,9 +1774,6 @@ PrefabInstance:
       value: Ultimate Charge (1)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0dcd1c3fb6a518146b84c3bbd04924fb, type: 3}
 --- !u!224 &636775406578394320 stripped
 RectTransform:
@@ -1829,7 +1798,6 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 3
     m_TransformParent: {fileID: 8488446590596177508}
     m_Modifications:
     - target: {fileID: 1398403109905253280, guid: e56e2573878cd8049a257922f6e64609,
@@ -1841,6 +1809,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1398403109905253280, guid: e56e2573878cd8049a257922f6e64609,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1398403109905253280, guid: e56e2573878cd8049a257922f6e64609,
         type: 3}
@@ -1938,9 +1911,6 @@ PrefabInstance:
       value: Ability Cost Charge
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e56e2573878cd8049a257922f6e64609, type: 3}
 --- !u!224 &3757605519724003606 stripped
 RectTransform:
@@ -1965,7 +1935,6 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 3
     m_TransformParent: {fileID: 5950461374946280381}
     m_Modifications:
     - target: {fileID: 1398403109905253280, guid: 0dcd1c3fb6a518146b84c3bbd04924fb,
@@ -1977,6 +1946,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1398403109905253280, guid: 0dcd1c3fb6a518146b84c3bbd04924fb,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1398403109905253280, guid: 0dcd1c3fb6a518146b84c3bbd04924fb,
         type: 3}
@@ -2074,9 +2048,6 @@ PrefabInstance:
       value: Ultimate Charge (2)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0dcd1c3fb6a518146b84c3bbd04924fb, type: 3}
 --- !u!114 &1643528180502244895 stripped
 MonoBehaviour:
@@ -2101,7 +2072,6 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 3
     m_TransformParent: {fileID: 8488446590596177508}
     m_Modifications:
     - target: {fileID: 1398403109905253280, guid: e56e2573878cd8049a257922f6e64609,
@@ -2113,6 +2083,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1398403109905253280, guid: e56e2573878cd8049a257922f6e64609,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1398403109905253280, guid: e56e2573878cd8049a257922f6e64609,
         type: 3}
@@ -2210,9 +2185,6 @@ PrefabInstance:
       value: Ability Cost Charge (2)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e56e2573878cd8049a257922f6e64609, type: 3}
 --- !u!114 &4542169270944664382 stripped
 MonoBehaviour:
@@ -2237,7 +2209,6 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 3
     m_TransformParent: {fileID: 8488446590596177508}
     m_Modifications:
     - target: {fileID: 1398403109905253280, guid: e56e2573878cd8049a257922f6e64609,
@@ -2249,6 +2220,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1398403109905253280, guid: e56e2573878cd8049a257922f6e64609,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1398403109905253280, guid: e56e2573878cd8049a257922f6e64609,
         type: 3}
@@ -2346,9 +2322,6 @@ PrefabInstance:
       value: Ability Cost Charge (1)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e56e2573878cd8049a257922f6e64609, type: 3}
 --- !u!114 &2178969310478702619 stripped
 MonoBehaviour:
@@ -2373,7 +2346,6 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 3
     m_TransformParent: {fileID: 5950461374946280381}
     m_Modifications:
     - target: {fileID: 1398403109905253280, guid: 0dcd1c3fb6a518146b84c3bbd04924fb,
@@ -2385,6 +2357,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1398403109905253280, guid: 0dcd1c3fb6a518146b84c3bbd04924fb,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1398403109905253280, guid: 0dcd1c3fb6a518146b84c3bbd04924fb,
         type: 3}
@@ -2482,9 +2459,6 @@ PrefabInstance:
       value: Ultimate Charge
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0dcd1c3fb6a518146b84c3bbd04924fb, type: 3}
 --- !u!114 &6627081057443897370 stripped
 MonoBehaviour:
