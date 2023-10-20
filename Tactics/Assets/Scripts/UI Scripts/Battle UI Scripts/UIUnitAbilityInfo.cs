@@ -77,7 +77,8 @@ namespace Battle.UIComponent
             abilityCooldownText.text = cooldown > 0 ? $"{so.Cooldown} turn{(cooldown > 1 ? "s":"")}" : "";
             
             StartCoroutine(AdjustPanelSizeRoutine());
-
+            return;
+            
             IEnumerator AdjustPanelSizeRoutine()
             {
                 var description = so.ConvertedDescription(associatedUnit);

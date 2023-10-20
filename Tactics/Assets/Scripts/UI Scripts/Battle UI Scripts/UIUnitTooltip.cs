@@ -16,14 +16,19 @@ namespace Battle.UIComponent
         [SerializeField] private Transform abilityShowerParent;
         private Dictionary<UnitAbilityInstance,GameObject> abilityShowerDict = new();
         
+        [Header("Passives")]
+        [SerializeField] private UIUnitPassiveIcon unitPassiveIconPrefab;
+        [SerializeField] private Transform passiveIconParent;
+        private Dictionary<UnitPassiveInstance,GameObject> passiveIconDict = new();
+        
         [Header("Stats")]
         [SerializeField] private UIStatElement UIStatElementPrefab;
         private List<UIStatElement> statElements = new();
-        private UIStatElement HpElement => statElements[0];
-        private UIStatElement AttackElement => statElements[1];
-        private UIStatElement AttackRangeElement => statElements[2];
-        private UIStatElement MovementElement => statElements[3];
-        private UIStatElement SpeedElement => statElements[4];
+        private UIStatElement MovementElement => statElements[0];
+        private UIStatElement SpeedElement => statElements[1];
+        private UIStatElement AttackElement => statElements[2];
+        private UIStatElement AttackRangeElement => statElements[3];
+        private UIStatElement HpElement => statElements[4];
 
         private Unit currentDisplayingUnit;
 
@@ -50,6 +55,7 @@ namespace Battle.UIComponent
             RemoveCallbacks(currentDisplayingUnit);
             HideCurrentStats();
             HideCurrentAbilities();
+            HideCurrentPassives();
             
             currentDisplayingUnit = unit;
             AddCallbacks(currentDisplayingUnit);
@@ -57,6 +63,7 @@ namespace Battle.UIComponent
             ShowUnitInfo();
             ShowCurrentStats();
             ShowCurrentAbilities();
+            ShowCurrentPassives();
         }
 
         public void Hide()
@@ -78,6 +85,19 @@ namespace Battle.UIComponent
                 if (abilityShowerDict.ContainsKey(abilityInstance))
                 {
                     abilityShowerDict[abilityInstance].SetActive(false);
+                }
+            }
+        }
+
+        private void HideCurrentPassives()
+        {
+            if (currentDisplayingUnit == null) return;
+            
+            foreach (var passiveInstance in currentDisplayingUnit.PassiveInstances)
+            {
+                if (passiveIconDict.ContainsKey(passiveInstance))
+                {
+                    passiveIconDict[passiveInstance].SetActive(false);
                 }
             }
         }
@@ -105,6 +125,22 @@ namespace Battle.UIComponent
                 }
                 
                 abilityShowerDict[abilityInstance].SetActive(true);
+            }
+        }
+
+        private void ShowCurrentPassives(UnitPassiveInstance _ = null)
+        {
+            foreach (var passiveInstance in currentDisplayingUnit.PassiveInstances)
+            {
+                if (!passiveIconDict.ContainsKey(passiveInstance))
+                {
+                    var icon = Instantiate(unitPassiveIconPrefab, passiveIconParent);
+                    icon.LinkToPassive(passiveInstance);
+                    
+                    passiveIconDict.Add(passiveInstance,icon.gameObject);
+                }
+                
+                passiveIconDict[passiveInstance].SetActive(true);
             }
         }
 
@@ -151,6 +187,9 @@ namespace Battle.UIComponent
             statsInstance.OnSpeedModified += UpdateSpeedStatElement;
             
             unit.OnMovementLeftChanged += UpdateUnitStatElementsForMovement;
+            
+            unit.OnPassiveAdded += ShowCurrentPassives;
+            unit.OnPassiveRemoved += ShowCurrentPassives;
         }
 
         private void RemoveCallbacks(Unit unit)
@@ -165,6 +204,9 @@ namespace Battle.UIComponent
             statsInstance.OnSpeedModified -= UpdateSpeedStatElement;
             
             unit.OnMovementLeftChanged -= UpdateUnitStatElementsForMovement;
+            
+            unit.OnPassiveAdded -= ShowCurrentPassives;
+            unit.OnPassiveRemoved -= ShowCurrentPassives;
         }
 
         private void UpdateHpStatElement(UnitStatsInstance statsInstance)

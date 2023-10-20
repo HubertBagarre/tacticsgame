@@ -1,9 +1,8 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace Battle
+namespace Battle.ScriptableObjects
 {
     public enum PassiveType
     {
@@ -54,8 +53,12 @@ namespace Battle
             return new UnitPassiveInstance(this);
         }
     }
-    
+}
 
+namespace Battle
+{
+    using ScriptableObjects;
+    
     public class UnitPassiveInstance
     {
         public UnitPassiveSO SO { get; }

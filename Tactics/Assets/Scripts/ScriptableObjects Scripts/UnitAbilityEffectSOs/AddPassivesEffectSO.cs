@@ -53,8 +53,6 @@ namespace Battle.ScriptableObjects.Ability.Effect
         {
             foreach (var tile in targetTiles)
             {
-                Debug.Log($"Adding Passive on {tile}");
-
                 //play animation
                 yield return null;
 
