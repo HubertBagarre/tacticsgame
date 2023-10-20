@@ -10,8 +10,8 @@ namespace Battle.UIComponent
 {
     public class UIUnit : MonoBehaviour
     {
-        [SerializeField] private Unit associatedUnit;
-
+        private Unit associatedUnit;
+        
         [SerializeField] private Transform uiParent;
         private GameObject uiParentGo;
         private Quaternion originalRotation;
@@ -30,11 +30,16 @@ namespace Battle.UIComponent
         [SerializeField] private Transform passiveIconParent;
         private List<UIUnitPassiveIcon> unitPassiveIcons = new ();
         
-        private void Start()
+        private void Awake()
         {
             uiParentGo = uiParent.gameObject;
             cam = Camera.main;
             unitPassiveIcons.Clear();
+        }
+
+        public void LinkToUnit(Unit unit)
+        {
+            associatedUnit = unit;
             
             hpBarImage.color = associatedUnit.Team == 0 ? allyColor : enemyColor;
             
@@ -61,16 +66,14 @@ namespace Battle.UIComponent
         private void UpdateMaxHpBar(UnitStatsInstance statsInstance)
         {
             var hp = statsInstance.CurrentHp;
-            
-            hpText.text = $"{hp}/{associatedUnit.Stats.So.MaxHp}";
-            hpBarImage.fillAmount = hp / (float)associatedUnit.Stats.So.MaxHp;
-            hpBarImageBack.DOFillAmount(hpBarImage.fillAmount, hpLerpTime);
+
+            UpdateHpBar(hp);
         }
         
         private void UpdateHpBar(int hp)
         {
-            hpText.text = $"{hp}/{associatedUnit.Stats.So.MaxHp}";
-            hpBarImage.fillAmount = hp / (float)associatedUnit.Stats.So.MaxHp;
+            hpText.text = $"{hp}/{associatedUnit.Stats.MaxHp}";
+            hpBarImage.fillAmount = hp / (float)associatedUnit.Stats.MaxHp;
             hpBarImageBack.DOFillAmount(hpBarImage.fillAmount, hpLerpTime);
         }
 

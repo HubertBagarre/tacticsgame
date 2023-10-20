@@ -370,6 +370,8 @@ MonoBehaviour:
   battleRoundIndicatorTr: {fileID: 2978642871753873976}
   battleRoundIndicatorText: {fileID: 5157554635077367028}
   battleStartIndicatorTr: {fileID: 8456144050522349650}
+  uiUnitPrefab: {fileID: 9120660406850791169, guid: 8799a21b5d9a8e948860e41081f58fef,
+    type: 3}
   unitTooltip: {fileID: 858919809663159194}
   endTurnButton: {fileID: 8038510025934745546}
   abilityButtonPrefab: {fileID: 8884394064699142754, guid: d1ff55a559b96b648b0f03978671bc35,

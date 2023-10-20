@@ -12,8 +12,9 @@ namespace Battle
 
     public class Unit : MonoBehaviour, BattleEntity
     {
-        [Header("Model")]
+        [Header("Anchors")]
         [SerializeField] private Transform modelParent;
+        [field:SerializeField] public Transform UiParent { get; private set; }
         public BattleModel BattleModel { get; private set; }
         
         [field: Header("Current Flags")]
@@ -67,7 +68,9 @@ namespace Battle
         public event Action OnTurnEnd;
         public event Action OnDeath;
         public event Action<UnitPassiveInstance> OnPassiveAdded; 
-        public event Action<UnitPassiveInstance> OnPassiveRemoved; 
+        public event Action<UnitPassiveInstance> OnPassiveRemoved;
+
+        public static event Action<Unit> OnUnitInit;
 
         public void InitUnit(Tile tile, int team, UnitSO so,Tile.Direction orientation)
         {
@@ -82,6 +85,8 @@ namespace Battle
             Stats = so.CreateInstance(this);
             
             tile.SetUnit(this);
+            
+            OnUnitInit?.Invoke(this);
         }
 
         public void InitEntityForBattle()

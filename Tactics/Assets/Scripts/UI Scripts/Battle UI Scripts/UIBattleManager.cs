@@ -27,6 +27,10 @@ namespace Battle
         [SerializeField] private TextMeshProUGUI battleRoundIndicatorText;
         [SerializeField] private RectTransform battleStartIndicatorTr;
 
+        [Header("Unit UI")]
+        [SerializeField] private UIUnit uiUnitPrefab;
+        private Dictionary<Unit, UIUnit> uiUnitsDict = new ();
+        
         [Header("Unit Tooltip")]
         [SerializeField] private UIUnitTooltip unitTooltip;
         
@@ -58,6 +62,8 @@ namespace Battle
 
         private void Awake()
         {
+            uiUnitsDict.Clear();
+            
             AssignTooltip();
         }
 
@@ -84,6 +90,9 @@ namespace Battle
             EventManager.AddListener<EntityLeaveBattleEvent>(RemoveBattleEntityTimelineUI);
             EventManager.AddListener<UpdateTurnValuesEvent>(ReorderBattleEntityTimeline);
 
+            //Unit
+            Unit.OnUnitInit += InstantiateUnitUi;
+            
             //Unit Tooltip
             EventManager.AddListener<ClickUnitEvent>(ShowUnitTooltip);
             
@@ -106,7 +115,9 @@ namespace Battle
 
             battleManager.OnStartRound += PlayRoundStartAnimation;
             EventManager.AddListener<StartBattleEvent>(PlayBattleStartAnimation);
-
+            
+            return;
+            
             void ClickEndTurnButton()
             {
                 OnEndTurnButtonClicked?.Invoke();
@@ -127,6 +138,15 @@ namespace Battle
             {
                 if(ctx.Canceled) ShowEndTurnButton(true);
             }
+        }
+
+        private void InstantiateUnitUi(Unit unit)
+        {
+            if(uiUnitsDict.ContainsKey(unit)) uiUnitsDict[unit].gameObject.SetActive(false);
+            var ui = Instantiate(uiUnitPrefab, unit.UiParent);
+            ui.LinkToUnit(unit);
+            
+            uiUnitsDict.Add(unit,ui);
         }
         
         private void ShowUnitTooltip(ClickUnitEvent ctx)

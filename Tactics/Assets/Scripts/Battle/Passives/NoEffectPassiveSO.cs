@@ -10,12 +10,17 @@ namespace Battle.ScriptableObjects.Passive
         {
             Debug.Log("Added Effect");
             
+            unit.Stats.IncreaseMaxHpModifier(10);
+            
             yield return null;
         }
 
         protected override IEnumerator OnRemovedEffect(Unit unit,UnitPassiveInstance instance)
         {
             Debug.Log("Removed Effect");
+            
+            unit.Stats.IncreaseMaxHpModifier(-10);
+            
             yield return null;
         }
         
