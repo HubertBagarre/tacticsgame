@@ -16,11 +16,6 @@ namespace Battle.UIComponent
         
         public bool IsHovering { get; private set; }
 
-        private void OnEnable()
-        {
-            abilityInfo.HideDescription();
-        }
-
         private void OnDisable()
         {
             abilityInfo.HideDescription();
@@ -33,6 +28,7 @@ namespace Battle.UIComponent
             AssociatedUnit = caster;
 
             abilityImage.sprite = AssociatedAbility.SO.Sprite;
+            abilityInfo.HideDescription();
         }
         
         public void OnPointerEnter(PointerEventData eventData)

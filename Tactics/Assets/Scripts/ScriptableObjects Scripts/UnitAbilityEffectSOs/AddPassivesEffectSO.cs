@@ -26,7 +26,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
 
         public override string ConvertedDescription(Unit caster)
         {
-            var text = " Inflicts";
+            var text = "Inflicts";
                 
             var passive = passivesToAdd[0];
             var passivesCount = passivesToAdd.Count;

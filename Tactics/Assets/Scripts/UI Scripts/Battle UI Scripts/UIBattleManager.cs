@@ -55,11 +55,14 @@ namespace Battle
         
         private Dictionary<BattleEntity, UIBattleEntityTimeline> uibattleTimelineDict = new();
         public static event Action OnEndTurnButtonClicked;
-        
-        private void Start()
+
+        private void Awake()
         {
             AssignTooltip();
-            
+        }
+
+        private void Start()
+        {
             AddCallbacks();
 
             battleTimelineParent.gameObject.SetActive(false);
