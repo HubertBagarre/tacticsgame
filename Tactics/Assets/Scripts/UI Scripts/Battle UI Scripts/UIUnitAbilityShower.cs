@@ -1,17 +1,38 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Battle.UIComponent
 {
     public class UIUnitAbilityShower : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] private UIUnitAbilityInfo abilityInfo;
-        public bool IsHovering { get; private set; }
+        [SerializeField] private Image abilityImage;
         
-        private void Start()
+        public UnitAbilityInstance AssociatedAbility { get; private set; }
+        public Unit AssociatedUnit { get; private set; }
+        
+        public bool IsHovering { get; private set; }
+
+        private void OnEnable()
         {
             abilityInfo.HideDescription();
+        }
+
+        private void OnDisable()
+        {
+            abilityInfo.HideDescription();
+            IsHovering = false;
+        }
+
+        public void LinkAbility(UnitAbilityInstance ability,Unit caster)
+        {
+            AssociatedAbility = ability;
+            AssociatedUnit = caster;
+
+            abilityImage.sprite = AssociatedAbility.SO.Sprite;
         }
         
         public void OnPointerEnter(PointerEventData eventData)

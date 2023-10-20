@@ -25,4 +25,5 @@ MonoBehaviour:
   <Initiative>k__BackingField: 10
   <Behaviour>k__BackingField: {fileID: 11400000, guid: a8888626e5592c14a9491f3e5a01b5e3,
     type: 2}
-  <Abilities>k__BackingField: []
+  <Abilities>k__BackingField:
+  - {fileID: 11400000, guid: 112bc70c7d75c9f41a41f2d352b09d80, type: 2}

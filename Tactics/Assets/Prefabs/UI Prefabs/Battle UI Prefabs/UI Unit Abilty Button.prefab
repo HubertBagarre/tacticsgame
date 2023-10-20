@@ -132,8 +132,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Button>k__BackingField: {fileID: 4165275796195270495}
-  abilityImage: {fileID: 6395026858607372807}
-  abilityInfo: {fileID: 112055904220219870}
+  abilityShower: {fileID: 6650948517975902933}
   cooldownCoverGo: {fileID: 5959723899256808626}
   cooldownText: {fileID: 2391639769786257103}
   abilityCostChargesParent: {fileID: 8488446590596177508}
@@ -161,6 +160,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   abilityInfo: {fileID: 112055904220219870}
+  abilityImage: {fileID: 6395026858607372807}
 --- !u!1 &2408955327811957396
 GameObject:
   m_ObjectHideFlags: 0

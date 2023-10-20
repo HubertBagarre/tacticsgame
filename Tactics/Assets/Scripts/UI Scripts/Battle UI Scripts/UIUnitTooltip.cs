@@ -11,6 +11,12 @@ namespace Battle.UIComponent
         [SerializeField] private TextMeshProUGUI unitTitleText;
         [SerializeField] private Image unitPortraitImage;
 
+        [Header("Abilities")]
+        [SerializeField] private UIUnitAbilityShower unitAbilityShowerPrefab;
+        [SerializeField] private Transform abilityShowerParent;
+        private Dictionary<UnitAbilityInstance,GameObject> abilityShowerDict = new();
+        
+        [Header("Stats")]
         [SerializeField] private UIStatElement UIStatElementPrefab;
         private List<UIStatElement> statElements = new();
         private UIStatElement HpElement => statElements[0];
@@ -26,6 +32,7 @@ namespace Battle.UIComponent
         private void Start()
         {
             statElements.Clear();
+            abilityShowerDict.Clear();
 
             for (var i = 0; i < 5; i++)
             {
@@ -42,12 +49,14 @@ namespace Battle.UIComponent
         {
             RemoveCallbacks(currentDisplayingUnit);
             HideCurrentStats();
+            HideCurrentAbilities();
             
             currentDisplayingUnit = unit;
             AddCallbacks(currentDisplayingUnit);
             
             ShowUnitInfo();
             ShowCurrentStats();
+            ShowCurrentAbilities();
         }
 
         public void Hide()
@@ -60,6 +69,19 @@ namespace Battle.UIComponent
             gameObject.SetActive(true);
         }
 
+        private void HideCurrentAbilities()
+        {
+            if (currentDisplayingUnit == null) return;
+            
+            foreach (var abilityInstance in currentDisplayingUnit.AbilityInstances)
+            {
+                if (abilityShowerDict.ContainsKey(abilityInstance))
+                {
+                    abilityShowerDict[abilityInstance].SetActive(false);
+                }
+            }
+        }
+
         private void HideCurrentStats()
         {
             if (currentDisplayingUnit == null) return;
@@ -67,6 +89,22 @@ namespace Battle.UIComponent
             foreach (var statElement in statElements)
             {
                 statElement.Show(false);
+            }
+        }
+
+        private void ShowCurrentAbilities()
+        {
+            foreach (var abilityInstance in currentDisplayingUnit.AbilityInstances)
+            {
+                if (!abilityShowerDict.ContainsKey(abilityInstance))
+                {
+                    var shower = Instantiate(unitAbilityShowerPrefab, abilityShowerParent);
+                    shower.LinkAbility(abilityInstance,currentDisplayingUnit);
+                    
+                    abilityShowerDict.Add(abilityInstance,shower.gameObject);
+                }
+                
+                abilityShowerDict[abilityInstance].SetActive(true);
             }
         }
 

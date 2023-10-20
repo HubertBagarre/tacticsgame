@@ -2,11 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Battle.AbilityEvents;
+
 using UnityEngine;
 
 namespace Battle.ScriptableObjects.Ability
 {
-    using AbilityEvents;
     using Selector;
     using Effect;
 
@@ -79,7 +80,15 @@ namespace Battle.ScriptableObjects.Ability
             return new UnitAbilityInstance(this);
         }
     }
+}
 
+namespace Battle
+{
+    using ScriptableObjects.Ability;
+    using ScriptableObjects.Ability.Effect;
+    using ScriptableObjects.Ability.Selector;
+    
+    
     public class UnitAbilityInstance
     {
         public UnitAbilitySO SO { get; }

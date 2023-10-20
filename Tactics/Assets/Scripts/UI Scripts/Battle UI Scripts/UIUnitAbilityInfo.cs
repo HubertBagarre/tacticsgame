@@ -20,20 +20,18 @@ namespace Battle.UIComponent
         [SerializeField] private TextMeshProUGUI abilityCooldownText;
         [SerializeField] private TextMeshProUGUI abilityDescriptionText;
         
-        private UnitAbilityInstance associatedAbility;
-        private Unit associatedUnit;
+        private UnitAbilityInstance associatedAbility => abilityShower.AssociatedAbility;
+        private Unit associatedUnit => abilityShower.AssociatedUnit;
 
         public bool IsHovering { get; private set; }
         [SerializeField] private bool show = true;
-        
-        public void LinkAbility(UnitAbilityInstance ability,Unit caster)
+
+        private void OnDisable()
         {
-            associatedAbility = ability;
-            associatedUnit = caster;
-            
-            UpdateDescription();
+            HideDescription();
+            IsHovering = false;
         }
-        
+
         public void ShowDescription()
         {
             UIBattleManager.Tooltip.Hide();

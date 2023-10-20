@@ -305,7 +305,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5084472740884737026}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
   m_Name: 
@@ -1279,6 +1279,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: UI Unit Panel
+      objectReference: {fileID: 0}
+    - target: {fileID: 9208507035447493658, guid: e792f8fc757ed164592f6be9351f3007,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9208507035447493658, guid: e792f8fc757ed164592f6be9351f3007,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9208507035447493658, guid: e792f8fc757ed164592f6be9351f3007,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9208507035447493658, guid: e792f8fc757ed164592f6be9351f3007,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e792f8fc757ed164592f6be9351f3007, type: 3}

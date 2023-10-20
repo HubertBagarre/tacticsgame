@@ -3,6 +3,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
 using Image = UnityEngine.UI.Image;
@@ -15,10 +16,9 @@ namespace Battle.UIComponent
     public class UIUnitAbilityButton : MonoBehaviour
     {
         [field: SerializeField] public Button Button { get; private set; }
-        [SerializeField] private Image abilityImage;
-
+        
         [Header("Description")]
-        [SerializeField] private UIUnitAbilityInfo abilityInfo;
+        [SerializeField] private UIUnitAbilityShower abilityShower;
         
         [Header("Cooldown")]
         [SerializeField] private GameObject cooldownCoverGo;
@@ -50,15 +50,10 @@ namespace Battle.UIComponent
                 associatedUnit.OnUltimatePointsAmountChanged -= UpdateUltimateCharges;
             }
             
-            if (associatedAbility != null)
-            {
-                //remove callbackslo
-            }
-            
             associatedAbility = ability;
             associatedUnit = caster;
             
-            abilityInfo.LinkAbility(ability,caster);
+            abilityShower.LinkAbility(ability,caster);
 
             associatedUnit.OnUltimatePointsAmountChanged += UpdateUltimateCharges;
 
@@ -67,8 +62,6 @@ namespace Battle.UIComponent
 
         public void UpdateAppearance()
         {
-            abilityImage.sprite = associatedAbility.SO.Sprite;
-            
             UpdateUltimateChargesAmount();
             UpdateCostCharges();
             UpdateCooldown();
