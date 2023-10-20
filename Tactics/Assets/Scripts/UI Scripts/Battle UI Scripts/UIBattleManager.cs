@@ -18,8 +18,9 @@ namespace Battle
     {
         [SerializeField] private BattleManager battleManager;
         
-        [Header("Battle Timeline")] [SerializeField]
-        private UIBattleEntityTimeline battleEntityTimelinePrefab;
+        [Header("Battle Timeline")]
+        [SerializeField] private UIBattleEntityTimeline battleEntityTimelinePrefab;
+        private UIBattleEntityTimeline currentEntityBattleTimeline;
         [SerializeField] private Transform battleTimelineParent;
         
         [Header("Battle State")]
@@ -69,6 +70,9 @@ namespace Battle
 
         private void Start()
         {
+            Debug.Log("Start");
+            InstantiateCurrentTurnEntityTimelineUI();
+            
             AddCallbacks();
 
             battleTimelineParent.gameObject.SetActive(false);
@@ -198,7 +202,8 @@ namespace Battle
             if(ctx.Ability.SO.EndUnitTurnAfterCast) return;
                 
             EventManager.AddListener<EndAbilityCastEvent>(ShowAbilityButtonsAfterAbilityCast,true);
-            
+            return;
+
             void ShowAbilityButtonsAfterAbilityCast(EndAbilityCastEvent endAbilityCastEvent)
             {
                 ShowEndTurnButton(true);
@@ -339,6 +344,18 @@ namespace Battle
 
         #region Battle Timeline
 
+        private void InstantiateCurrentTurnEntityTimelineUI()
+        {
+            var ui = Instantiate(battleEntityTimelinePrefab, battleTimelineParent);
+
+            Debug.Log("Spawned");
+            currentEntityBattleTimeline = ui;
+            
+            currentEntityBattleTimeline.ChangeValue(0);
+            currentEntityBattleTimeline.SetPreview(false);
+            currentEntityBattleTimeline.Show(false);
+        }
+        
         private void InstantiateBattleEntityTimelineUI(EntityJoinBattleEvent ctx)
         {
             var entity = ctx.Entity;
@@ -371,7 +388,18 @@ namespace Battle
         {
             var order = ctx.EntityTurnOrder;
             var roundIndex = ctx.RoundEndIndex;
-
+            var currentEntity = ctx.CurrentTurnEntity;
+            var hasCurrentEntity = currentEntity != null;
+            
+            currentEntityBattleTimeline.Show(hasCurrentEntity);
+            
+            if (hasCurrentEntity)
+            {
+                currentEntityBattleTimeline.ChangeImage(currentEntity.Portrait);
+                currentEntityBattleTimeline.ChangeBorderColor(currentEntity.Team);
+                currentEntityBattleTimeline.transform.SetSiblingIndex(0);
+            }
+            
             for (int i = 0; i < order.Count; i++)
             {
                 var entity = order[i];

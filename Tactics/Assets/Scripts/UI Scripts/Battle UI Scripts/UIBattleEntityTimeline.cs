@@ -12,17 +12,17 @@ public class UIBattleEntityTimeline : MonoBehaviour
     [SerializeField] private GameObject obj;
     
     [field:Header("Debug")]
-    [field:SerializeField] public IBattleEntity AssociatedEntity { get; private set; }
+    [field:SerializeField,SerializeReference] public IBattleEntity AssociatedEntity { get; private set; }
     
     public void ConnectToEntity(IBattleEntity entity)
     {
         AssociatedEntity = entity;
-        borderImage.color = AssociatedEntity.Team == 0 ? Color.cyan : Color.red;
+        ChangeBorderColor(AssociatedEntity.Team); 
         
         gameObject.name = $"{AssociatedEntity}'s time";
         
-        portraitImage.sprite = AssociatedEntity.Portrait;
-        turnValueText.text = $"{AssociatedEntity.DistanceFromTurnStart}";
+        ChangeImage(AssociatedEntity.Portrait);
+        ChangeValue(AssociatedEntity.DistanceFromTurnStart);
 
         EventManager.AddListener<UpdateTurnValuesEvent>(UpdateTurnValue);
         
@@ -35,6 +35,21 @@ public class UIBattleEntityTimeline : MonoBehaviour
     {
         Disconnect();
         gameObject.SetActive(false);
+    }
+
+    public void ChangeImage(Sprite sprite)
+    {
+        portraitImage.sprite = sprite;
+    }
+
+    public void ChangeBorderColor(int team)
+    {
+        borderImage.color = team == 0 ? Color.cyan : Color.red;
+    }
+    
+    public void ChangeValue(float value)
+    {
+        turnValueText.text = $"{value}";
     }
 
     public void Disconnect()

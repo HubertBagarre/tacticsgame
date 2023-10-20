@@ -54,7 +54,7 @@ namespace Battle
         private bool doneSetup;
 
         private UpdateTurnValuesEvent updateTurnValuesEvent =>
-            new(entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList(), endRoundEntity);
+            new(CurrentTurnEntity,entitiesInBattle.OrderBy(entity => entity.TurnOrder).ToList(), endRoundEntity);
 
         private int SlowestEntitySpeed => GetSlowestEntitySpeed();
 
@@ -545,10 +545,12 @@ namespace Battle.BattleEvents
     public class UpdateTurnValuesEvent
     {
         public List<IBattleEntity> EntityTurnOrder { get; }
+        public IBattleEntity CurrentTurnEntity { get; }
         public int RoundEndIndex { get; }
 
-        public UpdateTurnValuesEvent(List<IBattleEntity> entityTurnOrder, IBattleEntity roundEndEntity)
+        public UpdateTurnValuesEvent(IBattleEntity currentTurnEntity,List<IBattleEntity> entityTurnOrder, IBattleEntity roundEndEntity)
         {
+            CurrentTurnEntity = currentTurnEntity;
             EntityTurnOrder = entityTurnOrder;
             RoundEndIndex = entityTurnOrder.IndexOf(roundEndEntity);
         }
