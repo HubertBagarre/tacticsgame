@@ -22,7 +22,7 @@ public class UIBattleEntityTimeline : MonoBehaviour
         gameObject.name = $"{AssociatedEntity}'s time";
         
         ChangeImage(AssociatedEntity.Portrait);
-        ChangeValue(AssociatedEntity.DistanceFromTurnStart);
+        ChangeValue((int)AssociatedEntity.DistanceFromTurnStart);
 
         EventManager.AddListener<UpdateTurnValuesEvent>(UpdateTurnValue);
         
@@ -47,9 +47,10 @@ public class UIBattleEntityTimeline : MonoBehaviour
         borderImage.color = team == 0 ? Color.cyan : Color.red;
     }
     
-    public void ChangeValue(float value)
+    public void ChangeValue(int value)
     {
         turnValueText.text = $"{value}";
+        turnValueObj.SetActive(value >= 0);
     }
 
     public void Disconnect()
@@ -71,11 +72,8 @@ public class UIBattleEntityTimeline : MonoBehaviour
     
     private void UpdateTurnValue(UpdateTurnValuesEvent ctx)
     {
-        portraitImage.sprite = AssociatedEntity.Portrait;
-        
-        turnValueText.text = $"{(int)AssociatedEntity.TurnOrder}";
-        
-        turnValueObj.SetActive(AssociatedEntity.DistanceFromTurnStart > 0);
+        ChangeImage(AssociatedEntity.Portrait);
+        ChangeValue((int)AssociatedEntity.TurnOrder);
     }
 
 }

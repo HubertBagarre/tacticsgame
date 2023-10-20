@@ -243,6 +243,8 @@ namespace Battle
 
         private void PlayRoundStartAnimation(Vector3 durations)
         {
+            currentEntityBattleTimeline.gameObject.SetActive(false);
+            
             battleRoundIndicatorText.text = $"Round {battleManager.CurrentRound}";
 
             var sequence = DOTween.Sequence();
@@ -347,11 +349,10 @@ namespace Battle
         private void InstantiateCurrentTurnEntityTimelineUI()
         {
             var ui = Instantiate(battleEntityTimelinePrefab, battleTimelineParent);
-
-            Debug.Log("Spawned");
+            
             currentEntityBattleTimeline = ui;
             
-            currentEntityBattleTimeline.ChangeValue(0);
+            currentEntityBattleTimeline.ChangeValue(-1);
             currentEntityBattleTimeline.SetPreview(false);
             currentEntityBattleTimeline.Show(false);
         }
@@ -391,8 +392,8 @@ namespace Battle
             var currentEntity = ctx.CurrentTurnEntity;
             var hasCurrentEntity = currentEntity != null;
             
+            currentEntityBattleTimeline.gameObject.SetActive(hasCurrentEntity);
             currentEntityBattleTimeline.Show(hasCurrentEntity);
-            
             if (hasCurrentEntity)
             {
                 currentEntityBattleTimeline.ChangeImage(currentEntity.Portrait);
@@ -406,7 +407,7 @@ namespace Battle
                 var ui = uibattleTimelineDict[entity];
 
                 ui.transform.SetSiblingIndex(0);
-
+                
                 ui.Show(i <= roundIndex);
             }
         }

@@ -30,7 +30,6 @@ namespace Battle.ScriptableObjects
 
             yield return null;
             
-            Debug.Log("Starting player turn");
             playerTurn = true;
             EventManager.Trigger(new StartPlayerControlEvent(unit));
 
