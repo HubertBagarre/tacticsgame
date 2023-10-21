@@ -70,7 +70,6 @@ namespace Battle
 
         private void Start()
         {
-            Debug.Log("Start");
             InstantiateCurrentTurnEntityTimelineUI();
             
             AddCallbacks();

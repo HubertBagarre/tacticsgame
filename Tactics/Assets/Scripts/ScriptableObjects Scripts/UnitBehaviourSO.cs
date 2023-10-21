@@ -1,12 +1,19 @@
 using System;
 using System.Collections;
-using Battle;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects
 {
+    using AbilityEvents;
+    
     public abstract class UnitBehaviourSO : ScriptableObject
     {
+        protected Unit AssociatedUnit { get; private set; } 
+        protected bool IsInterrupted{ get; private set; } 
+        protected bool IsCastingAbility { get; private set; }
+        private bool isUnitTurn;
+        protected Func<bool> endBehaviourCondition;
+        
         // TODO - Remove if useless
         protected static BattleManager battleM;
         protected static TileManager tileM;
@@ -36,11 +43,58 @@ namespace Battle.ScriptableObjects
             abilityM = abilityManager;
         }
 
-        public abstract void InitBehaviour(Unit unit);
-        public abstract void ShowBehaviourPreview(Unit unit); // when you hover on timeline
+        public void InitBehaviour(Unit unit)
+        {
+            AssociatedUnit = unit;
+            IsInterrupted = false;
+            IsCastingAbility = false;
+            endBehaviourCondition = () => true;
+            
+            isUnitTurn = false;
+            
+            EventManager.AddListener<StartAbilityCastEvent>(EnterCastingAbility);
+            EventManager.AddListener<EndAbilityCastEvent>(ExitCastingAbility);
+            
+            InitBehaviourEffect(unit);
+        }
+        protected abstract void InitBehaviourEffect(Unit unit);
+        public abstract void ShowBehaviourPreview(); // when you hover on timeline
+        
+        public IEnumerator RunBehaviour()
+        {   
+            IsInterrupted = false;
+            IsCastingAbility = false;
+            
+            isUnitTurn = true;
+            
+            if(AssociatedUnit == null) yield break;
+         
+            yield return AssociatedUnit.StartCoroutine(RunBehaviourEffect());
+            
+            yield return new WaitUntil(endBehaviourCondition);
+            
+            Debug.Log("Ending Behaviour");
+        }
     
-        public abstract IEnumerator RunBehaviour(Unit unit);
+        protected abstract IEnumerator RunBehaviourEffect();
 
-        public abstract bool OnBehaviourInterrupted(Unit unit); // returns true if interrupt behaviour this frame
+        public void OnBehaviourInterrupted()
+        {
+            IsInterrupted = true;
+            OnBehaviourInterruptedEffect();
+        } 
+        protected abstract void OnBehaviourInterruptedEffect(); // returns true if interrupt behaviour this frame
+        
+        private void EnterCastingAbility(StartAbilityCastEvent ctx)
+        {
+            if(ctx.Caster != AssociatedUnit) return;
+            IsCastingAbility = true;
+        }
+        
+        private void ExitCastingAbility(EndAbilityCastEvent ctx)
+        {
+            if(ctx.Caster != AssociatedUnit) return;
+            IsCastingAbility = false;
+        }
     }
 }

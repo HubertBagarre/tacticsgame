@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Linq;
-using Battle.UnitEvents;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects
@@ -9,28 +8,28 @@ namespace Battle.ScriptableObjects
     [CreateAssetMenu(menuName = "Battle Scriptables/UnitBehaviour/Test")]
     public class AITestUnitBehaviourSO : UnitBehaviourSO
     {
-        public override void InitBehaviour(Unit unit)
+        protected override void InitBehaviourEffect(Unit unit)
         {
 
         }
 
-        public override void ShowBehaviourPreview(Unit unit)
+        public override void ShowBehaviourPreview()
         {
 
         }
 
-        public override IEnumerator RunBehaviour(Unit unit)
+        protected override IEnumerator RunBehaviourEffect()
         {
-            var path = unit.Tile.GetAdjacentTiles().ToList();
+            var path = AssociatedUnit.Tile.GetAdjacentTiles().ToList();
             
-            unit.SetMovement(path.Count);
+            AssociatedUnit.SetMovement(path.Count);
             
-            yield return unit.StartCoroutine(unit.MoveUnit(path,false));
+            yield return AssociatedUnit.StartCoroutine(AssociatedUnit.MoveUnit(path,false));
         }
 
-        public override bool OnBehaviourInterrupted(Unit unit)
+        protected override void OnBehaviourInterruptedEffect()
         {
-            return true;
+            
         }
     }
 }

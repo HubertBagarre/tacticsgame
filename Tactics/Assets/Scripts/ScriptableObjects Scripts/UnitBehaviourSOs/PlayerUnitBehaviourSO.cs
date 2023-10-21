@@ -10,71 +10,44 @@ namespace Battle.ScriptableObjects
     [CreateAssetMenu(menuName = "Battle Scriptables/UnitBehaviour/PlayerUnit")]
     public class PlayerUnitBehaviourSO : UnitBehaviourSO
     {
-        private Unit playerUnit;
+        private Func<bool> isInterruptedCondition;
+        private bool endTurn;
         
-        private bool isPlayerTurn;
-        private Func<bool> IsPlayerTurn;
-        private bool behaviourInterrupted;
-        private bool isCastingAbility;
-
-        public override void InitBehaviour(Unit unit)
+        protected override void InitBehaviourEffect(Unit unit)
         {
-            playerUnit = unit;
-            
-            isPlayerTurn = false;
-            behaviourInterrupted = false;
-            isCastingAbility = false;
-            IsPlayerTurn = () => isPlayerTurn;
-            
-            EventManager.AddListener<StartAbilityCastEvent>(EnterCastingAbility);
-            EventManager.AddListener<EndAbilityCastEvent>(ExitCastingAbility);
+            isInterruptedCondition = () => IsInterrupted && !IsCastingAbility && endTurn;
+            endTurn = false;
+            EventManager.AddListener<EndAbilityCastEvent>(InterruptOnCastingAbility);
         }
 
-        public override void ShowBehaviourPreview(Unit unit)
+        public override void ShowBehaviourPreview()
         {
+            
         }
 
-        public override IEnumerator RunBehaviour(Unit unit)
+        protected override IEnumerator RunBehaviourEffect()
         {
-            isPlayerTurn = true;
-            behaviourInterrupted = false;
-            isCastingAbility = false;
+            endTurn = false;
             
-            EventManager.Trigger(new StartPlayerControlEvent(unit));
-
-            yield return new WaitWhile(IsPlayerTurn);
+            EventManager.Trigger(new StartPlayerControlEvent(AssociatedUnit));
             
-            EndPlayerTurn();
-        }
-        
-        public override bool OnBehaviourInterrupted(Unit unit)
-        {
-            behaviourInterrupted = true;
+            yield return new WaitUntil(isInterruptedCondition);
             
-            if (!isCastingAbility) isPlayerTurn = false;
-
-            return false;
-        }
-
-        private void EndPlayerTurn()
-        {
             EventManager.Trigger(new EndPlayerControlEvent());
         }
-
-        private void EnterCastingAbility(StartAbilityCastEvent ctx)
+        
+        protected override void OnBehaviourInterruptedEffect()
         {
-            if(ctx.Caster != playerUnit || !isPlayerTurn) return;
-            isCastingAbility = true;
+            endTurn = true;
         }
         
-        private void ExitCastingAbility(EndAbilityCastEvent ctx)
+        private void InterruptOnCastingAbility(EndAbilityCastEvent ctx)
         {
-            if(ctx.Caster != playerUnit || !isPlayerTurn) return;
-            isCastingAbility = false;
-            
-            if (!ctx.Ability.EndUnitTurnAfterCast && !behaviourInterrupted) return;
-            
-            isPlayerTurn = false;
+            if(ctx.Caster != AssociatedUnit) return;
+            if (ctx.Ability.EndUnitTurnAfterCast)
+            {
+                AssociatedUnit.InterruptBehaviour();
+            }
         }
     }
 }

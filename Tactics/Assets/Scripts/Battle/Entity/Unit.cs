@@ -163,12 +163,7 @@ namespace Battle
 
             Debug.Log("Interrupting behaviour");
 
-            if (Behaviour.OnBehaviourInterrupted(this))
-            {
-                Debug.Log("Stopping routine");
-                StopCoroutine(behaviourRoutine);
-                behaviourRoutine = null;
-            }
+            Behaviour.OnBehaviourInterrupted();
         }
 
         public IEnumerator StartTurn(Action onBehaviourEnd)
@@ -216,7 +211,7 @@ namespace Battle
 
             IEnumerator RunBehaviour()
             {
-                behaviourRoutine = StartCoroutine(Behaviour.RunBehaviour(this));
+                behaviourRoutine = StartCoroutine(Behaviour.RunBehaviour());
                 yield return behaviourRoutine;
                 behaviourRoutine = null;
                 behaviourRunning = false;
