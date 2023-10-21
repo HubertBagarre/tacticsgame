@@ -150,12 +150,10 @@ namespace Battle
         
         public void SkipTurn()
         {
-            var entity = BattleManager.EndRoundEntity;
+            IBattleEntity entity = BattleManager.EndRoundEntity;
             if(entity == null) return;
             
-            Debug.Log("Skipping Turn");
-            
-            DistanceFromTurnStart = entity.DistanceFromTurnStart + 1;
+            DistanceFromTurnStart = (entity.DistanceFromTurnStart+0.01f) * Speed / entity.Speed;
         }
 
         public void InterruptBehaviour()
