@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Collections;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects.Ability.Effect
@@ -10,13 +9,6 @@ namespace Battle.ScriptableObjects.Ability.Effect
     [CreateAssetMenu(menuName = "Battle Scriptables/Ability Effect/Add Passives")]
     public class AddPassivesEffectSO : UnitAbilityEffectSO
     {
-        [Serializable]
-        public class PassiveToAdd
-        {
-            [field: SerializeField] public UnitPassiveSO Passive { get; private set; }
-            [field: SerializeField] public int Stacks { get; private set; } = 1;
-        }
-        
         [SerializeField] private List<PassiveToAdd> passivesToAdd = new();
         
         [SerializeField,Tooltip("Takes Neutral, Positive and Negative")] private List<PassiveType> order = new(){PassiveType.Neutral,PassiveType.Positive,PassiveType.Negative};

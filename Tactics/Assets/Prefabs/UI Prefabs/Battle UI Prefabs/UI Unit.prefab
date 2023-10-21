@@ -789,6 +789,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: UI Passive Icon
       objectReference: {fileID: 0}
+    - target: {fileID: 2114637740299780518, guid: 15ff08b49e4826f4ea2405a21c3b7083,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7757178609892600500, guid: 15ff08b49e4826f4ea2405a21c3b7083,
         type: 3}
       propertyPath: m_Pivot.x
@@ -812,7 +817,7 @@ PrefabInstance:
     - target: {fileID: 7757178609892600500, guid: 15ff08b49e4826f4ea2405a21c3b7083,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7757178609892600500, guid: 15ff08b49e4826f4ea2405a21c3b7083,
         type: 3}
@@ -822,17 +827,17 @@ PrefabInstance:
     - target: {fileID: 7757178609892600500, guid: 15ff08b49e4826f4ea2405a21c3b7083,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7757178609892600500, guid: 15ff08b49e4826f4ea2405a21c3b7083,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 7757178609892600500, guid: 15ff08b49e4826f4ea2405a21c3b7083,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 7757178609892600500, guid: 15ff08b49e4826f4ea2405a21c3b7083,
         type: 3}
@@ -872,12 +877,12 @@ PrefabInstance:
     - target: {fileID: 7757178609892600500, guid: 15ff08b49e4826f4ea2405a21c3b7083,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 7757178609892600500, guid: 15ff08b49e4826f4ea2405a21c3b7083,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -37
       objectReference: {fileID: 0}
     - target: {fileID: 7757178609892600500, guid: 15ff08b49e4826f4ea2405a21c3b7083,
         type: 3}

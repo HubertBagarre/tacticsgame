@@ -30,6 +30,8 @@ namespace Battle.ScriptableObjects
         public float Initiative { get; private set; } = 1000;
         [field: SerializeField] public UnitBehaviourSO Behaviour { get; private set; }
         [field: SerializeField] public List<UnitAbilitySO> Abilities { get; private set; }
+        
+        [field: SerializeField] public List<PassiveToAdd> StartingPassives { get; private set; }
         public UnitStatsInstance CreateInstance(Unit unit) => new UnitStatsInstance(this,unit);
     }
 }
@@ -37,6 +39,13 @@ namespace Battle.ScriptableObjects
 namespace Battle
 {
     using ScriptableObjects;
+    
+    [Serializable]
+    public class PassiveToAdd
+    {
+        [field: SerializeField] public UnitPassiveSO Passive { get; private set; }
+        [field: SerializeField] public int Stacks { get; private set; } = 1;
+    }
     
     public class UnitStatsInstance
     {

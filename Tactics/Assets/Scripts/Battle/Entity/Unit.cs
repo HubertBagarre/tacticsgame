@@ -124,6 +124,14 @@ namespace Battle
             behaviourRoutine = null;
         }
 
+        public IEnumerator LateInitEntityForBattle()
+        {
+            foreach (var passiveToAdd in Stats.So.StartingPassives)
+            {
+                yield return StartCoroutine(AddPassiveEffect(passiveToAdd.Passive, passiveToAdd.Stacks));
+            }
+        }
+
         public void PreStartRound()
         {
             if (isBreak)

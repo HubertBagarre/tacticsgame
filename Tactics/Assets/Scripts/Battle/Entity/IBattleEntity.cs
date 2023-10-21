@@ -17,6 +17,7 @@ public interface IBattleEntity
     public float TurnOrder => DistanceFromTurnStart / (Speed/100f);
     public bool IsDead { get; }
     public void InitEntityForBattle();
+    public IEnumerator LateInitEntityForBattle();
     public void KillEntityInBattle();
     public event Action OnDeath;
     public void ResetTurnValue(float value);

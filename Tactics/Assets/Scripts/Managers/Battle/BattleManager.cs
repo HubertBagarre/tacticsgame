@@ -287,29 +287,38 @@ namespace Battle
 
         private void AddEntityToBattle(IBattleEntity entity, bool createPreview)
         {
-            entity.InitEntityForBattle();
-
-            entitiesInBattle.Add(entity);
-            entity.ResetTurnValue(-1);
-
-            EventManager.Trigger(new EntityJoinBattleEvent(entity, false));
-
-            if (createPreview)
+            StartCoroutine(InitEntityForBattle());
+            return;
+            
+            IEnumerator InitEntityForBattle()
             {
-                var previewEntity = new PreviewEntity(this, entity);
-                entitiesInBattle.Add(previewEntity);
+                entity.InitEntityForBattle();
+                
+                entitiesInBattle.Add(entity);
+                entity.ResetTurnValue(-1);
+                
+                EventManager.Trigger(new EntityJoinBattleEvent(entity, false));
+                
+                yield return StartCoroutine(entity.LateInitEntityForBattle());
 
-                entity.OnDeath += RemoveAssociatedPreviewEntityFromBattle;
-
-                EventManager.Trigger(new EntityJoinBattleEvent(previewEntity, true));
-
-                void RemoveAssociatedPreviewEntityFromBattle()
+                if (createPreview)
                 {
-                    if (!deadUnits.Contains(previewEntity)) deadUnits.Add(previewEntity);
-                }
-            }
+                    var previewEntity = new PreviewEntity(this, entity);
+                    entitiesInBattle.Add(previewEntity);
 
-            EventManager.Trigger(updateTurnValuesEvent);
+                    entity.OnDeath += RemoveAssociatedPreviewEntityFromBattle;
+
+                    EventManager.Trigger(new EntityJoinBattleEvent(previewEntity, true));
+
+                    void RemoveAssociatedPreviewEntityFromBattle()
+                    {
+                        if (!deadUnits.Contains(previewEntity)) deadUnits.Add(previewEntity);
+                    }
+                }
+                
+
+                EventManager.Trigger(updateTurnValuesEvent);
+            }
         }
 
         private void UpdateTurnOrderOnEntityTurnOrderUpdated(IBattleEntity entity)
@@ -356,6 +365,11 @@ namespace Battle
 
         public void InitEntityForBattle()
         {
+        }
+
+        public IEnumerator LateInitEntityForBattle()
+        {
+            yield break;
         }
 
         public void KillEntityInBattle()
@@ -424,6 +438,11 @@ namespace Battle
 
         public void InitEntityForBattle()
         {
+        }
+
+        public IEnumerator LateInitEntityForBattle()
+        {
+            yield break;
         }
 
         public void KillEntityInBattle()
