@@ -119,7 +119,7 @@ namespace Battle
 
         public event Action<int> OnCurrentSelectedTilesUpdated;
         public event Action<int> OnCurrentCooldownUpdated;
-
+        
         public UnitAbilityInstance(UnitAbilitySO unitAbilitySo)
         {
             SO = unitAbilitySo;
@@ -235,6 +235,7 @@ namespace Battle
             EventManager.Trigger(new StartAbilityCastEvent(this, caster, currentAffectedTiles));
 
             caster.StartCoroutine(AbilityCast());
+            return;
 
             IEnumerator AbilityCast()
             {
@@ -244,7 +245,7 @@ namespace Battle
                 currentSelectedTiles.Clear();
                 currentAffectedTiles.Clear();
                 
-                EventManager.Trigger(new EndAbilityCastEvent(SO));
+                EventManager.Trigger(new EndAbilityCastEvent(SO,caster));
             }
         }
 

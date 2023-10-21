@@ -21,7 +21,7 @@ MonoBehaviour:
   <Effects>k__BackingField:
   - {fileID: 11400000, guid: 2a84ab598746c3446a8f57915d1179f7, type: 2}
   <Cooldown>k__BackingField: 0
-  <Cost>k__BackingField: 0
+  <Cost>k__BackingField: -4
   <IsUltimate>k__BackingField: 0
   <UltimateCost>k__BackingField: 0
   <SkipTargetSelection>k__BackingField: 0

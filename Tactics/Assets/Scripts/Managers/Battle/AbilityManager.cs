@@ -5,14 +5,13 @@ using UnityEngine;
 namespace Battle
 {
     using AbilityEvents;
-    using ScriptableObjects.Ability;
     using InputEvent;
     using BattleEvents;
 
     public class AbilityManager : MonoBehaviour
     {
-        [field: SerializeField] public int AbilityPoints { get; private set; } = 4;
-        public static int MaxAbilityPoints { get; } = 8;
+        [field: SerializeField] public int AbilityPoints { get; private set; } = 3;
+        public static int MaxAbilityPoints { get; } = 6;
 
         public static event Action<Unit, UnitAbilityInstance> OnUpdatedCastingAbility;
         public static event Action<int, int> OnUpdatedAbilityPoints;
@@ -123,45 +122,56 @@ namespace Battle
         {
             if(ability.IsUltimate) unit.ConsumeUltimatePoint(ability.UltimateCost);
             
-            ConsumeAbilityPoints(ability.Cost);
-
             if (ability.SO.Cooldown > 0) ability.EnterCooldown();
             
             if(!ability.IsUltimate) unit.GainUltimatePoint(1);
             
             ability.CastAbility(unit);
+            
+            ConsumeAbilityPoints(unit,ability.Cost);
         }
 
         private void InitAbilityPoints(StartRoundEvent ctx)
         {
             var startingAmount = -AbilityPoints;
             AbilityPoints = 0;
-            ConsumeAbilityPoints(startingAmount);
+            ConsumeAbilityPoints(null,startingAmount);
         }
 
-        public void ConsumeAbilityPoints(int amount)
+        public void ConsumeAbilityPoints(Unit unit,int amount)
         {
+            if(unit != null) if(unit.Team != 0) return;
+            
             var previous = AbilityPoints;
             AbilityPoints -= amount;
             if (AbilityPoints > MaxAbilityPoints)
             {
-                //Trigger overload
-                AbilityPoints = MaxAbilityPoints;
+                Overload(unit);
             }
 
             if (AbilityPoints < 0)
             {
-                //Trigger underload(?)
-                AbilityPoints = 0;
+                Underload(unit);
             }
             
-            Debug.Log($"Updating Ability Points : {previous} to {AbilityPoints}");
             OnUpdatedAbilityPoints?.Invoke(previous,AbilityPoints);
         }
 
         public void IncreaseUnitUltimatePoints()
         {
             
+        }
+
+        public void Overload(Unit unit)
+        {
+            Debug.Log("Overload");
+            unit.BreakShield();
+            AbilityPoints = 0;
+        }
+
+        public void Underload(Unit unit)
+        {
+            AbilityPoints = 0;
         }
     }
 }
@@ -210,10 +220,12 @@ namespace Battle.AbilityEvents
     public class EndAbilityCastEvent
     {
         public UnitAbilitySO Ability { get; }
+        public Unit Caster { get; }
 
-        public EndAbilityCastEvent(UnitAbilitySO ability)
+        public EndAbilityCastEvent(UnitAbilitySO ability,Unit caster)
         {
             Ability = ability;
+            Caster = caster;
         }
     }
 }

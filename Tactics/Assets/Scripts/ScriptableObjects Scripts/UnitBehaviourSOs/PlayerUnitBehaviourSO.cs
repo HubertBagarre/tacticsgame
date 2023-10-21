@@ -10,13 +10,24 @@ namespace Battle.ScriptableObjects
     [CreateAssetMenu(menuName = "Battle Scriptables/UnitBehaviour/PlayerUnit")]
     public class PlayerUnitBehaviourSO : UnitBehaviourSO
     {
-        private bool playerTurn;
+        private Unit playerUnit;
+        
+        private bool isPlayerTurn;
         private Func<bool> IsPlayerTurn;
+        private bool behaviourInterrupted;
+        private bool isCastingAbility;
 
         public override void InitBehaviour(Unit unit)
         {
-            playerTurn = false;
-            IsPlayerTurn = () => playerTurn;
+            playerUnit = unit;
+            
+            isPlayerTurn = false;
+            behaviourInterrupted = false;
+            isCastingAbility = false;
+            IsPlayerTurn = () => isPlayerTurn;
+            
+            EventManager.AddListener<StartAbilityCastEvent>(EnterCastingAbility);
+            EventManager.AddListener<EndAbilityCastEvent>(ExitCastingAbility);
         }
 
         public override void ShowBehaviourPreview(Unit unit)
@@ -25,33 +36,45 @@ namespace Battle.ScriptableObjects
 
         public override IEnumerator RunBehaviour(Unit unit)
         {
-            EventManager.AddListener<EndAbilityCastEvent>(EndTurnAfterAbilityCast);
-
-            yield return null;
+            isPlayerTurn = true;
+            behaviourInterrupted = false;
+            isCastingAbility = false;
             
-            playerTurn = true;
             EventManager.Trigger(new StartPlayerControlEvent(unit));
 
             yield return new WaitWhile(IsPlayerTurn);
             
-            EventManager.RemoveListener<EndAbilityCastEvent>(EndTurnAfterAbilityCast);
+            EndPlayerTurn();
         }
         
-        public override void OnBehaviourInterrupted(Unit unit)
+        public override bool OnBehaviourInterrupted(Unit unit)
         {
-            EventManager.RemoveListener<EndAbilityCastEvent>(EndTurnAfterAbilityCast);
+            behaviourInterrupted = true;
             
-            playerTurn = false;
+            if (!isCastingAbility) isPlayerTurn = false;
+
+            return false;
+        }
+
+        private void EndPlayerTurn()
+        {
             EventManager.Trigger(new EndPlayerControlEvent());
         }
 
-
-        private void EndTurnAfterAbilityCast(EndAbilityCastEvent ctx)
+        private void EnterCastingAbility(StartAbilityCastEvent ctx)
         {
-            if (!ctx.Ability.EndUnitTurnAfterCast) return;
+            if(ctx.Caster != playerUnit || !isPlayerTurn) return;
+            isCastingAbility = true;
+        }
+        
+        private void ExitCastingAbility(EndAbilityCastEvent ctx)
+        {
+            if(ctx.Caster != playerUnit || !isPlayerTurn) return;
+            isCastingAbility = false;
             
-            playerTurn = false;
-            EventManager.Trigger(new EndPlayerControlEvent());
+            if (!ctx.Ability.EndUnitTurnAfterCast && !behaviourInterrupted) return;
+            
+            isPlayerTurn = false;
         }
     }
 }

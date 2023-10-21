@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Deal 1
   m_EditorClassIdentifier: 
   hpDamage: 1
-  shieldDamage: 5
+  shieldDamage: 1
   damageShieldFirst: 1
   useCasterAttack: 0
   isAttack: 1

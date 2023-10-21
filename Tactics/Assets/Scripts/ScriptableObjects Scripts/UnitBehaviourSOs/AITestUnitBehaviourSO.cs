@@ -28,9 +28,9 @@ namespace Battle.ScriptableObjects
             yield return unit.StartCoroutine(unit.MoveUnit(path,false));
         }
 
-        public override void OnBehaviourInterrupted(Unit unit)
+        public override bool OnBehaviourInterrupted(Unit unit)
         {
-            
+            return true;
         }
     }
 }

@@ -81,7 +81,6 @@ namespace Battle
         private UnitBehaviourSO Behaviour => Stats.Behaviour;
         private Coroutine behaviourRoutine;
         
-        
         // TODO - use IEnumerator delegates instead of action;
         public event Action OnTurnStart;
         public event Action OnTurnEnd;
@@ -154,20 +153,22 @@ namespace Battle
             if(entity == null) return;
             
             DistanceFromTurnStart = (entity.DistanceFromTurnStart+0.01f) * Speed / entity.Speed;
-            
-            if(interruptBehaviour) InterruptBehaviour();
+
+            if (interruptBehaviour) InterruptBehaviour();
         }
 
         public void InterruptBehaviour()
         {
-            if (behaviourRoutine == null) return;
+            if (behaviourRoutine == null)  return;
 
             Debug.Log("Interrupting behaviour");
 
-            Behaviour.OnBehaviourInterrupted(this);
-
-            StopCoroutine(behaviourRoutine);
-            behaviourRoutine = null;
+            if (Behaviour.OnBehaviourInterrupted(this))
+            {
+                Debug.Log("Stopping routine");
+                StopCoroutine(behaviourRoutine);
+                behaviourRoutine = null;
+            }
         }
 
         public IEnumerator StartTurn(Action onBehaviourEnd)
@@ -200,11 +201,9 @@ namespace Battle
 
             UIBattleManager.OnEndTurnButtonClicked += InterruptBehaviour;
 
-            bool behaviourRunning = true;
+            var behaviourRunning = true;
 
             StartCoroutine(RunBehaviour());
-
-            bool IsBehaviourRoutineRunning() => behaviourRoutine != null && behaviourRunning;
 
             yield return new WaitWhile(IsBehaviourRoutineRunning);
 
@@ -212,6 +211,8 @@ namespace Battle
 
             onBehaviourEnd.Invoke();
             yield break;
+
+            bool IsBehaviourRoutineRunning() => behaviourRoutine != null && behaviourRunning;
 
             IEnumerator RunBehaviour()
             {
@@ -380,7 +381,7 @@ namespace Battle
 
         public void BreakShield()
         {
-            if(Stats.CurrentShield <= 0) Stats.CurrentShield = 0;
+            if(Stats.CurrentShield > 0) Stats.CurrentShield = 0;
             IsBreak = true;
             SkipTurn(true);
         }
@@ -443,7 +444,7 @@ namespace Battle
             //add passive instance to list
 
             var currentInstance = GetPassiveInstance(passiveSo);
-
+            
             //if current instance == null, no passive yet, creating new and adding to list
             //if passive isn't stackable, creating new and adding to list
             if (currentInstance == null || !passiveSo.IsStackable)

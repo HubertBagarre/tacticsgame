@@ -41,6 +41,6 @@ namespace Battle.ScriptableObjects
     
         public abstract IEnumerator RunBehaviour(Unit unit);
 
-        public abstract void OnBehaviourInterrupted(Unit unit);
+        public abstract bool OnBehaviourInterrupted(Unit unit); // returns true if interrupt behaviour this frame
     }
 }
