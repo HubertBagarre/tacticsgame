@@ -15,17 +15,17 @@ MonoBehaviour:
   passivesToAdd:
   - <Passive>k__BackingField: {fileID: 11400000, guid: c0f393a308a62d84dae6e12231b96b0a,
       type: 2}
-    <Stacks>k__BackingField: 1
-  - <Passive>k__BackingField: {fileID: 11400000, guid: c0f393a308a62d84dae6e12231b96b0a,
+    <Stacks>k__BackingField: 12
+  - <Passive>k__BackingField: {fileID: 11400000, guid: 045f4ad09524689429182773ab153872,
       type: 2}
     <Stacks>k__BackingField: 1
-  - <Passive>k__BackingField: {fileID: 11400000, guid: c0f393a308a62d84dae6e12231b96b0a,
+  - <Passive>k__BackingField: {fileID: 11400000, guid: 2ee9f3e8c44e6914eb7abf3e19cae3fb,
       type: 2}
     <Stacks>k__BackingField: 1
-  - <Passive>k__BackingField: {fileID: 11400000, guid: c0f393a308a62d84dae6e12231b96b0a,
+  - <Passive>k__BackingField: {fileID: 11400000, guid: b406b6210ac3bd8479b826d6751b55d8,
       type: 2}
     <Stacks>k__BackingField: 1
-  - <Passive>k__BackingField: {fileID: 11400000, guid: c0f393a308a62d84dae6e12231b96b0a,
+  - <Passive>k__BackingField: {fileID: 11400000, guid: ef7ba68073b250043a1107ed9f65d1ff,
       type: 2}
     <Stacks>k__BackingField: 1
-  order: 030000000100000002000000
+  order: 030000000200000001000000

@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Sprite>k__BackingField: {fileID: 21300000, guid: 86f5515ea3cedf8428cf0070e79dd782,
     type: 3}
-  <Name>k__BackingField: E
+  <Name>k__BackingField: Kit
   <Type>k__BackingField: 0
-  <Description>k__BackingField: E
+  <Description>k__BackingField: Tu meurt lol
   <IsStackable>k__BackingField: 1
   <MaxStacks>k__BackingField: 0
   <HasStartTurnEffect>k__BackingField: 1

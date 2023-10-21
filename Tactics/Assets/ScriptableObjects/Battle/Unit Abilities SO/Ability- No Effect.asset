@@ -10,21 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9aee06dd214c82043a27b1dc41ab3dc7, type: 3}
-  m_Name: PlayerMovement
+  m_Name: Ability- No Effect
   m_EditorClassIdentifier: 
-  <Sprite>k__BackingField: {fileID: 21300000, guid: 86f5515ea3cedf8428cf0070e79dd782,
-    type: 3}
-  <Name>k__BackingField: Movement
-  <Type>k__BackingField: 1
+  <Sprite>k__BackingField: {fileID: 0}
+  <Name>k__BackingField: Dummy Stance
+  <Type>k__BackingField: 2
   description: 
-  <Selector>k__BackingField: {fileID: 11400000, guid: 6824a522427953d44a6e615995658304,
-    type: 2}
+  <Selector>k__BackingField: {fileID: 0}
   <Effects>k__BackingField:
-  - {fileID: 11400000, guid: 204b6d5bad297ca43a95476b6dc9b812, type: 2}
+  - {fileID: 11400000, guid: 4f02c414292b1834193d210c9aca552f, type: 2}
   <Cooldown>k__BackingField: 0
   <Cost>k__BackingField: 0
   <IsUltimate>k__BackingField: 0
   <UltimateCost>k__BackingField: 0
-  <SkipTargetSelection>k__BackingField: 0
-  <SkipTargetConfirmation>k__BackingField: 0
+  <SkipTargetSelection>k__BackingField: 1
+  <SkipTargetConfirmation>k__BackingField: 1
   <EndUnitTurnAfterCast>k__BackingField: 0

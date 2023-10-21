@@ -69,10 +69,14 @@ namespace Battle.UIComponent
         {
             var so = associatedAbility.SO;
 
-            var color = Color.yellow;
-            var col = ColorUtility.ToHtmlStringRGB(color);
-            abilityNameText.text = $"{so.Name} <size=20><color=#{col}><i>[{so.Type}]</i></color></size>";
-
+            abilityNameText.text = $"{so.Name}";
+            if (so.Type != AbilityType.None)
+            {
+                var color = Color.yellow; //TODO change color based on type (use switch)
+                var col = ColorUtility.ToHtmlStringRGB(color);
+                abilityNameText.text = $"{so.Name} <size=20><color=#{col}><i>[{so.Type}]</i></color></size>";
+            }
+            
             var cooldown = so.Cooldown;
             abilityCooldownText.text = cooldown > 0 ? $"{so.Cooldown} turn{(cooldown > 1 ? "s":"")}" : "";
             

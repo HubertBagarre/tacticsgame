@@ -2,12 +2,12 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace Battle.ScriptableObjects
+namespace Battle.ScriptableObjects.UnitBehaviour
 {
     using UIEvents;
     using AbilityEvents;
     
-    [CreateAssetMenu(menuName = "Battle Scriptables/UnitBehaviour/PlayerUnit")]
+    [CreateAssetMenu(menuName = "Battle Scriptables/UnitBehaviour/Unique/PlayerUnit")]
     public class PlayerUnitBehaviourSO : UnitBehaviourSO
     {
         private Func<bool> isInterruptedCondition;

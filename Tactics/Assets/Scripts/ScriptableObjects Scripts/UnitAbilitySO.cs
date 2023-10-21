@@ -13,7 +13,7 @@ namespace Battle.ScriptableObjects.Ability
 
     public enum AbilityType
     {
-        Movement,Offensive,Defensive
+        None,Movement,Offensive,Defensive
     }
 
     [CreateAssetMenu(menuName = "Battle Scriptables/Ability")]
@@ -42,8 +42,7 @@ namespace Battle.ScriptableObjects.Ability
 
         public virtual string ConvertedDescription(Unit caster)
         {
-            //Maybe do something cleaner of multi effects
-            var descriptionText = Selector.SelectionDescription(caster);
+            
             var effectsText = string.Empty;
             foreach (var effect in Effects)
             {
@@ -53,12 +52,15 @@ namespace Battle.ScriptableObjects.Ability
             }
             effectsText = effectsText.TrimEnd('\n');
 
+            if(Selector == null) return $"{effectsText}";
+            
+            //Maybe do something cleaner of multi effects
+            var descriptionText = Selector.SelectionDescription(caster);
+            
             var affectedDesc = Selector.AffectedDescription(caster);
             var toAffectedDesc = affectedDesc == string.Empty ? string.Empty : $" to{affectedDesc}";
             effectsText = effectsText.Replace("%toAFFECTED%", $"{toAffectedDesc}");
             effectsText = effectsText.Replace("%AFFECTED%", Selector.AffectedDescription(caster));
-
-            if (descriptionText.Length == 0) return $"{effectsText}";
             
             return $"Select {descriptionText}.\n{effectsText}";
         }
