@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 
 namespace Battle.UIComponent
 {
-    using ScriptableObjects.Ability;
+    using ScriptableObjects;
     
     public class UIUnitAbilityInfo : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IPointerClickHandler
     {

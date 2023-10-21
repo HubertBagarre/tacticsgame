@@ -6,10 +6,10 @@ using Battle.AbilityEvents;
 
 using UnityEngine;
 
-namespace Battle.ScriptableObjects.Ability
+namespace Battle.ScriptableObjects
 {
-    using Selector;
-    using Effect;
+    using Ability.Selector;
+    using Ability.Effect;
 
     public enum AbilityType
     {
@@ -84,23 +84,23 @@ namespace Battle.ScriptableObjects.Ability
             }
         }
         
-        public UnitAbilityInstance CreateInstance()
+        public UnitAbilityInstance CreateInstance(bool showInUI = true)
         {
-            return new UnitAbilityInstance(this);
+            return new UnitAbilityInstance(new AbilityToAdd(this,showInUI));
         }
+
     }
 }
 
 namespace Battle
 {
-    using ScriptableObjects.Ability;
-    using ScriptableObjects.Ability.Effect;
-    using ScriptableObjects.Ability.Selector;
-    
+    using ScriptableObjects;
     
     public class UnitAbilityInstance
     {
-        public UnitAbilitySO SO { get; }
+        private AbilityToAdd Origin { get; }
+        public UnitAbilitySO SO => Origin.Ability;
+        public bool ShowInTooltip => Origin.ShowInUI;
         private UnitAbilitySelectorSO Selector { get; }
         private UnitAbilityEffectSO[] Effects { get; }
         public int ExpectedSelections => Selector.ExpectedSelections;
@@ -128,10 +128,10 @@ namespace Battle
 
         public event Action<int> OnCurrentSelectedTilesUpdated;
         public event Action<int> OnCurrentCooldownUpdated;
-        
-        public UnitAbilityInstance(UnitAbilitySO unitAbilitySo)
+
+        public UnitAbilityInstance(AbilityToAdd origin)
         {
-            SO = unitAbilitySo;
+            Origin = origin;
             Selector = SO.Selector;
             Effects = SO.Effects;
             

@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Battle.ScriptableObjects.Ability.Effect
+namespace Battle.ScriptableObjects
 {
 
     public abstract class UnitAbilityEffectSO : ScriptableObject

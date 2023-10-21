@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Battle.ScriptableObjects.Ability.Selector
+namespace Battle.ScriptableObjects
 {
     public abstract class UnitAbilitySelectorSO : ScriptableObject
     {

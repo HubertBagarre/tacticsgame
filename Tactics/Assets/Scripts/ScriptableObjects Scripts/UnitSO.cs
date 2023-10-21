@@ -4,8 +4,6 @@ using UnityEngine;
 
 namespace Battle.ScriptableObjects
 {
-    using Ability;
-    
     [CreateAssetMenu(menuName = "Unit")]
     public class UnitSO : ScriptableObject
     {
@@ -29,7 +27,7 @@ namespace Battle.ScriptableObjects
         [field: SerializeField, Tooltip("Start Turn Value, lower is faster")]
         public float Initiative { get; private set; } = 1000;
         [field: SerializeField] public UnitBehaviourSO Behaviour { get; private set; }
-        [field: SerializeField] public List<UnitAbilitySO> Abilities { get; private set; }
+        [field: SerializeField] public List<AbilityToAdd> Abilities { get; private set; }
         
         [field: SerializeField] public List<PassiveToAdd> StartingPassives { get; private set; }
         public UnitStatsInstance CreateInstance(Unit unit) => new UnitStatsInstance(this,unit);
@@ -39,6 +37,24 @@ namespace Battle.ScriptableObjects
 namespace Battle
 {
     using ScriptableObjects;
+
+    [Serializable]
+    public class AbilityToAdd
+    {
+        [field: SerializeField] public UnitAbilitySO Ability { get; private set; }
+        [field: SerializeField] public bool ShowInUI { get; private set; } = true;
+
+        public AbilityToAdd(UnitAbilitySO ability,bool showInUI = true)
+        {
+            Ability = ability;
+            ShowInUI = showInUI;
+        }
+        
+        public UnitAbilityInstance CreateInstance()
+        {
+            return new UnitAbilityInstance(this);
+        }
+    }
     
     [Serializable]
     public class PassiveToAdd

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9aee06dd214c82043a27b1dc41ab3dc7, type: 3}
-  m_Name: PlayerMovement
+  m_Name: Ability- Free Movement
   m_EditorClassIdentifier: 
   <Sprite>k__BackingField: {fileID: 21300000, guid: 86f5515ea3cedf8428cf0070e79dd782,
     type: 3}

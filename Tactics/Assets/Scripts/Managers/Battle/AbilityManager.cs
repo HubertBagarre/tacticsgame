@@ -179,7 +179,7 @@ namespace Battle
 
 namespace Battle.AbilityEvents
 {
-    using ScriptableObjects.Ability;
+    using ScriptableObjects;
     
     public class StartAbilityTargetSelectionEvent
     {

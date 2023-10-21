@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -114,7 +115,7 @@ namespace Battle.UIComponent
 
         private void ShowCurrentAbilities()
         {
-            foreach (var abilityInstance in currentDisplayingUnit.AbilityInstances)
+            foreach (var abilityInstance in currentDisplayingUnit.AbilityInstances.Where(abilityInstance => abilityInstance.ShowInTooltip))
             {
                 if (!abilityShowerDict.ContainsKey(abilityInstance))
                 {

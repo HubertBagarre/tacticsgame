@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62996ebfa77fec64b9ac0152150a92d8, type: 3}
   m_Name: Effect- No Effect
   m_EditorClassIdentifier: 
-  text: Does nothing
+  text: Do nothing.

@@ -62,8 +62,9 @@ namespace Battle
             get => isBreak;
             private set
             {
+                var changed = isBreak != value;
                 isBreak = value;
-                OnBreakChanged?.Invoke(isBreak);
+                if(changed) OnBreakChanged?.Invoke(isBreak);
             } 
         }
 
@@ -117,9 +118,9 @@ namespace Battle
             IsBreak = false;
 
             AbilityInstances.Clear();
-            foreach (var ability in Stats.So.Abilities)
+            foreach (var abilityToAdd in Stats.So.Abilities)
             {
-                AbilityInstances.Add(ability.CreateInstance());
+                AbilityInstances.Add(abilityToAdd.CreateInstance());
             }
             behaviourRoutine = null;
         }
