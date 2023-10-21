@@ -148,12 +148,14 @@ namespace Battle
             DistanceFromTurnStart = 0;
         }
         
-        public void SkipTurn()
+        public void SkipTurn(bool interruptBehaviour)
         {
             IBattleEntity entity = BattleManager.EndRoundEntity;
             if(entity == null) return;
             
             DistanceFromTurnStart = (entity.DistanceFromTurnStart+0.01f) * Speed / entity.Speed;
+            
+            if(interruptBehaviour) InterruptBehaviour();
         }
 
         public void InterruptBehaviour()
@@ -380,7 +382,7 @@ namespace Battle
         {
             if(Stats.CurrentShield <= 0) Stats.CurrentShield = 0;
             IsBreak = true;
-            SkipTurn();
+            SkipTurn(true);
         }
         
         
