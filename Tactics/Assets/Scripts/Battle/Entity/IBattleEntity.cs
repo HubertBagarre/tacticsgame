@@ -21,6 +21,7 @@ public interface IBattleEntity
     public event Action OnDeath;
     public void ResetTurnValue(float value);
     public void DecayTurnValue(float amount);
+    public void PreStartRound();
     public IEnumerator StartRound();
     public IEnumerator EndRound();
     public IEnumerator StartTurn(Action onBehaviourEnd);

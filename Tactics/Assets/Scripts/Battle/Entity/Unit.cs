@@ -8,7 +8,6 @@ namespace Battle
 {
     using UnitEvents;
     using ScriptableObjects;
-    using ScriptableObjects.Ability;
 
     public class Unit : MonoBehaviour, IBattleEntity
     {
@@ -55,7 +54,6 @@ namespace Battle
             }
         }
         public static event Action<IBattleEntity> OnDistanceFromTurnStartChanged;
-        
         public bool IsDead => Stats.CurrentHp <= 0;
         private event Action<bool> OnBreakChanged; 
         private bool isBreak;
@@ -127,6 +125,14 @@ namespace Battle
             behaviourRoutine = null;
         }
 
+        public void PreStartRound()
+        {
+            if (isBreak)
+            {
+                if (Stats.CurrentShield <= 0) Stats.CurrentShield = Stats.MaxShield;
+            }
+        }
+
         public IEnumerator StartRound()
         {
             yield return null; //apply effects
@@ -140,6 +146,16 @@ namespace Battle
         public void FastForwardTurn()
         {
             DistanceFromTurnStart = 0;
+        }
+        
+        public void SkipTurn()
+        {
+            var entity = BattleManager.EndRoundEntity;
+            if(entity == null) return;
+            
+            Debug.Log("Skipping Turn");
+            
+            DistanceFromTurnStart = entity.DistanceFromTurnStart + 1;
         }
 
         public void InterruptBehaviour()
@@ -364,8 +380,9 @@ namespace Battle
 
         public void BreakShield()
         {
+            if(Stats.CurrentShield <= 0) Stats.CurrentShield = 0;
             IsBreak = true;
-            Debug.Log("BREAK");
+            SkipTurn();
         }
         
         

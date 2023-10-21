@@ -44,8 +44,9 @@ namespace Battle
 
         private BattleLevel battleLevel;
         public IBattleEntity CurrentTurnEntity { get; private set; }
-        private EndRoundEntity endRoundEntity;
-
+        private static EndRoundEntity endRoundEntity;
+        public static EndRoundEntity EndRoundEntity => endRoundEntity;
+ 
         private List<IBattleEntity> entitiesInBattle = new();
         public IBattleEntity[] EntitiesInBattle => entitiesInBattle.Where(entity => entity.Team >= 0).ToArray();
         private List<IBattleEntity> deadUnits = new();
@@ -121,6 +122,8 @@ namespace Battle
             return !(availableEntities.Length > 0) ? 100 : availableEntities.OrderBy(entity => entity.Speed).First().Speed;
         }
 
+        private IBattleEntity GetEndRoundEntity => endRoundEntity;
+
         public void StartBattle()
         {
             endBattle = false;
@@ -187,6 +190,11 @@ namespace Battle
 
             IEnumerator StartRoundLogicRoutine()
             {
+                foreach (var battleEntity in entitiesInBattle)
+                {
+                    battleEntity.PreStartRound();
+                }
+                
                 foreach (var battleEntity in entitiesInBattle)
                 {
                     yield return StartCoroutine(battleEntity.StartRound());
@@ -362,6 +370,11 @@ namespace Battle
         {
         }
 
+        public void PreStartRound()
+        {
+            
+        }
+
         public IEnumerator StartRound()
         {
             yield return null;
@@ -432,6 +445,11 @@ namespace Battle
         public void DecayTurnValue(float amount)
         {
             DistanceFromTurnStart -= amount * DecayRate;
+        }
+
+        public void PreStartRound()
+        {
+            
         }
 
         public IEnumerator StartRound()

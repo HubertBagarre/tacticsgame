@@ -82,7 +82,7 @@ namespace Battle
             OnMaxShieldModified?.Invoke(this);
         }
         
-        public int currentShield;
+        private int currentShield;
         public event Action<UnitStatsInstance> OnCurrentShieldModified;
         public int CurrentShield
         {
