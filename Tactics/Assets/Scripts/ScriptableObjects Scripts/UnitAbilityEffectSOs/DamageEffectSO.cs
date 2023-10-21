@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Battle.ScriptableObjects.Ability.Effect
 {
@@ -9,6 +10,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
     {
         [SerializeField,Tooltip("-1 is none")] private int hpDamage = 2;
         [SerializeField,Tooltip("-1 is none")] private int shieldDamage = 0;
+        [SerializeField] private bool damageShieldFirst = false;
         [SerializeField] private bool useCasterAttack = false;
         [SerializeField] private bool isAttack = false;
         
@@ -31,7 +33,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
         {
             //play animation
             var hpDmg = useCasterAttack ? caster.Stats.Attack : hpDamage;
-            var damageInstance = new DamageInstance(hpDmg >= 0 ? hpDmg : null, shieldDamage >= 0 ? shieldDamage : null);
+            var damageInstance = new DamageInstance(hpDmg >= 0 ? hpDmg : null, shieldDamage >= 0 ? shieldDamage : null,damageShieldFirst);
             
             yield return null;
 

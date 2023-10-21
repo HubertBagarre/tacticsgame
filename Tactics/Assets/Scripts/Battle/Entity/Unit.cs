@@ -57,6 +57,17 @@ namespace Battle
         public static event Action<IBattleEntity> OnDistanceFromTurnStartChanged;
         
         public bool IsDead => Stats.CurrentHp <= 0;
+        private event Action<bool> OnBreakChanged; 
+        private bool isBreak;
+        public bool IsBreak
+        {
+            get => isBreak;
+            private set
+            {
+                isBreak = value;
+                OnBreakChanged?.Invoke(isBreak);
+            } 
+        }
 
         [field: SerializeField] public int CurrentUltimatePoints { get; protected set; }
         public int MaxUltimatePoints => GetHighestCostUltimate();
@@ -106,6 +117,7 @@ namespace Battle
             Stats.ResetModifiers();
             
             IsActive = true;
+            IsBreak = false;
 
             AbilityInstances.Clear();
             foreach (var ability in Stats.So.Abilities)
@@ -317,7 +329,8 @@ namespace Battle
             
             var amount = damageInstance.HpDamage ?? 0;
             if (amount < 0) amount = 0; //No negative damage, negative damage doesn't heal, but can deal 0 damage
-
+            if(isBreak) amount *= 2;
+            
             var startHp = Stats.CurrentHp;
             Stats.CurrentHp -= amount;
             
@@ -328,6 +341,13 @@ namespace Battle
 
         public void TakeDamage(DamageInstance damageInstance)
         {
+            if (damageInstance.DamageShieldFirst)
+            {
+                if(damageInstance.TookShieldDamage) TakeShieldDamage(damageInstance);
+                if(damageInstance.TookHPDamage) TakeHpDamage(damageInstance);
+                return;
+            }
+            
             if(damageInstance.TookHPDamage) TakeHpDamage(damageInstance);
             if(damageInstance.TookShieldDamage) TakeShieldDamage(damageInstance);
         }
@@ -344,7 +364,8 @@ namespace Battle
 
         public void BreakShield()
         {
-            
+            IsBreak = true;
+            Debug.Log("BREAK");
         }
         
         
@@ -463,14 +484,17 @@ namespace Battle
         public int? ShieldDamage { get; private set; }
         public bool TookHPDamage => HpDamage != null;
         public bool TookShieldDamage => ShieldDamage != null;
+        public bool DamageShieldFirst { get; }
 
-        public DamageInstance(int? hpDamage,int? shieldDamage)
+        public DamageInstance(int? hpDamage, int? shieldDamage, bool damageShieldFirst = false)
         {
             OriginalHpDamage = hpDamage;
             HpDamage = hpDamage;
             
             OriginalShieldDamage = shieldDamage;
             ShieldDamage = shieldDamage;
+
+            DamageShieldFirst = damageShieldFirst;
         }
 
         public override string ToString()

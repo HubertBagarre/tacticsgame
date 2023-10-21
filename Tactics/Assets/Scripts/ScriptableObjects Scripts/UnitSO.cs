@@ -94,6 +94,7 @@ namespace Battle
             set
             {
                 currentShield = value;
+                if(currentShield < 0) currentShield = 0;
                 OnCurrentShieldModified?.Invoke(this);
             } 
         }
