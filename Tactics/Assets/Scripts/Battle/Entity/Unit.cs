@@ -433,18 +433,20 @@ namespace Battle
         /// CAN RETURN NULL
         /// </summary>
         /// <param name="passiveSo"></param>
+        /// <param name="amount"></param>
         /// <returns></returns>
-        public IEnumerator AddPassiveEffect(UnitPassiveSO passiveSo)
+        public IEnumerator AddPassiveEffect(UnitPassiveSO passiveSo,int amount = 1)
         {
             //add passive instance to list
-
+            if (!passiveSo.IsStackable) amount = 1;
+            
             var currentInstance = GetPassiveInstance(passiveSo);
             
             //if current instance == null, no passive yet, creating new and adding to list
             //if passive isn't stackable, creating new and adding to list
             if (currentInstance == null || !passiveSo.IsStackable)
             {
-                currentInstance = passiveSo.CreateInstance();
+                currentInstance = passiveSo.CreateInstance(amount);
                 PassiveInstances.Add(currentInstance);
             }
             

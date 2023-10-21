@@ -6,7 +6,7 @@ namespace Battle.ScriptableObjects
 {
     public enum PassiveType
     {
-        Kit,Buff,Debuff
+        Kit,Positive,Negative,Neutral
     }
     
     public abstract class UnitPassiveSO : ScriptableObject
@@ -48,9 +48,9 @@ namespace Battle.ScriptableObjects
         protected abstract IEnumerator OnTurnEndEffect(Unit unit,UnitPassiveInstance instance);
         protected abstract IEnumerator OnTurnStartEvent(Unit unit,UnitPassiveInstance instance);
 
-        public UnitPassiveInstance CreateInstance()
+        public UnitPassiveInstance CreateInstance(int stacks = 1)
         {
-            return new UnitPassiveInstance(this);
+            return new UnitPassiveInstance(this,stacks);
         }
     }
 }
@@ -69,11 +69,12 @@ namespace Battle
 
         public event Action<int> OnCurrentStacksChanged;
 
-        public UnitPassiveInstance(UnitPassiveSO so)
+        public UnitPassiveInstance(UnitPassiveSO so,int startingStacks = 1)
         {
             SO = so;
             NeedRemoveOnTurnEnd = false;
             NeedRemoveOnTurnStart = false;
+            CurrentStacks = startingStacks - 1;
         }
         
         public IEnumerator AddPassive(Unit unit)
