@@ -72,7 +72,11 @@ namespace Battle.UIComponent
             abilityNameText.text = $"{so.Name}";
             if (so.Type != AbilityType.None)
             {
-                var color = Color.yellow; //TODO change color based on type (use switch)
+                var color = so.Type switch
+                {
+                    AbilityType.Movement => Color.yellow,
+                    _ => Color.yellow
+                };
                 var col = ColorUtility.ToHtmlStringRGB(color);
                 abilityNameText.text = $"{so.Name} <size=20><color=#{col}><i>[{so.Type}]</i></color></size>";
             }
