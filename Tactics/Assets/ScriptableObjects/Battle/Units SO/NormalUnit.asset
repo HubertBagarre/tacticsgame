@@ -18,6 +18,7 @@ MonoBehaviour:
   <Description>k__BackingField: 
   model: {fileID: 4027157100062863514, guid: 25cbeb5debcffa7499a1be55dd2c6db6, type: 3}
   <MaxHp>k__BackingField: 10
+  <MaxShield>k__BackingField: 5
   <Attack>k__BackingField: 1
   <AttackRange>k__BackingField: 3
   <BaseMovement>k__BackingField: 3

@@ -16,11 +16,13 @@ MonoBehaviour:
     type: 3}
   <Name>k__BackingField: Default Unit
   <Description>k__BackingField: Default Unit
+  model: {fileID: 0}
   <MaxHp>k__BackingField: 1
+  <MaxShield>k__BackingField: 5
   <Attack>k__BackingField: 1
   <AttackRange>k__BackingField: 1
+  <BaseMovement>k__BackingField: 3
   <BaseSpeed>k__BackingField: 100
   <Initiative>k__BackingField: 1000
   <Behaviour>k__BackingField: {fileID: 0}
   <Abilities>k__BackingField: []
-  <BaseMovement>k__BackingField: 3

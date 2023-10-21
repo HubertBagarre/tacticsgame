@@ -17,6 +17,8 @@ namespace Battle.ScriptableObjects
         
         [field:Header("Stats")]
         [field: SerializeField] public int MaxHp { get; private set; }
+
+        [field: SerializeField] public int MaxShield { get; private set; } = 3;
         [field: SerializeField] public int Attack { get; private set; } = 1; // TODO - probably change name
         [field: SerializeField] public int AttackRange { get; private set; } = 3;
         [field: SerializeField, Tooltip("Maximum Tiles that can be moved during a turn")]
@@ -65,6 +67,34 @@ namespace Battle
             {
                 currentHp = value;
                 OnCurrentHpModified?.Invoke(this);
+            } 
+        }
+        
+        //Shield
+        public int BaseMaxShield => So.MaxShield;
+        public int MaxShieldModifier { get; private set; }
+        public int MaxShield => BaseMaxShield + MaxShieldModifier < 0 ? 0 : BaseMaxShield + MaxShieldModifier;
+        public int MaxShieldDiff => MaxShieldModifier == 0 ? 0 : MaxShieldModifier > 0 ? 1 : -1;
+        public event Action<UnitStatsInstance> OnMaxShieldModified;
+        public void IncreaseMaxShieldModifier(int amount)
+        {
+            MaxShieldModifier += amount;
+            OnMaxShieldModified?.Invoke(this);
+        }
+        
+        public int currentShield;
+        public event Action<UnitStatsInstance> OnCurrentShieldModified;
+        public int CurrentShield
+        {
+            get
+            {
+                if (currentShield > MaxShield) currentShield = MaxShield;
+                return currentShield;
+            }
+            set
+            {
+                currentShield = value;
+                OnCurrentShieldModified?.Invoke(this);
             } 
         }
 
@@ -131,6 +161,7 @@ namespace Battle
             ResetModifiers();
             
             CurrentHp = MaxHp;
+            CurrentShield = MaxShield;
             
             Behaviour.InitBehaviour(unit);
         }
@@ -138,12 +169,14 @@ namespace Battle
         public void ResetModifiers()
         {
             MaxHpModifier = 0;
+            MaxShieldModifier = 0;
             AttackModifier = 0;
             AttackRangeModifier = 0;
             MovementModifier = 0;
             SpeedModifier = 0;
             
             OnMaxHpModified?.Invoke(this);
+            OnMaxShieldModified?.Invoke(this);
             OnAttackModified?.Invoke(this);
             OnAttackRangeModified?.Invoke(this);
             OnMovementModified?.Invoke(this);

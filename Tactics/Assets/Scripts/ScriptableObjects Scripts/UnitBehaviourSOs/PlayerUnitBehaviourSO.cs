@@ -5,7 +5,6 @@ using UnityEngine;
 namespace Battle.ScriptableObjects
 {
     using UIEvents;
-    using UnitEvents;
     using AbilityEvents;
     
     [CreateAssetMenu(menuName = "Battle Scriptables/UnitBehaviour/PlayerUnit")]

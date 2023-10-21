@@ -36,8 +36,10 @@ namespace Battle.ScriptableObjects.Ability.Effect
             
                 if (isCrit) damage *= critDamageMultiplier;
                 
+                var damageInstance = new DamageInstance(damage,null);
+                
                 //play unit attack animation (changes if isCrit or not)
-                yield return caster.AttackUnitEffect(target, damage);
+                yield return caster.AttackUnitEffect(target, damageInstance);
             }
             
         }

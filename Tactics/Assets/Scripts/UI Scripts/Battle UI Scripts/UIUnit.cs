@@ -24,6 +24,9 @@ namespace Battle.UIComponent
         [SerializeField] private float hpLerpTime = 0.5f;
         [SerializeField] private Color allyColor = Color.cyan;
         [SerializeField] private Color enemyColor = Color.red;
+        
+        [Header("Shield")]
+        [SerializeField] private Image shieldBarImage;
 
         [Header("Passives")]
         [SerializeField] private UIUnitPassiveIcon passiveIconPrefab;
@@ -46,8 +49,12 @@ namespace Battle.UIComponent
             UpdateUIRotation();
             
             // TODO - setup after unit gets initialized
-            associatedUnit.Stats.OnMaxHpModified += UpdateMaxHpBar;
-            associatedUnit.OnCurrentHealthChanged += UpdateHpBar;
+            associatedUnit.Stats.OnMaxHpModified += UpdateHpBar;
+            associatedUnit.Stats.OnCurrentHpModified += UpdateHpBar;
+            
+            associatedUnit.Stats.OnMaxShieldModified += UpdateShieldBar;
+            associatedUnit.Stats.OnCurrentShieldModified += UpdateShieldBar;
+            
             associatedUnit.OnPassiveAdded += AddPassiveIcon;
             associatedUnit.OnPassiveRemoved += RemovePassiveIcon;
         }
@@ -63,20 +70,24 @@ namespace Battle.UIComponent
             uiParent.LookAt(uiParent.position + camRot * Vector3.forward,camRot * Vector3.up);
         }
 
-        private void UpdateMaxHpBar(UnitStatsInstance statsInstance)
+        private void UpdateHpBar(UnitStatsInstance statsInstance)
         {
-            var hp = statsInstance.CurrentHp;
-
-            UpdateHpBar(hp);
-        }
-        
-        private void UpdateHpBar(int hp)
-        {
-            hpText.text = $"{hp}/{associatedUnit.Stats.MaxHp}";
-            hpBarImage.fillAmount = hp / (float)associatedUnit.Stats.MaxHp;
+            var current = statsInstance.CurrentHp;
+            var max = statsInstance.MaxHp;
+            
+            hpText.text = $"{current}/{max}";
+            hpBarImage.fillAmount = current / (float)max;
             hpBarImageBack.DOFillAmount(hpBarImage.fillAmount, hpLerpTime);
         }
-
+        
+        private void UpdateShieldBar(UnitStatsInstance statsInstance)
+        {
+            var current = statsInstance.CurrentShield;
+            var max = statsInstance.MaxShield;
+            
+            shieldBarImage.fillAmount = current / (float)max;
+        }
+        
         private void AddPassiveIcon(UnitPassiveInstance passiveInstance)
         {
             var associatedPassive =
@@ -99,7 +110,6 @@ namespace Battle.UIComponent
             unitPassiveIcons.Remove(associatedPassive);
             Destroy(associatedPassive.gameObject);
         }
-
     }
 }
 

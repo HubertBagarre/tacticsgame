@@ -74,7 +74,6 @@ namespace Battle
         
         
         // TODO - use IEnumerator delegates instead of action;
-        public event Action<int> OnCurrentHealthChanged;
         public event Action OnTurnStart;
         public event Action OnTurnEnd;
         public event Action OnDeath;
@@ -276,32 +275,47 @@ namespace Battle
             MovementLeft = value;
         }
 
-        public IEnumerator AttackUnitEffect(Unit attackedUnit,int damage)
+        public IEnumerator AttackUnitEffect(Unit attackedUnit,DamageInstance damageInstance)
         {
-            var attackInstance = new AttackInstance(damage);
-            
             foreach (var routine in onAttackOtherUnitRoutines)
             {
                 yield return StartCoroutine(routine);
                 if(IsDead) yield break;
             }
             
-            yield return StartCoroutine(attackedUnit.AttackedUnitEffect(attackInstance));
+            yield return StartCoroutine(attackedUnit.AttackedUnitEffect(damageInstance));
         }
 
-        public IEnumerator AttackedUnitEffect(AttackInstance attackInstance)
+        public IEnumerator AttackedUnitEffect(DamageInstance damageInstance)
         {
             foreach (var routine in onAttackedRoutines)
             {
                 yield return StartCoroutine(routine);
             }
-            TakeDamage(attackInstance.Damage);
+            TakeDamage(damageInstance);
 
             yield return new WaitForSeconds(1f);
         }
 
-        public void TakeDamage(int amount)
+        public void TakeShieldDamage(DamageInstance damageInstance)
         {
+            if(!damageInstance.TookShieldDamage) return;
+            
+            var amount = damageInstance.ShieldDamage ?? 0;
+            if (amount < 0) amount = 0;
+            
+            Stats.CurrentShield -= amount;
+            
+            EventManager.Trigger(new UnitTakeDamageEvent(this, Stats.CurrentHp));
+
+            if (Stats.CurrentShield <= 0) BreakShield();
+        }
+
+        public void TakeHpDamage(DamageInstance damageInstance)
+        {
+            if(!damageInstance.TookHPDamage) return;
+            
+            var amount = damageInstance.HpDamage ?? 0;
             if (amount < 0) amount = 0; //No negative damage, negative damage doesn't heal, but can deal 0 damage
 
             var startHp = Stats.CurrentHp;
@@ -310,7 +324,12 @@ namespace Battle
             EventManager.Trigger(new UnitTakeDamageEvent(this, startHp));
 
             if (Stats.CurrentHp <= 0) KillEntityInBattle();
-            OnCurrentHealthChanged?.Invoke(Stats.CurrentHp);
+        }
+
+        public void TakeDamage(DamageInstance damageInstance)
+        {
+            if(damageInstance.TookHPDamage) TakeHpDamage(damageInstance);
+            if(damageInstance.TookShieldDamage) TakeShieldDamage(damageInstance);
         }
 
         public void HealDamage(int amount)
@@ -321,14 +340,18 @@ namespace Battle
             Stats.CurrentHp += amount;
 
             EventManager.Trigger(new UnitHealDamageEvent(this, startHp));
-            
-            OnCurrentHealthChanged?.Invoke(Stats.CurrentHp );
         }
+
+        public void BreakShield()
+        {
+            
+        }
+        
         
         [ContextMenu("Execute")]
         public void Execute()
         {
-            TakeDamage(Stats.CurrentHp);
+            KillEntityInBattle();
         }
 
         public void KillEntityInBattle()
@@ -432,41 +455,64 @@ namespace Battle
         }
     }
     
-    public class AttackInstance
+    public class DamageInstance
     {
-        public int OriginalDamage { get; }
-        public int Damage { get; private set; }
+        public int? OriginalHpDamage { get; }
+        public int? OriginalShieldDamage { get; }
+        public int? HpDamage { get; private set; }
+        public int? ShieldDamage { get; private set; }
+        public bool TookHPDamage => HpDamage != null;
+        public bool TookShieldDamage => ShieldDamage != null;
 
-        public AttackInstance(int damage)
+        public DamageInstance(int? hpDamage,int? shieldDamage)
         {
-            OriginalDamage = damage;
-            Damage = damage;
+            OriginalHpDamage = hpDamage;
+            HpDamage = hpDamage;
+            
+            OriginalShieldDamage = shieldDamage;
+            ShieldDamage = shieldDamage;
         }
 
         public override string ToString()
         {
-            return $"AttackInstance: {OriginalDamage} -> {Damage}";
+            return $"AttackInstance: {OriginalHpDamage} -> {HpDamage}, {OriginalShieldDamage} -> {ShieldDamage}";
         }
 
-        public void ChangeDamage(int value)
+        public void ChangeHpDamage(int value)
         {
-            Damage = value;
+            HpDamage = value;
         }
 
-        public void IncreaseDamage(int value)
+        public void IncreaseHpDamage(int value)
         {
-            Damage += value;
+            if(!TookHPDamage) return;
+            HpDamage += value;
         }
 
-        public void DecreaseDamage(int value)
+        public void DecreaseHpDamage(int value)
         {
-            Damage -= value;
-            if (Damage < 0) Damage = 0;
+            if(!TookHPDamage) return;
+            HpDamage -= value;
+            if (HpDamage < 0) HpDamage = 0;
         }
         
-        
-        
-        
+        public void ChangeShieldDamage(int value)
+        {
+            ShieldDamage = value;
+        }
+
+        public void IncreaseShieldDamage(int value)
+        {
+            if(!TookShieldDamage) return;
+            ShieldDamage += value;
+        }
+
+        public void DecreaseShieldDamage(int value)
+        {
+            if(!TookShieldDamage) return;
+            ShieldDamage -= value;
+            if (ShieldDamage < 0) ShieldDamage = 0;
+        }
     }
 }
 

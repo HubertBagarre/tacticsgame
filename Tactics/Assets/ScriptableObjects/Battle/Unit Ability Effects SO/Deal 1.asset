@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e47b55f978106c549a6398743d9e0290, type: 3}
   m_Name: Deal 1
   m_EditorClassIdentifier: 
-  damage: 6
+  hpDamage: 0
+  shieldDamage: 1
   useCasterAttack: 0
   isAttack: 1
