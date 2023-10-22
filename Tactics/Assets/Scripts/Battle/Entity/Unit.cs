@@ -9,7 +9,7 @@ namespace Battle
     using UnitEvents;
     using ScriptableObjects;
 
-    public class Unit : MonoBehaviour, IBattleEntity
+    public class Unit : MonoBehaviour, IBattleEntity, IPassivesContainer<Unit>
     {
         [SerializeField] private UnitSO defaultUnitSo;
         
@@ -75,8 +75,8 @@ namespace Battle
         public event Action<int, int> OnUltimatePointsAmountChanged;
         
         public List<UnitAbilityInstance> AbilityInstances { get; } = new();
-        public List<UnitPassiveInstance> PassiveInstances { get; } = new();
-        private List<UnitPassiveInstance> passivesToRemove = new();
+        public List<PassiveInstance<Unit>> PassiveInstances { get; } = new();
+        private List<PassiveInstance<Unit>> passivesToRemove = new();
 
         private List<IEnumerator> onAttackOtherUnitRoutines = new ();
         private List<IEnumerator> onAttackedRoutines = new ();
@@ -88,8 +88,8 @@ namespace Battle
         public event Action OnTurnStart;
         public event Action OnTurnEnd;
         public event Action OnDeath;
-        public event Action<UnitPassiveInstance> OnPassiveAdded; 
-        public event Action<UnitPassiveInstance> OnPassiveRemoved;
+        public event Action<PassiveInstance<Unit>> OnPassiveAdded; 
+        public event Action<PassiveInstance<Unit>> OnPassiveRemoved;
 
         public static event Action<Unit> OnUnitInit;
 
@@ -237,7 +237,7 @@ namespace Battle
         public IEnumerator EndTurn()
         {
             passivesToRemove.Clear();
-            foreach (var passiveInstance in PassiveInstances.Where(unitPassiveInstance => unitPassiveInstance.SO.HasEndTurnEffect))
+            foreach (var passiveInstance in PassiveInstances.Where(passiveInstance => passiveInstance.SO.HasEndTurnEffect))
             {
                 yield return StartCoroutine(passiveInstance.EndTurnEffect(this));
                 if(passiveInstance.NeedRemoveOnTurnEnd) passivesToRemove.Add(passiveInstance);
@@ -452,18 +452,18 @@ namespace Battle
             OnUltimatePointsAmountChanged?.Invoke(previous, CurrentUltimatePoints);
         }
 
-        public UnitPassiveInstance GetPassiveInstance(UnitPassiveSO passiveSo)
+        public PassiveInstance<Unit> GetPassiveInstance(PassiveSO<Unit> passiveSo)
         {
             return PassiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
         }
-        
+
         /// <summary>
         /// CAN RETURN NULL
         /// </summary>
         /// <param name="passiveSo"></param>
         /// <param name="amount"></param>
         /// <returns></returns>
-        public IEnumerator AddPassiveEffect(UnitPassiveSO passiveSo,int amount = 1)
+        public IEnumerator AddPassiveEffect(PassiveSO<Unit> passiveSo, int amount = 1)
         {
             //add passive instance to list
             if (!passiveSo.IsStackable) amount = 1;
@@ -488,7 +488,7 @@ namespace Battle
         /// </summary>
         /// <param name="passiveSo"></param>
         /// <returns></returns>
-        public IEnumerator RemovePassiveEffect(UnitPassiveSO passiveSo)
+        public IEnumerator RemovePassiveEffect(PassiveSO<Unit> passiveSo)
         {
             var currentInstance = GetPassiveInstance(passiveSo);
             return currentInstance == null ? null : RemovePassiveEffect(currentInstance);
@@ -499,7 +499,7 @@ namespace Battle
         /// </summary>
         /// <param name="passiveInstance"></param>
         /// <returns></returns>
-        public IEnumerator RemovePassiveEffect(UnitPassiveInstance passiveInstance)
+        public IEnumerator RemovePassiveEffect(PassiveInstance<Unit> passiveInstance)
         {
             if (!PassiveInstances.Contains(passiveInstance)) return null;
             PassiveInstances.Remove(passiveInstance);
@@ -507,6 +507,11 @@ namespace Battle
             OnPassiveRemoved?.Invoke(passiveInstance);
             
             return passiveInstance.RemovePassive(this);
+        }
+
+        IEnumerator IPassivesContainer<Unit>.RemoveAllPassives()
+        {
+            return RemoveAllPassives();
         }
 
         private IEnumerator RemoveAllPassives()
@@ -518,7 +523,7 @@ namespace Battle
             passivesToRemove.Clear();
         }
 
-        public int GetPassiveEffectCount(Func<UnitPassiveInstance,bool> condition,out UnitPassiveInstance firstPassiveInstance)
+        public int GetPassiveEffectCount(Func<PassiveInstance<Unit>,bool> condition,out PassiveInstance<Unit> firstPassiveInstance)
         {
             condition ??= _ => true;
             

@@ -4,6 +4,11 @@ using UnityEngine;
 
 namespace Battle.ScriptableObjects
 {
+    public enum PassiveType
+    {
+        Kit,Positive,Negative,Neutral
+    }
+    
     public abstract class PassiveSO<T> : ScriptableObject where T : IPassivesContainer<T>
     {
         [field: Header("Ability Details")]
@@ -11,6 +16,7 @@ namespace Battle.ScriptableObjects
         public Sprite Sprite { get; private set; }
 
         [field: SerializeField] public GameObject Model { get; private set; }
+        [field: SerializeField] public PassiveType Type { get; private set; } = PassiveType.Neutral;
         [field: SerializeField] public string Name { get; private set; }
 
         [field: SerializeField, TextArea(10, 10)]
@@ -60,7 +66,7 @@ namespace Battle
 
     public interface IPassivesContainer<T> where T : IPassivesContainer<T>
     {
-        public UnitPassiveInstance GetPassiveInstance(PassiveSO<T> passiveSo);
+        public PassiveInstance<T> GetPassiveInstance(PassiveSO<T> passiveSo);
         public IEnumerator AddPassiveEffect(PassiveSO<T> passiveSo, int amount = 1);
         public IEnumerator RemovePassiveEffect(PassiveSO<T> passiveSo);
         public IEnumerator RemovePassiveEffect(PassiveInstance<T> passiveInstance);

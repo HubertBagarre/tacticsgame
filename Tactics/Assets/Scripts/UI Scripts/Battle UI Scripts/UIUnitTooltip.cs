@@ -20,7 +20,7 @@ namespace Battle.UIComponent
         [Header("Passives")]
         [SerializeField] private UIUnitPassiveIcon unitPassiveIconPrefab;
         [SerializeField] private Transform passiveIconParent;
-        private Dictionary<UnitPassiveInstance,GameObject> passiveIconDict = new();
+        private Dictionary<PassiveInstance<Unit> ,GameObject> passiveIconDict = new();
         
         [Header("Stats")]
         [SerializeField] private UIStatElement UIStatElementPrefab;
@@ -129,7 +129,7 @@ namespace Battle.UIComponent
             }
         }
 
-        private void AddPassive(UnitPassiveInstance passiveInstance)
+        private void AddPassive(PassiveInstance<Unit>  passiveInstance)
         {
             if (!passiveIconDict.ContainsKey(passiveInstance))
             {
@@ -142,7 +142,7 @@ namespace Battle.UIComponent
             UpdateCurrentPassives();
         }
 
-        private void RemovePassive(UnitPassiveInstance passiveInstance)
+        private void RemovePassive(PassiveInstance<Unit>  passiveInstance)
         {
             if (passiveIconDict.ContainsKey(passiveInstance))
             {

@@ -11,7 +11,8 @@ namespace Battle.ScriptableObjects.Ability.Effect
     {
         [SerializeField] private List<PassiveToAdd> passivesToAdd = new();
         
-        [SerializeField,Tooltip("Takes Neutral, Positive and Negative")] private List<PassiveType> order = new(){PassiveType.Neutral,PassiveType.Positive,PassiveType.Negative};
+        [SerializeField,Tooltip("Takes Neutral, Positive and Negative")] private List<PassiveType> order = 
+            new(){PassiveType.Neutral,PassiveType.Positive,PassiveType.Negative};
         private Dictionary<PassiveType,IEnumerable<PassiveToAdd>> passivesByType = new(){ { PassiveType.Neutral,Enumerable.Empty<PassiveToAdd>()},{ PassiveType.Positive,Enumerable.Empty<PassiveToAdd>()},{ PassiveType.Negative,Enumerable.Empty<PassiveToAdd>()}};
         
         private IEnumerable<PassiveToAdd> NeutralPassives => passivesToAdd.Where(passiveToAdd => passiveToAdd.Passive.Type != PassiveType.Positive && passiveToAdd.Passive.Type != PassiveType.Negative );

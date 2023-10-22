@@ -8,9 +8,9 @@ namespace Battle.UIComponent
     {
         [SerializeField] private Image image;
         [SerializeField] private TextMeshProUGUI stacksCountText;
-        public UnitPassiveInstance PassiveInstance { get; private set; }
+        public PassiveInstance<Unit>  PassiveInstance { get; private set; }
 
-        public void LinkToPassive(UnitPassiveInstance instance)
+        public void LinkToPassive(PassiveInstance<Unit>  instance)
         {
             PassiveInstance = instance;
             image.sprite = PassiveInstance.SO.Sprite;

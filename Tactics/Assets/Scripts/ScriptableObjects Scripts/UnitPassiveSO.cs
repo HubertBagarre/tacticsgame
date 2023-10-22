@@ -2,12 +2,10 @@ using System;
 using System.Collections;
 using UnityEngine;
 
+/*
 namespace Battle.ScriptableObjects
 {
-    public enum PassiveType
-    {
-        Kit,Positive,Negative,Neutral
-    }
+    
     
     public abstract class UnitPassiveSO : ScriptableObject
     {
@@ -139,5 +137,5 @@ namespace Battle
         }
     }
 }
-
+*/
 

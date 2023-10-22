@@ -59,7 +59,7 @@ namespace Battle
     [Serializable]
     public class PassiveToAdd
     {
-        [field: SerializeField] public UnitPassiveSO Passive { get; private set; }
+        [field: SerializeField] public PassiveSO<Unit> Passive { get; private set; }
         [field: SerializeField] public int Stacks { get; private set; } = 1;
     }
     

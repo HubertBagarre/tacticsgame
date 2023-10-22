@@ -12,7 +12,7 @@ namespace Battle.ScriptableObjects
         [Serializable]
         public class RequiredPassive
         {
-            [field: SerializeField] public UnitPassiveSO Passive { get; private set; }
+            [field: SerializeField] public PassiveSO<Unit> Passive { get; private set; }
             [field: SerializeField] public int RequiredStacks { get; private set; } = 0;
             public bool RequiresStacks => RequiredStacks > 0 && Passive.IsStackable;
             [field: SerializeField] public bool ConsumeStacks { get; private set; } = false;
@@ -80,7 +80,7 @@ namespace Battle.ScriptableObjects
             }
         }
         
-        private static bool Condition(UnitPassiveInstance instance,RequiredPassive requiredPassive)
+        private static bool Condition(PassiveInstance<Unit>  instance,RequiredPassive requiredPassive)
         {
             var matchingSo = instance.SO == requiredPassive.Passive;
             if(!matchingSo) return false;
@@ -100,7 +100,7 @@ namespace Battle.ScriptableObjects
                 
                 continue;
 
-                bool Func(UnitPassiveInstance instance) => Condition(instance, requiredPassive);
+                bool Func(PassiveInstance<Unit> instance) => Condition(instance, requiredPassive);
             }
 
             return true;
@@ -116,7 +116,7 @@ namespace Battle.ScriptableObjects
                 
                 continue;
 
-                bool Func(UnitPassiveInstance instance) => Condition(instance, requiredPassive);
+                bool Func(PassiveInstance<Unit> instance) => Condition(instance, requiredPassive);
             }
         }
     }

@@ -88,7 +88,7 @@ namespace Battle.UIComponent
             shieldBarImage.fillAmount = current / (float)max;
         }
         
-        private void AddPassiveIcon(UnitPassiveInstance passiveInstance)
+        private void AddPassiveIcon(PassiveInstance<Unit>  passiveInstance)
         {
             var associatedPassive =
                 unitPassiveIcons.FirstOrDefault(passiveIcon => passiveIcon.PassiveInstance == passiveInstance);
@@ -101,7 +101,7 @@ namespace Battle.UIComponent
             associatedPassive.LinkToPassive(passiveInstance);
         }
 
-        private void RemovePassiveIcon(UnitPassiveInstance passiveInstance)
+        private void RemovePassiveIcon(PassiveInstance<Unit>  passiveInstance)
         {
             var associatedPassive =
                 unitPassiveIcons.FirstOrDefault(passiveIcon => passiveIcon.PassiveInstance == passiveInstance);

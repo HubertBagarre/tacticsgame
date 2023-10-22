@@ -7,7 +7,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
     [CreateAssetMenu(menuName = "Battle Scriptables/Ability Effect/Remove Passives")]
     public class RemovePassivesEffectSo : UnitAbilityEffectSO
     {
-        [SerializeField] private List<UnitPassiveSO> passivesToRemove = new();
+        [SerializeField] private List<PassiveSO<Unit>> passivesToRemove = new();
 
         public override string ConvertedDescription(Unit caster)
         {
