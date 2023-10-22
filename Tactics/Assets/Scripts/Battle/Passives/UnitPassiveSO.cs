@@ -64,9 +64,12 @@ namespace Battle
         public UnitPassiveSO SO { get; }
         public bool IsStackable => SO.IsStackable;
         public int CurrentStacks { get; private set; } = 0;
+        public bool HasMoreStacksThanMax => SO.MaxStacks != 0 && CurrentStacks >= SO.MaxStacks;
         public bool NeedRemoveOnTurnStart { get; private set; }
         public bool NeedRemoveOnTurnEnd { get; private set; }
 
+        private Unit associatedUnit;
+        
         public event Action<int> OnCurrentStacksChanged;
 
         public UnitPassiveInstance(UnitPassiveSO so,int startingStacks = 1)
@@ -77,10 +80,13 @@ namespace Battle
             CurrentStacks = startingStacks - 1;
         }
         
-        public IEnumerator AddPassive(Unit unit)
+        public IEnumerator AddPassive(Unit unit,int amount = 1)
         {
-            if (SO.MaxStacks != 0 && CurrentStacks >= SO.MaxStacks) return null;
-            CurrentStacks++;
+            if(associatedUnit == null) associatedUnit = unit;
+            
+            if (HasMoreStacksThanMax) return null;
+            CurrentStacks += amount;
+            if (HasMoreStacksThanMax) CurrentStacks = SO.MaxStacks;
             OnCurrentStacksChanged?.Invoke(CurrentStacks);
             return SO.AddPassive(unit,this);
         }
@@ -108,6 +114,28 @@ namespace Battle
         public void SetRemoveOnTurnEnd(bool value)
         {
             NeedRemoveOnTurnEnd = value;
+        }
+
+        public IEnumerator IncreaseStacks(int amount)
+        {
+            yield return AddPassive(associatedUnit,amount);
+        }
+
+        public IEnumerator DecreaseStacks(int amount)
+        {
+            if (CurrentStacks <= 1)
+            {
+                yield return associatedUnit.RemovePassiveEffect(this);
+                yield break;
+            }
+            
+            CurrentStacks -= amount;
+            
+            if(CurrentStacks <= 0) CurrentStacks = 0;
+            OnCurrentStacksChanged?.Invoke(CurrentStacks);
+            
+            yield return RemovePassive(associatedUnit);
+
         }
     }
 }

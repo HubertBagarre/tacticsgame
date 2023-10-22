@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-namespace Battle.ScriptableObjects.Ability.Selector
+namespace Battle.ScriptableObjects.Selector
 {
     [CreateAssetMenu(menuName = "Battle Scriptables/Ability Selector/List Selector")]
     public class ListSelector : UnitAbilitySelectorSO
@@ -10,10 +11,10 @@ namespace Battle.ScriptableObjects.Ability.Selector
 
         protected override int OverrideExpectedSelections()
         {
-            return selectors.Count;
+            return selectors.Sum(selector => selector.ExpectedSelections);
         }
 
-        public override string SelectionDescription(Unit caster)
+        public override string Description(Unit caster)
         {
             var text = "";
             for (var index = 0; index < selectors.Count; index++)
@@ -21,7 +22,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
                 var selector = selectors[index];
                 var returnChar = (index != 0 ? ", then " : "");
                 
-                var selectorText = selector.SelectionDescription(caster);
+                var selectorText = selector.Description(caster);
                 if(index != 0) selectorText = selectorText.ToLower();
                 
                 text += $"{returnChar}{selectorText}";

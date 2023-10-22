@@ -29,7 +29,7 @@ MonoBehaviour:
   <Abilities>k__BackingField:
   - <Ability>k__BackingField: {fileID: 11400000, guid: 112bc70c7d75c9f41a41f2d352b09d80,
       type: 2}
-    <ShowInUI>k__BackingField: 0
+    <ShowInUI>k__BackingField: 1
   - <Ability>k__BackingField: {fileID: 11400000, guid: e017d0e95778ff74290ac401d649921d,
       type: 2}
     <ShowInUI>k__BackingField: 1

@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d941316ac0761124bb2116ed7d0deafb, type: 3}
+  m_Name: Katarina
+  m_EditorClassIdentifier: 
+  <Portrait>k__BackingField: {fileID: 0}
+  <Name>k__BackingField: Katarina
+  <Description>k__BackingField: Daggers and Resets
+  model: {fileID: 0}
+  <MaxHp>k__BackingField: 6
+  <MaxShield>k__BackingField: 5
+  <Attack>k__BackingField: 1
+  <AttackRange>k__BackingField: 3
+  <BaseMovement>k__BackingField: 3
+  <BaseSpeed>k__BackingField: 12
+  <Initiative>k__BackingField: 90
+  <Behaviour>k__BackingField: {fileID: 11400000, guid: d70b7e818c234f34c9fb661ceb2610dd,
+    type: 2}
+  <Abilities>k__BackingField:
+  - <Ability>k__BackingField: {fileID: 11400000, guid: 112bc70c7d75c9f41a41f2d352b09d80,
+      type: 2}
+    <ShowInUI>k__BackingField: 0
+  - <Ability>k__BackingField: {fileID: 11400000, guid: f00d3bec0f9a6824fb4b345c1d0f9efe,
+      type: 2}
+    <ShowInUI>k__BackingField: 0
+  - <Ability>k__BackingField: {fileID: 11400000, guid: 31e6ceaff8da4aa48af84465371c69df,
+      type: 2}
+    <ShowInUI>k__BackingField: 0
+  <StartingPassives>k__BackingField: []

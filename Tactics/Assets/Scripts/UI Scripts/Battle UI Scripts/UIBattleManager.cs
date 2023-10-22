@@ -129,12 +129,12 @@ namespace Battle
 
             void CancelSelection()
             {
-                EventManager.Trigger(new EndAbilityTargetSelectionEvent(true));
+                EventManager.Trigger(new EndAbilityTargetSelectionEvent(null,true));
             }
 
             void ConfirmSelection()
             {
-                EventManager.Trigger(new EndAbilityTargetSelectionEvent(false));
+                EventManager.Trigger(new EndAbilityTargetSelectionEvent(null,false));
             }
 
             void ShowEndTurnButtonOnAbilityTargetSelectionCancel(EndAbilityTargetSelectionEvent ctx)

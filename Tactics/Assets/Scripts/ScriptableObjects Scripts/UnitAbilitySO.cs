@@ -27,6 +27,7 @@ namespace Battle.ScriptableObjects
         [field: SerializeField] public AbilityType Type { get; private set; }
         [SerializeField, TextArea(10, 10)] protected string description;
         [field:SerializeField] public UnitAbilitySelectorSO Selector { get; private set; }
+        [field:SerializeField] public UnitAbilityRequirementSO Requirement { get; private set; }
         [field:SerializeField] public UnitAbilityEffectSO[] Effects { get; private set; }
         
         [field:Header("Costs")]
@@ -42,6 +43,7 @@ namespace Battle.ScriptableObjects
 
         public virtual string ConvertedDescription(Unit caster)
         {
+            var requirementsText = Requirement == null ? string.Empty : $"<i>{Requirement.Description(caster)}</i>\n";
             
             var effectsText = string.Empty;
             foreach (var effect in Effects)
@@ -55,29 +57,41 @@ namespace Battle.ScriptableObjects
             if(Selector == null) return $"{effectsText}";
             
             //Maybe do something cleaner of multi effects
-            var descriptionText = Selector.SelectionDescription(caster);
+            var descriptionText = Selector.Description(caster);
             
             var affectedDesc = Selector.AffectedDescription(caster);
             var toAffectedDesc = affectedDesc == string.Empty ? string.Empty : $" to{affectedDesc}";
             effectsText = effectsText.Replace("%toAFFECTED%", $"{toAffectedDesc}");
             effectsText = effectsText.Replace("%AFFECTED%", Selector.AffectedDescription(caster));
             
-            return $"Select {descriptionText}.\n{effectsText}";
+            if(descriptionText == string.Empty) return $"{requirementsText}{effectsText}";
+            
+            return $"{requirementsText}Select {descriptionText}.\n{effectsText}";
         }
 
         public string ConvertDescriptionLinks(Unit caster, string linkKey)
         {
             var text = linkKey;
-            if (Selector.ConvertDescriptionLinks(caster,linkKey, out var selectorText)) text = selectorText;
+            if(Selector != null) if (Selector.ConvertDescriptionLinks(caster,linkKey, out var selectorText)) text = selectorText;
+            if(Requirement != null) if (Requirement.ConvertDescriptionLinks(caster,linkKey, out var requirementText)) text = requirementText;
             foreach (var effect in Effects)
             {
                 if (effect.ConvertDescriptionLinks(caster,linkKey, out var effectText)) text = effectText;
             }
             return text;
         }
+
+        public bool CanCastAbility(Unit caster)
+        {
+            return Requirement == null || Requirement.CanCastAbility(caster);
+        }
         
         public IEnumerator CastAbility(Unit caster, Tile[] targetTiles)
         {
+            if(!CanCastAbility(caster)) yield break;
+
+            if(Requirement != null) yield return caster.StartCoroutine(Requirement.ConsumeRequirement(caster));
+            
             foreach (var effect in Effects)
             {
                 yield return caster.StartCoroutine(effect.AbilityEffect(caster, targetTiles));
@@ -216,7 +230,7 @@ namespace Battle
 
             if (SO.SkipTargetConfirmation)
             {
-                EventManager.Trigger(new EndAbilityTargetSelectionEvent(false));
+                EventManager.Trigger(new EndAbilityTargetSelectionEvent(caster,false));
             }
         }
 

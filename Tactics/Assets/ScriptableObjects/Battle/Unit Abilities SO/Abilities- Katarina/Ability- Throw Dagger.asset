@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9aee06dd214c82043a27b1dc41ab3dc7, type: 3}
+  m_Name: Ability- Throw Dagger
+  m_EditorClassIdentifier: 
+  <Sprite>k__BackingField: {fileID: 0}
+  <Name>k__BackingField: Throw Dagger
+  <Type>k__BackingField: 2
+  description: 
+  <Selector>k__BackingField: {fileID: 11400000, guid: 8f40bf7c71ae6b24395bf6427a76573b,
+    type: 2}
+  <Requirement>k__BackingField: {fileID: 11400000, guid: 832c5cc794e383842a61ba015dcba11b,
+    type: 2}
+  <Effects>k__BackingField:
+  - {fileID: 11400000, guid: 613b3f78832c3254483fa8922386357a, type: 2}
+  <Cooldown>k__BackingField: 0
+  <Cost>k__BackingField: 1
+  <IsUltimate>k__BackingField: 0
+  <UltimateCost>k__BackingField: 0
+  <SkipTargetSelection>k__BackingField: 0
+  <SkipTargetConfirmation>k__BackingField: 0
+  <EndUnitTurnAfterCast>k__BackingField: 1

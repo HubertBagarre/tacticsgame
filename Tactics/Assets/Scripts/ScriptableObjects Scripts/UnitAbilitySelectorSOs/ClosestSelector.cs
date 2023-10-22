@@ -47,9 +47,9 @@ namespace Battle.ScriptableObjects.Ability.Selector
             return true;
         }
 
-        public override string SelectionDescription(Unit caster)
+        public override string Description(Unit caster)
         {
-            return selector == null ? string.Empty : selector.SelectionDescription(caster);
+            return selector == null ? string.Empty : selector.Description(caster);
         }
 
         public override string AffectedDescription(Unit caster)

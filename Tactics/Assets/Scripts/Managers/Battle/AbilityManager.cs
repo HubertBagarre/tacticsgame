@@ -41,7 +41,7 @@ namespace Battle
             {
                 var cancel = (currentCastingAbilityInstance == ctx.Ability);
 
-                EventManager.Trigger(new EndAbilityTargetSelectionEvent(true));
+                EventManager.Trigger(new EndAbilityTargetSelectionEvent(caster,true));
 
                 if (cancel) return;
 
@@ -57,7 +57,7 @@ namespace Battle
             
             if (caster.CurrentUltimatePoints < currentCastingAbilityInstance.UltimateCost)
             {
-                EventManager.Trigger(new EndAbilityTargetSelectionEvent(true));
+                EventManager.Trigger(new EndAbilityTargetSelectionEvent(caster,true));
                 return;
             }
 
@@ -83,7 +83,7 @@ namespace Battle
 
             void CancelAbilityTargetSelection()
             {
-                EventManager.Trigger(new EndAbilityTargetSelectionEvent(true));
+                EventManager.Trigger(new EndAbilityTargetSelectionEvent(caster,true));
             }
 
             void TryCastAbility(EndAbilityTargetSelectionEvent selectionEvent)
@@ -195,10 +195,12 @@ namespace Battle.AbilityEvents
 
     public class EndAbilityTargetSelectionEvent
     {
+        public Unit Caster { get; }
         public bool Canceled { get; }
 
-        public EndAbilityTargetSelectionEvent(bool canceled)
+        public EndAbilityTargetSelectionEvent(Unit caster,bool canceled)
         {
+            Caster = caster;
             Canceled = canceled;
         }
     }

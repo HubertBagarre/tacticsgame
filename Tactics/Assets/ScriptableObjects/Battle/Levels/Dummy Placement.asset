@@ -10,24 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5bc82edcfd36e7f4690169738e55694f, type: 3}
-  m_Name: Test Placement
+  m_Name: Dummy Placement
   m_EditorClassIdentifier: 
   <PlacedUnits>k__BackingField:
   - prefab: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
       type: 3}
-    so: {fileID: 11400000, guid: 9678e3581c87714498371f90fc482a9c, type: 2}
-    team: 0
-    position: {x: 0, y: 0}
-    orientation: 4
-  - prefab: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
-      type: 3}
-    so: {fileID: 11400000, guid: 8c798ae10bc978341b71cae74b691113, type: 2}
-    team: 0
-    position: {x: 2, y: 2}
-    orientation: 4
-  - prefab: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
-      type: 3}
     so: {fileID: 11400000, guid: 61a3f0fc4fd04034798ec0fc6883ad4e, type: 2}
     team: 1
-    position: {x: 6, y: 6}
+    position: {x: 4, y: 4}
     orientation: 6
+  - prefab: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
+      type: 3}
+    so: {fileID: 11400000, guid: ce006ab0bef781c41bcdfbffb35f3e6b, type: 2}
+    team: 0
+    position: {x: 1, y: 1}
+    orientation: 4

@@ -15,10 +15,10 @@ namespace Battle.ScriptableObjects.Ability.Selector
             return startTileSelector != null ? expectedDirections : expectedDirections + 1;
         }
 
-        public override string SelectionDescription(Unit caster)
+        public override string Description(Unit caster)
         {
             var text = $" {expectedDirections} direction{(expectedDirections > 1 ? "s" : "")}.";
-            if (startTileSelector != null) return $"{startTileSelector.SelectionDescription(caster)}, then {text}";
+            if (startTileSelector != null) return $"{startTileSelector.Description(caster)}, then {text}";
             return text;
         }
 

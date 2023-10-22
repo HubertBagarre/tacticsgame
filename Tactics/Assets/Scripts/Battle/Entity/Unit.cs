@@ -11,6 +11,8 @@ namespace Battle
 
     public class Unit : MonoBehaviour, IBattleEntity
     {
+        [SerializeField] private UnitSO defaultUnitSo;
+        
         [Header("Anchors")]
         [SerializeField] private Transform modelParent;
         [field:SerializeField] public Transform UiParent { get; private set; }
@@ -94,7 +96,12 @@ namespace Battle
         public void InitUnit(Tile tile, int team, UnitSO so,Tile.Direction orientation)
         {
             // TODO - Instantiate model
-            BattleModel = Instantiate(so.model, modelParent);
+            if (so == null) so = defaultUnitSo;
+            
+            var model = so.model;
+            if (model == null) model = defaultUnitSo.model;
+            
+            BattleModel = Instantiate(model, modelParent);
             BattleModel.SetOrientation(orientation);
             BattleModel.SetPosition(transform.position);
             BattleModel.ShowGhost(false);
@@ -103,7 +110,7 @@ namespace Battle
             Team = team;
             Stats = so.CreateInstance(this);
             
-            tile.SetUnit(this);
+            if(Tile != null) tile.SetUnit(this);
             
             OnUnitInit?.Invoke(this);
         }
@@ -497,6 +504,15 @@ namespace Battle
                 yield return StartCoroutine(RemovePassiveEffect(passiveToRemove)); 
             }
             passivesToRemove.Clear();
+        }
+
+        public int GetPassiveEffectCount(Func<UnitPassiveInstance,bool> condition,out UnitPassiveInstance firstPassiveInstance)
+        {
+            condition ??= _ => true;
+            
+            firstPassiveInstance = PassiveInstances.Where(condition).FirstOrDefault();
+            
+            return PassiveInstances.Count(condition);
         }
     }
     

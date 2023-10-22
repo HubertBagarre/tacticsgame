@@ -8,7 +8,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
     {
         //TODO: Add a range to this selector
 
-        public override string SelectionDescription(Unit caster)
+        public override string Description(Unit caster)
         {
             return "a Tile";
         }

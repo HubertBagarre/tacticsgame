@@ -30,7 +30,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
             return true;
         }
 
-        public override string SelectionDescription(Unit caster)
+        public override string Description(Unit caster)
         {
             var range = caster.Stats.AttackRange;
             var unitType = string.Empty;

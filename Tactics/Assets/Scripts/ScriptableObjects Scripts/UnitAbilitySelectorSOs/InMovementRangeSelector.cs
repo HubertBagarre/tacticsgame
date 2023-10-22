@@ -11,7 +11,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
             return 1;
         }
 
-        public override string SelectionDescription(Unit caster)
+        public override string Description(Unit caster)
         {
             return "a tile within Movement range";
         }

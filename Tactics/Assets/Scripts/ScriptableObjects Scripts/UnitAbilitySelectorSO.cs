@@ -25,7 +25,7 @@ namespace Battle.ScriptableObjects
             return false;
         }
 
-        public abstract string SelectionDescription(Unit caster);
+        public abstract string Description(Unit caster);
 
         public virtual string AffectedDescription(Unit caster)
         {

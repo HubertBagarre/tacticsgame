@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f83a9c31904b99249a4e82aa8788c2a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultUnitSo: {fileID: 11400000, guid: 61a3f0fc4fd04034798ec0fc6883ad4e, type: 2}
   modelParent: {fileID: 7971550186961886234}
   <UiParent>k__BackingField: {fileID: 1007381053093905679}
   <Tile>k__BackingField: {fileID: 0}
@@ -54,7 +55,7 @@ MonoBehaviour:
   <IsActive>k__BackingField: 0
   <CanMove>k__BackingField: 1
   movementLeft: 0
-  <DistanceFromTurnStart>k__BackingField: 0
+  distanceFromTurnStart: 0
   <CurrentUltimatePoints>k__BackingField: 0
 --- !u!136 &6609939913135990062
 CapsuleCollider:

@@ -1,17 +1,11 @@
-using System.Collections;
-using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
-using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
-using Image = UnityEngine.UI.Image;
 
 namespace Battle.UIComponent
 {
     using AbilityEvents;
-    using ScriptableObjects.Ability;
+    using UIEvents;
     
     public class UIUnitAbilityButton : MonoBehaviour
     {
@@ -42,12 +36,29 @@ namespace Battle.UIComponent
             ultimateChargesParent = ultimateChargesParentGo.transform;
             Button.onClick.AddListener(StartAbilityTargetSelection);
         }
+
+        private bool CanBeCast()
+        {
+            if(!associatedAbility.SO.CanCastAbility(associatedUnit)) return false;
+            if (associatedAbility.CurrentCooldown > 0) return false;
+            return associatedUnit.CurrentUltimatePoints >= associatedAbility.UltimateCost;
+        }
+
+        private void UpdateButtonInteractable(EndAbilityTargetSelectionEvent ctx)
+        {
+            if(associatedUnit == null) return;
+            if(associatedAbility == null) return;
+            if(ctx.Caster != associatedUnit) return;
+            
+            Button.interactable = CanBeCast();
+        }
         
         public void LinkAbility(UnitAbilityInstance ability,Unit caster)
         {
             if (associatedUnit != null)
             {
                 associatedUnit.OnUltimatePointsAmountChanged -= UpdateUltimateCharges;
+                EventManager.RemoveListener<EndAbilityTargetSelectionEvent>(UpdateButtonInteractable);
             }
             
             associatedAbility = ability;
@@ -56,6 +67,7 @@ namespace Battle.UIComponent
             abilityShower.LinkAbility(ability,caster);
 
             associatedUnit.OnUltimatePointsAmountChanged += UpdateUltimateCharges;
+            EventManager.AddListener<EndAbilityTargetSelectionEvent>(UpdateButtonInteractable);
 
             UpdateAppearance();
         }
@@ -66,7 +78,7 @@ namespace Battle.UIComponent
             UpdateCostCharges();
             UpdateCooldown();
             
-            Button.interactable = associatedUnit.CurrentUltimatePoints >= associatedAbility.UltimateCost && !(associatedAbility.CurrentCooldown > 0);
+            Button.interactable = CanBeCast();
         }
         
         private void UpdateUltimateChargesAmount()
@@ -112,6 +124,8 @@ namespace Battle.UIComponent
 
         private void StartAbilityTargetSelection()
         {
+            
+            
             EventManager.Trigger(new StartAbilityTargetSelectionEvent(associatedAbility,associatedUnit));
         }
     }

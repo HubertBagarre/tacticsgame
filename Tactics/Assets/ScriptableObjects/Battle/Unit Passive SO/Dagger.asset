@@ -15,10 +15,12 @@ MonoBehaviour:
   <Sprite>k__BackingField: {fileID: 21300000, guid: 86f5515ea3cedf8428cf0070e79dd782,
     type: 3}
   <Name>k__BackingField: Dagger
-  <Type>k__BackingField: 0
+  <Type>k__BackingField: 1
   <Description>k__BackingField: It's a dagger lmao.
-  <IsStackable>k__BackingField: 0
+  <IsStackable>k__BackingField: 1
   <MaxStacks>k__BackingField: 0
-  <HasStartTurnEffect>k__BackingField: 1
-  <HasEndTurnEffect>k__BackingField: 1
+  <HasStartTurnEffect>k__BackingField: 0
+  <HasEndTurnEffect>k__BackingField: 0
   <IsUnmovable>k__BackingField: 0
+  removeOnTurnEnd: 0
+  removeOnTurnStart: 0
