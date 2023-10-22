@@ -15,6 +15,8 @@ namespace Battle.UIComponent
             PassiveInstance = instance;
             image.sprite = PassiveInstance.SO.Sprite;
             PassiveInstance.OnCurrentStacksChanged += UpdateStacksCount;
+            
+            UpdateStacksCount(PassiveInstance.CurrentStacks);
         }
 
         private void UpdateStacksCount(int amount)

@@ -64,7 +64,7 @@ namespace Battle.UIComponent
             ShowUnitInfo();
             ShowCurrentStats();
             ShowCurrentAbilities();
-            ShowCurrentPassives();
+            UpdateCurrentPassives();
         }
 
         public void Hide()
@@ -129,7 +129,32 @@ namespace Battle.UIComponent
             }
         }
 
-        private void ShowCurrentPassives(UnitPassiveInstance _ = null)
+        private void AddPassive(UnitPassiveInstance passiveInstance)
+        {
+            if (!passiveIconDict.ContainsKey(passiveInstance))
+            {
+                var icon = Instantiate(unitPassiveIconPrefab, passiveIconParent);
+                icon.LinkToPassive(passiveInstance);
+                    
+                passiveIconDict.Add(passiveInstance,icon.gameObject);
+            }
+            
+            UpdateCurrentPassives();
+        }
+
+        private void RemovePassive(UnitPassiveInstance passiveInstance)
+        {
+            if (passiveIconDict.ContainsKey(passiveInstance))
+            {
+                var icon = passiveIconDict[passiveInstance];
+                passiveIconDict.Remove(passiveInstance);
+                Destroy(icon);
+            }
+            
+            UpdateCurrentPassives();
+        }
+
+        private void UpdateCurrentPassives()
         {
             foreach (var passiveInstance in currentDisplayingUnit.PassiveInstances)
             {
@@ -189,8 +214,8 @@ namespace Battle.UIComponent
             
             unit.OnMovementLeftChanged += UpdateUnitStatElementsForMovement;
             
-            unit.OnPassiveAdded += ShowCurrentPassives;
-            unit.OnPassiveRemoved += ShowCurrentPassives;
+            unit.OnPassiveAdded += AddPassive;
+            unit.OnPassiveRemoved += RemovePassive;
         }
 
         private void RemoveCallbacks(Unit unit)
@@ -206,8 +231,8 @@ namespace Battle.UIComponent
             
             unit.OnMovementLeftChanged -= UpdateUnitStatElementsForMovement;
             
-            unit.OnPassiveAdded -= ShowCurrentPassives;
-            unit.OnPassiveRemoved -= ShowCurrentPassives;
+            unit.OnPassiveAdded -= AddPassive;
+            unit.OnPassiveRemoved -= RemovePassive;
         }
 
         private void UpdateHpStatElement(UnitStatsInstance statsInstance)
