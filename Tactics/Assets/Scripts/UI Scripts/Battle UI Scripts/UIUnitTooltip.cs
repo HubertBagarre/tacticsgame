@@ -25,11 +25,11 @@ namespace Battle.UIComponent
         [Header("Stats")]
         [SerializeField] private UIStatElement UIStatElementPrefab;
         private List<UIStatElement> statElements = new();
-        private UIStatElement MovementElement => statElements[0];
-        private UIStatElement SpeedElement => statElements[1];
-        private UIStatElement AttackElement => statElements[2];
-        private UIStatElement AttackRangeElement => statElements[3];
-        private UIStatElement HpElement => statElements[4];
+        private UIStatElement MovementElement => statElements[(int)UnitStat.Movement];
+        private UIStatElement SpeedElement => statElements[(int)UnitStat.Speed];
+        private UIStatElement AttackElement => statElements[(int)UnitStat.Attack];
+        private UIStatElement AttackRangeElement => statElements[(int)UnitStat.AttackRange];
+        private UIStatElement HpElement => statElements[(int)UnitStat.Hp];
 
         private Unit currentDisplayingUnit;
 

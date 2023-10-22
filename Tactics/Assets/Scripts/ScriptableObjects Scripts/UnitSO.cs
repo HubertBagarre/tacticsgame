@@ -109,6 +109,19 @@ namespace Battle
             if(!TargetTileFirst && tileRoutine != null) yield return tile.StartCoroutine(tileRoutine);
         }
     }
+
+    public enum UnitStat
+    {
+        Hp = 4,
+        MaxHp = 5,
+        Movement = 0,
+        CurrentMovement = 6,
+        Speed = 1,
+        Attack = 2,
+        AttackRange = 3,
+        MaxShield = 7,
+        CurrentShield = 8
+    }
     
     public class UnitStatsInstance
     {

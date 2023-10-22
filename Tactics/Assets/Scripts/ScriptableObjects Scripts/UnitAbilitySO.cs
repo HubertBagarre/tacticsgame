@@ -8,9 +8,6 @@ using UnityEngine;
 
 namespace Battle.ScriptableObjects
 {
-    using Ability.Selector;
-    using Ability.Effect;
-
     public enum AbilityType
     {
         None,Movement,Offensive,Defensive

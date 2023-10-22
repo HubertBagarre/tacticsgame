@@ -331,6 +331,14 @@ namespace Battle
             MovementLeft = value;
         }
 
+        public void DecreaseMovement(int value)
+        {
+            Debug.Log($"Decreasing movement by {value}");
+            
+            MovementLeft -= value;
+            if(MovementLeft < 0) MovementLeft = 0;
+        }
+
         public IEnumerator AttackUnitEffect(Unit attackedUnit,DamageInstance damageInstance)
         {
             foreach (var routine in onAttackOtherUnitRoutines)
@@ -367,6 +375,12 @@ namespace Battle
             if (Stats.CurrentShield <= 0) BreakShield();
         }
 
+        public void TakeHpDamage(int amount,bool damageShieldFirst = false)
+        {
+            var instance = new DamageInstance(amount, null, damageShieldFirst);
+            TakeHpDamage(instance);
+        }
+        
         public void TakeHpDamage(DamageInstance damageInstance)
         {
             if(!damageInstance.TookHPDamage) return;

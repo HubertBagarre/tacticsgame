@@ -18,7 +18,8 @@ MonoBehaviour:
   description: 
   <Selector>k__BackingField: {fileID: 11400000, guid: a0355caa0bfa62c478d8275ea8a6c520,
     type: 2}
-  <Requirement>k__BackingField: {fileID: 0}
+  <Requirement>k__BackingField: {fileID: 11400000, guid: 1654da66df3b96d42b088935fd9dad0a,
+    type: 2}
   <Effects>k__BackingField:
   - {fileID: 11400000, guid: ff0543f5568a8ef4e8ebc448ed1e700b, type: 2}
   <Cooldown>k__BackingField: 0

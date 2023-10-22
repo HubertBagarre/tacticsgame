@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Battle.ScriptableObjects
+namespace Battle.ScriptableObjects.Requirement
 {
     [CreateAssetMenu(menuName = "Battle Scriptables/Ability Requirement/Required Passives")]
     public class RequirePassiveRequirement : UnitAbilityRequirementSO
@@ -41,8 +41,8 @@ namespace Battle.ScriptableObjects
         {
             var text = string.Empty;
 
-            var requiredText = GetText(RequiredPassives, "Requires");
-            var consumesText = GetText(ConsumedPassives, "Consumes");
+            var requiredText = GetPassivesText(RequiredPassives, "Requires");
+            var consumesText = GetPassivesText(ConsumedPassives, "Consumes");
             
             if(requiredText != string.Empty) text += requiredText;
             if(consumesText != string.Empty) text += consumesText;
@@ -50,7 +50,7 @@ namespace Battle.ScriptableObjects
             
             return text;
             
-            string GetText(IEnumerable<RequiredPassive> enumerable,string enumerableText)
+            string GetPassivesText(IEnumerable<RequiredPassive> enumerable,string enumerableText)
             {
                 var list = enumerable.ToList();
                 
@@ -59,9 +59,8 @@ namespace Battle.ScriptableObjects
                 var passivesCount = list.Count;
                 
                 var requiredPassive = list[0];
-                    
-                enumerableText += $"<color=yellow>{(requiredPassive.RequiresStacks ? $" {requiredPassive.RequiredStacks} stack{(requiredPassive.RequiredStacks > 1 ? "s":"")} of ":"")}" +
-                                  $" <u><link=\"passive:{0}\">{requiredPassive.Passive.Name}</link></u></color>";
+
+                enumerableText += GetPassiveText(requiredPassive);
 
                 if (passivesCount >= 2)
                 {
@@ -70,17 +69,25 @@ namespace Battle.ScriptableObjects
                         requiredPassive = list[i];
 
                         enumerableText += i == passivesCount - 1 ? " and" : ",";
-                        enumerableText += $"<color=yellow>{(requiredPassive.Passive.IsStackable ? $" {requiredPassive.RequiredStacks} stack{(requiredPassive.RequiredStacks > 1 ? "s":"")} of ":"")}" +
-                                          $" <u><link=\"passive:{i}\">{requiredPassive.Passive.Name}</link></u></color>";
+                        enumerableText += GetPassiveText(requiredPassive);
                     }
                 }
 
                 enumerableText += ".\n";
                 return enumerableText;
             }
+
+            string GetPassiveText(RequiredPassive requiredPassive)
+            {
+                var amountText = (requiredPassive.RequiresStacks
+                    ? $" {requiredPassive.RequiredStacks} stack{(requiredPassive.RequiredStacks > 1 ? "s" : "")} of "
+                    : "");
+
+                return $"<color=yellow>{amountText} <u><link=\"passive:{0}\">{requiredPassive.Passive.Name}</link></u></color>";
+            }
         }
         
-        private static bool Condition(PassiveInstance<Unit>  instance,RequiredPassive requiredPassive)
+        private static bool Condition(PassiveInstance<Unit> instance,RequiredPassive requiredPassive)
         {
             var matchingSo = instance.SO == requiredPassive.Passive;
             if(!matchingSo) return false;
