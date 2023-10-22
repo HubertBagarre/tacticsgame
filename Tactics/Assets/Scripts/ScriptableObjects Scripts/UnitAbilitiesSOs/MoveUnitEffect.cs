@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Battle.ScriptableObjects.Ability.Effect
+namespace Battle.ScriptableObjects.Effect
 {
     [CreateAssetMenu(menuName = "Battle Scriptables/Ability Effect/Move Unit")]
     public class MoveUnitEffect : UnitAbilityEffectSO
@@ -10,7 +10,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
         
         public override string ConvertedDescription(Unit caster)
         {
-            return "Move the unit.";
+            return "Move to tile.";
         }
 
         public override IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles)

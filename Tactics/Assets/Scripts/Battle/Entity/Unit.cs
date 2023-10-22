@@ -198,7 +198,7 @@ namespace Battle
                 }
             }
 
-            yield return StartCoroutine(RemovePassives());
+            yield return StartCoroutine(RemoveAllPassives());
 
             foreach (var abilityInstance in AbilityInstances)
             {
@@ -243,7 +243,7 @@ namespace Battle
                 if(passiveInstance.NeedRemoveOnTurnEnd) passivesToRemove.Add(passiveInstance);
             }
             
-            yield return StartCoroutine(RemovePassives());
+            yield return StartCoroutine(RemoveAllPassives());
 
             OnTurnEnd?.Invoke();
 
@@ -257,6 +257,19 @@ namespace Battle
             Tile = tile;
 
             Tile.SetUnit(this);
+        }
+
+        public IEnumerator TeleportUnit(Tile tile,bool isForced)
+        {
+            if(tile == null) yield break;
+            
+            
+            //TODO - play animation, different is isForced
+            yield return new WaitForSeconds(0.5f);
+            
+            transform.position = tile.transform.position;
+            BattleModel.SetPosition(transform.position);
+            SetTile(tile);
         }
 
         public IEnumerator MoveUnit(List<Tile> path,bool isForced) //PATH DOESN'T INCLUDE STARTING TILE
@@ -284,10 +297,9 @@ namespace Battle
                 yield return new WaitForSeconds(0.5f);
 
                 if(!isForced) MovementLeft--;
+                
                 transform.position = tile.transform.position;
-                
                 BattleModel.SetPosition(transform.position);
-                
                 SetTile(tile);
             }
 
@@ -497,7 +509,7 @@ namespace Battle
             return passiveInstance.RemovePassive(this);
         }
 
-        private IEnumerator RemovePassives()
+        private IEnumerator RemoveAllPassives()
         {
             foreach (var passiveToRemove in passivesToRemove)
             {
