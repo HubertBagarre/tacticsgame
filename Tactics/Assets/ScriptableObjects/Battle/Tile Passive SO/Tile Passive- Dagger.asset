@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Tile Passive- Dagger
   m_EditorClassIdentifier: 
   <Sprite>k__BackingField: {fileID: 0}
-  <Model>k__BackingField: {fileID: 0}
+  <Model>k__BackingField: {fileID: 9141144285871887397, guid: 6a3f229f84291e94497715f87da6c4c3,
+    type: 3}
   <Type>k__BackingField: 3
   <Name>k__BackingField: Thrown Dagger
   <Description>k__BackingField: A Lost Dagger

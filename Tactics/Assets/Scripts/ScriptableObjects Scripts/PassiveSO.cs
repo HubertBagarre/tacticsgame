@@ -146,7 +146,6 @@ namespace Battle
         public bool HasMoreStacksThanMax => SO.MaxStacks != 0 && CurrentStacks >= SO.MaxStacks;
 
         private T associatedPassiveContainer;
-
         public event Action<int> OnCurrentStacksChanged;
         
         public virtual void Init(PassiveSO<T> so, int startingStacks = 1)

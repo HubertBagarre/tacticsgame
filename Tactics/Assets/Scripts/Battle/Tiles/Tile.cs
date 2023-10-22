@@ -23,6 +23,9 @@ namespace Battle
         public List<IEnumerator> OnUnitExitEvents = new();
 
         // Passives
+        [Header("Passives")]
+        [SerializeField] private Transform passiveAnchor;
+        
         public List<PassiveInstance<Tile>> PassiveInstances { get; } = new();
         private List<PassiveInstance<Tile>> passivesToRemove = new();
         public event Action<PassiveInstance<Tile>> OnPassiveAdded; 
@@ -414,7 +417,21 @@ namespace Battle
                 if (instance == null || !passiveSo.IsStackable)
                 {
                     instance = passiveSo.CreateInstance<PassiveInstance<Tile>>(amount);
-                    PassiveInstances.Add(instance);
+                    if (instance.SO.Model != null)
+                    {
+                        var model = Instantiate(instance.SO.Model, passiveAnchor);
+                        OnPassiveRemoved += RemovePassiveModel;
+                    
+                        PassiveInstances.Add(instance);
+                    
+                        void RemovePassiveModel(PassiveInstance<Tile> passiveInstance)
+                        {
+                            if(passiveInstance != instance) return;
+                        
+                            OnPassiveRemoved -= RemovePassiveModel;
+                            Destroy(model);
+                        }
+                    }
                 }
             
                 OnPassiveAdded?.Invoke(instance);
