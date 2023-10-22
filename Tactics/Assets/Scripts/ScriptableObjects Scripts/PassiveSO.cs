@@ -162,11 +162,16 @@ namespace Battle
             CurrentStacks += amount;
             if (HasMoreStacksThanMax) CurrentStacks = SO.MaxStacks;
             OnCurrentStacksChanged?.Invoke(CurrentStacks);
+            
+            Debug.Log($"Adding passive {SO.Name} to {container}");
+            
             return SO.AddPassive(container,this);
         }
         
         public IEnumerator RemovePassive(T container)
         {
+            Debug.Log($"Removing passive {SO.Name} from {container}");
+            
             return SO.RemovePassive(container,this);
         }
         

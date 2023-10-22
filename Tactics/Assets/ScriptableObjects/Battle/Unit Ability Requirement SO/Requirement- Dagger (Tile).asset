@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d84fa7e1fa8ebaf40a35526f6ec445bd, type: 3}
+  m_Name: Requirement- Dagger (Tile)
+  m_EditorClassIdentifier: 
+  requiredPassives:
+  - <UnitPassive>k__BackingField: {fileID: 0}
+    <TilePassive>k__BackingField: {fileID: 11400000, guid: a14e004f2bafe9b4b92d00a71ab1c93d,
+      type: 2}
+    <TargetTileFirst>k__BackingField: 0
+    <IgnoreTileIfUnit>k__BackingField: 0
+    <IgnoreUnitIfTile>k__BackingField: 0
+    <RequiredStacks>k__BackingField: 1
+    <ConsumeStacks>k__BackingField: 0

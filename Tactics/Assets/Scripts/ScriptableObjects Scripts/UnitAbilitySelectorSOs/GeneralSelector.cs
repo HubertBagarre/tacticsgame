@@ -3,13 +3,15 @@ using UnityEngine;
 
 namespace Battle.ScriptableObjects.Ability.Selector
 {
-    [CreateAssetMenu(menuName = "Battle Scriptables/Ability Selector/Basic")]
-    public class BasicSelector : UnitAbilitySelectorSO
+    [CreateAssetMenu(menuName = "Battle Scriptables/Ability Selector/General Selector")]
+    public class GeneralSelector : UnitAbilitySelectorSO
     {
         [SerializeField,Tooltip("-1 is Infinite")] private int range = 2;
         [SerializeField] private bool targetAllies = false;
         [SerializeField] private bool targetEnemies = true;
         private bool TargetUnits => targetAllies || targetEnemies;
+        
+        [SerializeField] private List<UnitAbilityRequirementSO> requirements = new List<UnitAbilityRequirementSO>();
         
         public override bool ConvertDescriptionLinks(Unit caster, string linkKey, out string text)
         {
@@ -51,17 +53,29 @@ namespace Battle.ScriptableObjects.Ability.Selector
         public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
         {
             if (range >= 0 && !caster.Tile.GetSurroundingTiles(range).Contains(selectableTile)) return false;
+            
+            var meetRequirements = MeetRequirements(selectableTile);
 
-            if (!TargetUnits) return true;
+            if (!TargetUnits) return meetRequirements;
             
             if (!selectableTile.HasUnit()) return false;
             
             var unit = selectableTile.Unit;
 
-            if (targetAllies && unit.Team == caster.Team) return true;
-            if (targetEnemies && unit.Team != caster.Team) return true;
+            if (targetAllies && unit.Team == caster.Team) return meetRequirements;
+            if (targetEnemies && unit.Team != caster.Team) return meetRequirements;
             
             return false;
+        }
+
+        private bool MeetRequirements(Tile selectableTile)
+        {
+            foreach (var requirement in requirements)
+            {
+                if (!requirement.CanCastAbility(selectableTile)) return false;
+            }
+
+            return true;
         }
     }
 }

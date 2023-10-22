@@ -37,7 +37,8 @@ namespace Battle.ScriptableObjects
         
         public bool IsTileSelectable(Unit caster, Tile tile, List<Tile> currentlySelectedTiles)
         {
-            return TileSelectionMethod(caster, tile, currentlySelectedTiles);
+            var value = TileSelectionMethod(caster, tile, currentlySelectedTiles);
+            return value;
         }
 
         public abstract bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles);

@@ -423,6 +423,8 @@ namespace Battle
                         OnPassiveRemoved += RemovePassiveModel;
                     
                         PassiveInstances.Add(instance);
+                        
+                        Debug.Log($"Added {instance.SO.Name} to {this}");
                     
                         void RemovePassiveModel(PassiveInstance<Tile> passiveInstance)
                         {

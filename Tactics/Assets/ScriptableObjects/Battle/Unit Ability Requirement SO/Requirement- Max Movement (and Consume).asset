@@ -20,6 +20,6 @@ MonoBehaviour:
     <ConsumeCurrentValue>k__BackingField: 0
   - <Stat>k__BackingField: 6
     <RequiredValue>k__BackingField: 0
-    <RequireMaxValue>k__BackingField: 0
+    <RequireMaxValue>k__BackingField: 1
     <ConsumeStat>k__BackingField: 1
-    <ConsumeCurrentValue>k__BackingField: 1
+    <ConsumeCurrentValue>k__BackingField: 0

@@ -509,8 +509,6 @@ namespace Battle
             
                 OnPassiveAdded?.Invoke(instance);
                 
-                Debug.Log($"Adding passive effect {instance.GetType()}");
-
                 return instance.AddPassive(this);
             }
         }

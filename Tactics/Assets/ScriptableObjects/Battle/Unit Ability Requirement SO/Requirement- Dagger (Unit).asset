@@ -10,10 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d84fa7e1fa8ebaf40a35526f6ec445bd, type: 3}
-  m_Name: Requirement- Dagger
+  m_Name: Requirement- Dagger (Unit)
   m_EditorClassIdentifier: 
   requiredPassives:
-  - <Passive>k__BackingField: {fileID: 11400000, guid: 982021c890af1ae47bcba873d8994375,
+  - <UnitPassive>k__BackingField: {fileID: 11400000, guid: 982021c890af1ae47bcba873d8994375,
       type: 2}
+    <TilePassive>k__BackingField: {fileID: 0}
+    <TargetTileFirst>k__BackingField: 0
+    <IgnoreTileIfUnit>k__BackingField: 0
+    <IgnoreUnitIfTile>k__BackingField: 0
     <RequiredStacks>k__BackingField: 1
     <ConsumeStacks>k__BackingField: 1

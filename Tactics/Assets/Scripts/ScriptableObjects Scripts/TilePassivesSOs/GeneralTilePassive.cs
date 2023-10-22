@@ -26,7 +26,7 @@ namespace Battle.ScriptableObjects.Passive
             yield break;
         }
 
-        protected IEnumerator UnitEnterGeneralEffect(Tile tile, PassiveInstance<Tile> instance)
+        private IEnumerator UnitEnterGeneralEffect(Tile tile, PassiveInstance<Tile> instance)
         {
             foreach (var passiveToAdd in passiveToAddOnUnitEnter)
             {
@@ -42,7 +42,7 @@ namespace Battle.ScriptableObjects.Passive
             }
         }
 
-        protected IEnumerator UnitExitGeneralEffect(Tile tile, PassiveInstance<Tile> instance)
+        private IEnumerator UnitExitGeneralEffect(Tile tile, PassiveInstance<Tile> instance)
         {
             if(stacksModifierOnUnitExit != 0) yield return tile.StartCoroutine(instance.IncreaseStacks(stacksModifierOnUnitExit));
             

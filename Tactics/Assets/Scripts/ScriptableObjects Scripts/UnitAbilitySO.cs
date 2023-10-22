@@ -161,6 +161,8 @@ namespace Battle
             currentAffectedTiles.Clear();
             currentSelectedTiles.Clear();
             affectedTilesDict.Clear();
+            
+            if(Selector == null) Debug.LogWarning($"Selector is null for {SO} !!",SO);
         }
 
         public override string ToString()
