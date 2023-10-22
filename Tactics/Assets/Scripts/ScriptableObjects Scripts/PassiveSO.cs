@@ -41,22 +41,34 @@ namespace Battle.ScriptableObjects
             return OnRemovedEffect(container, instance);
         }
 
-        public IEnumerator EndTurnEffect(T container, PassiveInstance<T> instance)
+        protected abstract IEnumerator OnAddedEffect(T container, PassiveInstance<T> instance);
+        protected abstract IEnumerator OnRemovedEffect(T container, PassiveInstance<T> instance);
+
+        public TPassiveInstance CreateInstance<TPassiveInstance>(int stacks = 1) where TPassiveInstance : PassiveInstance<T>, new()
+        {
+            var instance = new TPassiveInstance();
+            instance.Init(this,stacks);
+            return instance;
+        }
+    }
+
+    public abstract class EntityPassiveSo<T> : PassiveSO<T> where T : IPassivesContainer<T>, IBattleEntity
+    {
+        [field: SerializeField] public bool RemoveOnTurnEnd { get; private set; } = false;
+        [field: SerializeField] public bool RemoveOnTurnStart { get; private set; }= false;
+        
+        public IEnumerator EndTurnEffect(T container, EntityPassiveInstance<T> instance)
         {
             return OnTurnEndEffect(container, instance);
         }
 
-        public IEnumerator StartTurnEffect(T container, PassiveInstance<T> instance)
+        public IEnumerator StartTurnEffect(T container, EntityPassiveInstance<T> instance)
         {
             return OnTurnStartEvent(container, instance);
         }
-
-        protected abstract IEnumerator OnAddedEffect(T container, PassiveInstance<T> instance);
-        protected abstract IEnumerator OnRemovedEffect(T container, PassiveInstance<T> instance);
-        protected abstract IEnumerator OnTurnEndEffect(T container, PassiveInstance<T> instance);
-        protected abstract IEnumerator OnTurnStartEvent(T container, PassiveInstance<T> instance);
-
-        public PassiveInstance<T> CreateInstance(int stacks = 1) => new PassiveInstance<T>(this, stacks);
+        
+        protected abstract IEnumerator OnTurnEndEffect(T container, EntityPassiveInstance<T> instance);
+        protected abstract IEnumerator OnTurnStartEvent(T container, EntityPassiveInstance<T> instance);
     }
 }
 
@@ -66,32 +78,27 @@ namespace Battle
 
     public interface IPassivesContainer<T> where T : IPassivesContainer<T>
     {
-        public PassiveInstance<T> GetPassiveInstance(PassiveSO<T> passiveSo);
+        public TPassiveInstance GetPassiveInstance<TPassiveInstance>(PassiveSO<T> passiveSo) where TPassiveInstance : PassiveInstance<T>;
         public IEnumerator AddPassiveEffect(PassiveSO<T> passiveSo, int amount = 1);
         public IEnumerator RemovePassiveEffect(PassiveSO<T> passiveSo);
         public IEnumerator RemovePassiveEffect(PassiveInstance<T> passiveInstance);
-        protected IEnumerator RemoveAllPassives();
         public int GetPassiveEffectCount(Func<PassiveInstance<T>, bool> condition, out PassiveInstance<T> firstPassiveInstance);
     }
     
     public class PassiveInstance<T> where T : IPassivesContainer<T>
     {
-        public PassiveSO<T> SO { get; }
+        public PassiveSO<T> SO { get; private set; }
         public bool IsStackable => SO.IsStackable;
         public int CurrentStacks { get; private set; } = 0;
         public bool HasMoreStacksThanMax => SO.MaxStacks != 0 && CurrentStacks >= SO.MaxStacks;
-        public bool NeedRemoveOnTurnStart { get; private set; }
-        public bool NeedRemoveOnTurnEnd { get; private set; }
 
         private T associatedPassiveContainer;
 
         public event Action<int> OnCurrentStacksChanged;
-
-        public PassiveInstance(PassiveSO<T> so, int startingStacks = 1)
+        
+        public virtual void Init(PassiveSO<T> so, int startingStacks = 1)
         {
             SO = so;
-            NeedRemoveOnTurnEnd = false;
-            NeedRemoveOnTurnStart = false;
             CurrentStacks = startingStacks - 1;
         }
         
@@ -110,27 +117,7 @@ namespace Battle
         {
             return SO.RemovePassive(container,this);
         }
-
-        public IEnumerator EndTurnEffect(T container)
-        {
-            return SO.EndTurnEffect(container,this);
-        }
         
-        public IEnumerator StartTurnEffect(T container)
-        {
-            return SO.StartTurnEffect(container,this);
-        }
-
-        public void SetRemoveOnTurnStart(bool value)
-        {
-            NeedRemoveOnTurnStart = value;
-        }
-        
-        public void SetRemoveOnTurnEnd(bool value)
-        {
-            NeedRemoveOnTurnEnd = value;
-        }
-
         public IEnumerator IncreaseStacks(int amount)
         {
             yield return AddPassive(associatedPassiveContainer,amount);
@@ -150,7 +137,41 @@ namespace Battle
             OnCurrentStacksChanged?.Invoke(CurrentStacks);
             
             yield return RemovePassive(associatedPassiveContainer);
+        }
+    }
 
+    public class EntityPassiveInstance<T> : PassiveInstance<T> where T : IPassivesContainer<T>,IBattleEntity
+    {
+        private EntityPassiveSo<T> castedSo;
+        public bool NeedRemoveOnTurnStart { get; private set; }
+        public bool NeedRemoveOnTurnEnd { get; private set; }
+
+        public override void Init(PassiveSO<T> so, int startingStacks = 1)
+        {
+            base.Init(so, startingStacks);
+            castedSo = (EntityPassiveSo<T>) so;
+            NeedRemoveOnTurnEnd = castedSo.RemoveOnTurnEnd;
+            NeedRemoveOnTurnStart = castedSo.RemoveOnTurnStart;
+        }
+
+        public void SetRemoveOnTurnStart(bool value)
+        {
+            NeedRemoveOnTurnStart = value;
+        }
+        
+        public void SetRemoveOnTurnEnd(bool value)
+        {
+            NeedRemoveOnTurnEnd = value;
+        }
+        
+        public IEnumerator EndTurnEffect(T container)
+        {
+            return castedSo.EndTurnEffect(container,this);
+        }
+        
+        public IEnumerator StartTurnEffect(T container)
+        {
+            return castedSo.StartTurnEffect(container,this);
         }
     }
 }

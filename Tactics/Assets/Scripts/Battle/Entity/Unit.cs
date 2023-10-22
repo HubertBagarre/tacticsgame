@@ -187,7 +187,12 @@ namespace Battle
             MovementLeft = Stats.Movement;
             
             passivesToRemove.Clear();
-            foreach (var passiveInstance in PassiveInstances)
+            
+            Debug.Log($"Found {PassiveInstances.Count} passives");
+            var entityInstances = PassiveInstances.OfType<EntityPassiveInstance<Unit>>().ToList();
+            Debug.Log($"Found {entityInstances.Count} entity passives");
+            
+            foreach (var passiveInstance in entityInstances)
             {
                 if (passiveInstance.SO.HasStartTurnEffect) yield return StartCoroutine(passiveInstance.StartTurnEffect(this));
                 if(passiveInstance.NeedRemoveOnTurnStart) passivesToRemove.Add(passiveInstance);
@@ -198,7 +203,7 @@ namespace Battle
                 }
             }
 
-            yield return StartCoroutine(RemoveAllPassives());
+            yield return StartCoroutine(RemoveAllPassivesToRemove());
 
             foreach (var abilityInstance in AbilityInstances)
             {
@@ -237,13 +242,14 @@ namespace Battle
         public IEnumerator EndTurn()
         {
             passivesToRemove.Clear();
-            foreach (var passiveInstance in PassiveInstances.Where(passiveInstance => passiveInstance.SO.HasEndTurnEffect))
+            var entityInstances = PassiveInstances.OfType<EntityPassiveInstance<Unit>>();
+            foreach (var passiveInstance in entityInstances.Where(passiveInstance => passiveInstance.SO.HasEndTurnEffect))
             {
                 yield return StartCoroutine(passiveInstance.EndTurnEffect(this));
                 if(passiveInstance.NeedRemoveOnTurnEnd) passivesToRemove.Add(passiveInstance);
             }
             
-            yield return StartCoroutine(RemoveAllPassives());
+            yield return StartCoroutine(RemoveAllPassivesToRemove());
 
             OnTurnEnd?.Invoke();
 
@@ -451,10 +457,12 @@ namespace Battle
 
             OnUltimatePointsAmountChanged?.Invoke(previous, CurrentUltimatePoints);
         }
-
-        public PassiveInstance<Unit> GetPassiveInstance(PassiveSO<Unit> passiveSo)
+        
+        public TPassiveInstance GetPassiveInstance<TPassiveInstance>(PassiveSO<Unit> passiveSo) where TPassiveInstance : PassiveInstance<Unit>
         {
-            return PassiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
+            var instance = PassiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
+            
+            return instance as TPassiveInstance;
         }
 
         /// <summary>
@@ -467,20 +475,34 @@ namespace Battle
         {
             //add passive instance to list
             if (!passiveSo.IsStackable) amount = 1;
-            
-            var currentInstance = GetPassiveInstance(passiveSo);
-            
-            //if current instance == null, no passive yet, creating new and adding to list
-            //if passive isn't stackable, creating new and adding to list
-            if (currentInstance == null || !passiveSo.IsStackable)
+
+            if (passiveSo is EntityPassiveSo<Unit> entityPassiveSo)
             {
-                currentInstance = passiveSo.CreateInstance(amount);
-                PassiveInstances.Add(currentInstance);
+                var entityPassive = GetPassiveInstance<EntityPassiveInstance<Unit>>(passiveSo);
+
+                return AddToPassives(entityPassive);
             }
             
-            OnPassiveAdded?.Invoke(currentInstance);
+            var normalPassive = GetPassiveInstance<PassiveInstance<Unit>>(passiveSo);
 
-            return currentInstance.AddPassive(this);
+            return AddToPassives(normalPassive);
+            
+            IEnumerator AddToPassives(PassiveInstance<Unit> instance)
+            {
+                //if current instance == null, no passive yet, creating new and adding to list
+                //if passive isn't stackable, creating new and adding to list
+                if (instance == null || !passiveSo.IsStackable)
+                {
+                    instance = passiveSo.CreateInstance<EntityPassiveInstance<Unit>>(amount);
+                    PassiveInstances.Add(instance);
+                }
+            
+                OnPassiveAdded?.Invoke(instance);
+                
+                Debug.Log($"Adding passive effect {instance.GetType()}");
+
+                return instance.AddPassive(this);
+            }
         }
 
         /// <summary>
@@ -490,7 +512,7 @@ namespace Battle
         /// <returns></returns>
         public IEnumerator RemovePassiveEffect(PassiveSO<Unit> passiveSo)
         {
-            var currentInstance = GetPassiveInstance(passiveSo);
+            var currentInstance = GetPassiveInstance<PassiveInstance<Unit>>(passiveSo);
             return currentInstance == null ? null : RemovePassiveEffect(currentInstance);
         }
 
@@ -508,13 +530,8 @@ namespace Battle
             
             return passiveInstance.RemovePassive(this);
         }
-
-        IEnumerator IPassivesContainer<Unit>.RemoveAllPassives()
-        {
-            return RemoveAllPassives();
-        }
-
-        private IEnumerator RemoveAllPassives()
+        
+        private IEnumerator RemoveAllPassivesToRemove()
         {
             foreach (var passiveToRemove in passivesToRemove)
             {
