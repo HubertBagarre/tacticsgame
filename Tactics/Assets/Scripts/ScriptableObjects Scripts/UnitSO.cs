@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -59,8 +60,54 @@ namespace Battle
     [Serializable]
     public class PassiveToAdd
     {
-        [field: SerializeField] public PassiveSO<Unit> Passive { get; private set; }
-        [field: SerializeField] public int Stacks { get; private set; } = 1;
+        [field: SerializeField] public PassiveSO<Unit> UnitPassive { get; private set; }
+        [field: SerializeField] public int UnitStacks { get; private set; } = 1;
+        [field: SerializeField] public PassiveSO<Tile> TilePassive { get; private set; }
+        [field: SerializeField] public int TileStacks { get; private set; } = 1;
+        [field: SerializeField] public bool TargetTileFirst { get; private set; } = false;
+        [field: SerializeField] public bool IgnoreTileIfUnit { get; private set; } = false;
+        [field: SerializeField] public bool IgnoreUnitIfTile { get; private set; } = false;
+
+        public bool IsType(PassiveType type)
+        {
+            var unitMatch = UnitPassive != null ? UnitPassive.Type == type : false;
+            var tileMatch = TilePassive != null ? TilePassive.Type == type : false;
+            
+            return TargetTileFirst ? tileMatch : unitMatch;
+        }
+        
+        public string GetText()
+        {
+            var unitText = UnitPassive != null ? $"<color=yellow>{(UnitPassive.IsStackable ? $" {UnitStacks} stack{(UnitStacks > 1 ? "s":"")} of ":"")}" + 
+                                                 $" <u><link=\"passive:{0}\">{UnitPassive.Name}</link></u></color>" : string.Empty;
+            var tileText =  TilePassive != null ? $"<color=yellow>{(TilePassive.IsStackable ? $" {TileStacks} stack{(TileStacks > 1 ? "s":"")} of ":"")}" + 
+                                                  $" <u><link=\"passive:{0}\">{TilePassive.Name}</link></u></color>" : string.Empty;
+            
+            if(unitText == string.Empty && tileText == string.Empty) return string.Empty;
+            if(unitText == string.Empty && tileText != string.Empty) return $"{tileText}";
+            if(unitText != string.Empty && tileText == string.Empty) return $"{unitText}";
+
+            if (TargetTileFirst) return $"{tileText} and {unitText}";
+            return $"{unitText} and {tileText}";
+        }
+        
+
+        public IEnumerator AddPassive(Tile tile)
+        {
+            if(tile == null) yield break;
+            
+            var tileRoutine = TilePassive != null ? tile.AddPassiveEffect(TilePassive,TileStacks) : null;
+            var unitRoutine = UnitPassive != null
+                ? tile.HasUnit() ? tile.Unit.AddPassiveEffect(UnitPassive, UnitStacks) : null
+                : null;
+
+            if (IgnoreUnitIfTile && tileRoutine != null) unitRoutine = null;
+            if(IgnoreTileIfUnit && unitRoutine != null) tileRoutine = null;
+
+            if(TargetTileFirst && tileRoutine != null) yield return tile.StartCoroutine(tileRoutine);
+            if (unitRoutine != null) yield return tile.StartCoroutine(unitRoutine);
+            if(!TargetTileFirst && tileRoutine != null) yield return tile.StartCoroutine(tileRoutine);
+        }
     }
     
     public class UnitStatsInstance

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects
@@ -26,21 +27,19 @@ namespace Battle.ScriptableObjects
 
         [field: SerializeField, Tooltip("0 is infinite")]
         public int MaxStacks { get; private set; } = 0; //0 is no limit
-
-        [field: SerializeField] public bool HasStartTurnEffect { get; private set; } = false;
-        [field: SerializeField] public bool HasEndTurnEffect { get; private set; } = false;
+        
         [field: SerializeField] public bool IsUnmovable { get; private set; }
 
-        public IEnumerator AddPassive(T container, PassiveInstance<T> instance)
+        public virtual IEnumerator AddPassive(T container, PassiveInstance<T> instance)
         {
             return OnAddedEffect(container, instance);
         }
 
-        public IEnumerator RemovePassive(T container, PassiveInstance<T> instance)
+        public virtual IEnumerator RemovePassive(T container, PassiveInstance<T> instance)
         {
             return OnRemovedEffect(container, instance);
         }
-
+        
         protected abstract IEnumerator OnAddedEffect(T container, PassiveInstance<T> instance);
         protected abstract IEnumerator OnRemovedEffect(T container, PassiveInstance<T> instance);
 
@@ -52,8 +51,60 @@ namespace Battle.ScriptableObjects
         }
     }
 
+    public abstract class RoundPassiveSo<T> : PassiveSO<T> where T : IPassivesContainer<T>
+    {
+        [field: SerializeField] public bool HasStartRoundEffect { get; private set; } = false;
+        [field: SerializeField] public bool HasEndRoundEffect { get; private set; } = false;
+        
+        public override IEnumerator AddPassive(T container, PassiveInstance<T> instance)
+        {
+            if(HasStartRoundEffect) BattleManager.AddStartRoundPassive(RoundStartEffect(container, instance));
+            if(HasEndRoundEffect) BattleManager.AddEndRoundPassive(RoundEndEffect(container, instance));
+            
+            return base.AddPassive(container, instance);
+        }
+
+        public override IEnumerator RemovePassive(T container, PassiveInstance<T> instance)
+        {
+            if(HasStartRoundEffect) BattleManager.RemoveStartRoundPassive(RoundStartEffect(container, instance));
+            if(HasEndRoundEffect) BattleManager.RemoveEndRoundPassive(RoundEndEffect(container, instance));
+            
+            return base.RemovePassive(container, instance);
+        }
+
+        protected abstract IEnumerator RoundStartEffect(T container, PassiveInstance<T> instance);
+        protected abstract IEnumerator RoundEndEffect(T container, PassiveInstance<T> instance);
+    }
+
+    public abstract class TilePassiveSo<T> : PassiveSO<T> where T : Tile, IPassivesContainer<T>
+    {
+        [field: SerializeField] public bool HasUnitEnterEffect { get; private set; } = false;
+        [field: SerializeField] public bool HasUnitExitEffect { get; private set; } = false;
+        
+        public override IEnumerator AddPassive(T tile, PassiveInstance<T> instance)
+        {
+            if(HasUnitEnterEffect) tile.AddOnUnitEnterEvent(UnitEnterEffect(tile, instance));
+            if(HasUnitExitEffect) tile.AddOnUnitExitEvent(UnitExitEffect(tile, instance));
+            
+            return base.AddPassive(tile, instance);
+        }
+
+        public override IEnumerator RemovePassive(T tile, PassiveInstance<T> instance)
+        {
+            if(HasUnitEnterEffect) tile.RemoveOnUnitEnterEvent(UnitEnterEffect(tile, instance));
+            if(HasUnitExitEffect) tile.RemoveOnUnitExitEvent(UnitExitEffect(tile, instance));
+            
+            return base.RemovePassive(tile, instance);
+        }
+        
+        protected abstract IEnumerator UnitEnterEffect(Tile tile, PassiveInstance<T> instance);
+        protected abstract IEnumerator UnitExitEffect(Tile tile, PassiveInstance<T> instance);
+    }
+
     public abstract class EntityPassiveSo<T> : PassiveSO<T> where T : IPassivesContainer<T>, IBattleEntity
     {
+        [field: SerializeField] public bool HasStartTurnEffect { get; private set; } = false;
+        [field: SerializeField] public bool HasEndTurnEffect { get; private set; } = false;
         [field: SerializeField] public bool RemoveOnTurnEnd { get; private set; } = false;
         [field: SerializeField] public bool RemoveOnTurnStart { get; private set; }= false;
         
@@ -78,6 +129,8 @@ namespace Battle
 
     public interface IPassivesContainer<T> where T : IPassivesContainer<T>
     {
+        public event Action<PassiveInstance<T>> OnPassiveAdded; 
+        public event Action<PassiveInstance<T>> OnPassiveRemoved;
         public TPassiveInstance GetPassiveInstance<TPassiveInstance>(PassiveSO<T> passiveSo) where TPassiveInstance : PassiveInstance<T>;
         public IEnumerator AddPassiveEffect(PassiveSO<T> passiveSo, int amount = 1);
         public IEnumerator RemovePassiveEffect(PassiveSO<T> passiveSo);
@@ -140,9 +193,16 @@ namespace Battle
         }
     }
 
+    public class TilePassiveInstance<T> : PassiveInstance<T> where T : Tile,IPassivesContainer<T>
+    {
+        
+    }
+
     public class EntityPassiveInstance<T> : PassiveInstance<T> where T : IPassivesContainer<T>,IBattleEntity
     {
         private EntityPassiveSo<T> castedSo;
+        public bool HasStartTurnEffect => castedSo.HasStartTurnEffect;
+        public bool HasEndTurnEffect => castedSo.HasEndTurnEffect;
         public bool NeedRemoveOnTurnStart { get; private set; }
         public bool NeedRemoveOnTurnEnd { get; private set; }
 

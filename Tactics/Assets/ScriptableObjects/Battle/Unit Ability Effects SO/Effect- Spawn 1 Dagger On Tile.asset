@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1f77a83361d6f5f44a0cc7744b469bc1, type: 3}
-  m_Name: Effect- Gain 1 Dagger
+  m_Name: Effect- Spawn 1 Dagger On Tile
   m_EditorClassIdentifier: 
   passivesToAdd:
-  - <UnitPassive>k__BackingField: {fileID: 11400000, guid: 982021c890af1ae47bcba873d8994375,
-      type: 2}
+  - <UnitPassive>k__BackingField: {fileID: 0}
     <UnitStacks>k__BackingField: 1
-    <TilePassive>k__BackingField: {fileID: 0}
+    <TilePassive>k__BackingField: {fileID: 11400000, guid: a14e004f2bafe9b4b92d00a71ab1c93d,
+      type: 2}
     <TileStacks>k__BackingField: 1
     <TargetTileFirst>k__BackingField: 0
     <IgnoreTileIfUnit>k__BackingField: 0

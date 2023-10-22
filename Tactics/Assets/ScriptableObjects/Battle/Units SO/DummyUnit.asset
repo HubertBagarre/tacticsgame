@@ -39,7 +39,4 @@ MonoBehaviour:
   - <Ability>k__BackingField: {fileID: 11400000, guid: 112bc70c7d75c9f41a41f2d352b09d80,
       type: 2}
     <ShowInUI>k__BackingField: 1
-  <StartingPassives>k__BackingField:
-  - <Passive>k__BackingField: {fileID: 11400000, guid: c0f393a308a62d84dae6e12231b96b0a,
-      type: 2}
-    <Stacks>k__BackingField: 1
+  <StartingPassives>k__BackingField: []

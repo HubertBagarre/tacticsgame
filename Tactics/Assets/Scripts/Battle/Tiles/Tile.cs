@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Battle.ScriptableObjects;
 using TMPro;
 using UnityEngine;
 
@@ -10,14 +12,22 @@ namespace Battle
     /// Data Container for Tile Info
     /// (tile position, adjacent Tiles, current Unit)
     /// </summary>
-    public class Tile : MonoBehaviour
+    public class Tile : MonoBehaviour, IPassivesContainer<Tile>
     {
         //generation
         [SerializeField] private Vector2Int position;
         public Vector2Int Position => position;
 
         [SerializeField] private Unit currentUnit;
+        public List<IEnumerator> OnUnitEnterEvents = new();
+        public List<IEnumerator> OnUnitExitEvents = new();
 
+        // Passives
+        public List<PassiveInstance<Tile>> PassiveInstances { get; } = new();
+        private List<PassiveInstance<Tile>> passivesToRemove = new();
+        public event Action<PassiveInstance<Tile>> OnPassiveAdded; 
+        public event Action<PassiveInstance<Tile>> OnPassiveRemoved;
+        
         //pathing
         [Header("Path Rendering")]
         [SerializeField] private LineRenderer lineRenderer;
@@ -82,14 +92,44 @@ namespace Battle
             IsWalkable = value;
         }
 
-        public void RemoveUnit()
+        public IEnumerator RemoveUnit()
         {
             currentUnit = null;
+            var events = OnUnitExitEvents.ToList();
+            foreach (var unitEnterEvent in events)
+            {
+                yield return StartCoroutine(unitEnterEvent);
+            }
         }
 
-        public void SetUnit(Unit unit)
+        public IEnumerator SetUnit(Unit unit)
         {
             currentUnit = unit;
+            var events = OnUnitEnterEvents.ToList();
+            foreach (var unitEnterEvent in events)
+            {
+                yield return StartCoroutine(unitEnterEvent);
+            }
+        }
+        
+        public void AddOnUnitEnterEvent(IEnumerator unitEnterEvent)
+        {
+            OnUnitEnterEvents.Add(unitEnterEvent);
+        }
+        
+        public void RemoveOnUnitEnterEvent(IEnumerator unitEnterEvent)
+        {
+            if(OnUnitEnterEvents.Contains(unitEnterEvent)) OnUnitEnterEvents.Remove(unitEnterEvent);
+        }
+        
+        public void AddOnUnitExitEvent(IEnumerator unitExitEvent)
+        {
+            OnUnitExitEvents.Add(unitExitEvent);
+        }
+        
+        public void RemoveOnUnitExitEvent(IEnumerator unitExitEvent)
+        {
+            if(OnUnitExitEvents.Contains(unitExitEvent)) OnUnitExitEvents.Remove(unitExitEvent);
         }
 
         public bool HasUnit()
@@ -345,6 +385,71 @@ namespace Battle
         {
             lineRenderer.positionCount = 0;
         }
+
+        public TPassiveInstance GetPassiveInstance<TPassiveInstance>(PassiveSO<Tile> passiveSo) where TPassiveInstance : PassiveInstance<Tile>
+        {
+            var instance = PassiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
+            
+            return instance as TPassiveInstance;
+        }
+
+        public IEnumerator AddPassiveEffect(PassiveSO<Tile> passiveSo, int amount = 1)
+        {
+            //add passive instance to list
+            if (!passiveSo.IsStackable) amount = 1;
+            
+            var normalPassive = GetPassiveInstance<PassiveInstance<Tile>>(passiveSo);
+
+            return AddToPassives(normalPassive);
+            
+            IEnumerator AddToPassives(PassiveInstance<Tile> instance)
+            {
+                //if current instance == null, no passive yet, creating new and adding to list
+                //if passive isn't stackable, creating new and adding to list
+                if (instance == null || !passiveSo.IsStackable)
+                {
+                    instance = passiveSo.CreateInstance<PassiveInstance<Tile>>(amount);
+                    PassiveInstances.Add(instance);
+                }
+            
+                OnPassiveAdded?.Invoke(instance);
+                
+                return instance.AddPassive(this);
+            }
+        }
+
+        public IEnumerator RemovePassiveEffect(PassiveSO<Tile> passiveSo)
+        {
+            var currentInstance = GetPassiveInstance<PassiveInstance<Tile>>(passiveSo);
+            return currentInstance == null ? null : RemovePassiveEffect(currentInstance);
+        }
+
+        public IEnumerator RemovePassiveEffect(PassiveInstance<Tile> passiveInstance)
+        {
+            if (!PassiveInstances.Contains(passiveInstance)) return null;
+            PassiveInstances.Remove(passiveInstance);
+            
+            OnPassiveRemoved?.Invoke(passiveInstance);
+            
+            return passiveInstance.RemovePassive(this);
+        }
         
+        private IEnumerator RemoveAllPassivesToRemove()
+        {
+            foreach (var passiveToRemove in passivesToRemove)
+            {
+                yield return StartCoroutine(RemovePassiveEffect(passiveToRemove)); 
+            }
+            passivesToRemove.Clear();
+        }
+
+        public int GetPassiveEffectCount(Func<PassiveInstance<Tile>, bool> condition, out PassiveInstance<Tile> firstPassiveInstance)
+        {
+            condition ??= _ => true;
+            
+            firstPassiveInstance = PassiveInstances.Where(condition).FirstOrDefault();
+            
+            return PassiveInstances.Count(condition);
+        }
     }
 }

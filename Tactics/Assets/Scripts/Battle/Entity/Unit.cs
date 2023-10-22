@@ -93,7 +93,7 @@ namespace Battle
 
         public static event Action<Unit> OnUnitInit;
 
-        public void InitUnit(Tile tile, int team, UnitSO so,Tile.Direction orientation)
+        public IEnumerator InitUnit(Tile tile, int team, UnitSO so,Tile.Direction orientation)
         {
             // TODO - Instantiate model
             if (so == null) so = defaultUnitSo;
@@ -110,7 +110,7 @@ namespace Battle
             Team = team;
             Stats = so.CreateInstance(this);
             
-            if(Tile != null) tile.SetUnit(this);
+            if(Tile != null) yield return StartCoroutine( tile.SetUnit(this));
             
             OnUnitInit?.Invoke(this);
         }
@@ -136,7 +136,7 @@ namespace Battle
         {
             foreach (var passiveToAdd in Stats.So.StartingPassives)
             {
-                yield return StartCoroutine(AddPassiveEffect(passiveToAdd.Passive, passiveToAdd.Stacks));
+                yield return StartCoroutine(AddPassiveEffect(passiveToAdd.UnitPassive, passiveToAdd.UnitStacks));
             }
         }
 
@@ -156,7 +156,7 @@ namespace Battle
         public IEnumerator EndRound()
         {
             yield return null; //apply effects
-        }
+        }   
 
         public void FastForwardTurn()
         {
@@ -188,13 +188,10 @@ namespace Battle
             
             passivesToRemove.Clear();
             
-            Debug.Log($"Found {PassiveInstances.Count} passives");
             var entityInstances = PassiveInstances.OfType<EntityPassiveInstance<Unit>>().ToList();
-            Debug.Log($"Found {entityInstances.Count} entity passives");
-            
             foreach (var passiveInstance in entityInstances)
             {
-                if (passiveInstance.SO.HasStartTurnEffect) yield return StartCoroutine(passiveInstance.StartTurnEffect(this));
+                if (passiveInstance.HasStartTurnEffect) yield return StartCoroutine(passiveInstance.StartTurnEffect(this));
                 if(passiveInstance.NeedRemoveOnTurnStart) passivesToRemove.Add(passiveInstance);
                 if (IsDead)
                 {
@@ -243,7 +240,7 @@ namespace Battle
         {
             passivesToRemove.Clear();
             var entityInstances = PassiveInstances.OfType<EntityPassiveInstance<Unit>>();
-            foreach (var passiveInstance in entityInstances.Where(passiveInstance => passiveInstance.SO.HasEndTurnEffect))
+            foreach (var passiveInstance in entityInstances.Where(passiveInstance => passiveInstance.HasEndTurnEffect))
             {
                 yield return StartCoroutine(passiveInstance.EndTurnEffect(this));
                 if(passiveInstance.NeedRemoveOnTurnEnd) passivesToRemove.Add(passiveInstance);
@@ -256,13 +253,13 @@ namespace Battle
             EventManager.Trigger(new EndUnitTurnEvent(this));
         }
 
-        public void SetTile(Tile tile)
+        public IEnumerator SetTile(Tile tile)
         {
-            if (Tile != null) Tile.RemoveUnit();
+            if (Tile != null) yield return StartCoroutine(Tile.RemoveUnit());
 
             Tile = tile;
 
-            Tile.SetUnit(this);
+            yield return StartCoroutine(Tile.SetUnit(this));
         }
 
         public IEnumerator TeleportUnit(Tile tile,bool isForced)
@@ -275,7 +272,7 @@ namespace Battle
             
             transform.position = tile.transform.position;
             BattleModel.SetPosition(transform.position);
-            SetTile(tile);
+            yield return StartCoroutine(SetTile(tile));
         }
 
         public IEnumerator MoveUnit(List<Tile> path,bool isForced) //PATH DOESN'T INCLUDE STARTING TILE
@@ -295,6 +292,7 @@ namespace Battle
                 yield break;
             }
             
+            Debug.Log($"Moving {path.Count} tiles");
             for (var index = 0; index < path.Count && CanContinueMovement(); index++)
             {
                 var tile = path[index];
@@ -306,7 +304,7 @@ namespace Battle
                 
                 transform.position = tile.transform.position;
                 BattleModel.SetPosition(transform.position);
-                SetTile(tile);
+                yield return StartCoroutine(SetTile(tile));
             }
 
             yield break;

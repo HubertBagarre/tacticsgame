@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Battle.ScriptableObjects;
@@ -11,7 +12,7 @@ namespace Battle
     public class BattleLevel : MonoBehaviour
     {
         [SerializeField] private UnitPlacementSO unitPlacement;
-        public List<IBattleEntity> StartingEntities => SetupStartingEntities();
+        public List<IBattleEntity> StartingEntities { get; private set; }
         
         [field:SerializeField] public List<Tile> Tiles { get; private set; }
         [field:SerializeField] public List<Unit> Units { get; private set; }
@@ -63,7 +64,7 @@ namespace Battle
             Units = units;
         }
         
-        protected virtual List<IBattleEntity> SetupStartingEntities()
+        public virtual IEnumerator SetupStartingEntities()
         {
             var units = new List<Unit>();
             foreach (var placedUnit in unitPlacement.PlacedUnits)
@@ -77,14 +78,14 @@ namespace Battle
                 unitTr.SetParent(transform);
 
                 unit.name = placedUnit.so.name;
-                unit.InitUnit(tile,placedUnit.team,placedUnit.so,placedUnit.orientation);
+                yield return StartCoroutine(unit.InitUnit(tile,placedUnit.team,placedUnit.so,placedUnit.orientation));
             
                 units.Add(unit);
             }
 
             SetUnits(units);
             
-            return Units.Cast<IBattleEntity>().ToList();
+            StartingEntities = Units.Cast<IBattleEntity>().ToList();
         }
     }
 }

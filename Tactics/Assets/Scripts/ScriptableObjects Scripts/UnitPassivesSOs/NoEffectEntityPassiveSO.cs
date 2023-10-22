@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Battle.ScriptableObjects.Passive
 {
     [CreateAssetMenu(menuName = "Battle Scriptables/Unit Passive/NoEffect")]
-    public class NoEffectPassiveSO : EntityPassiveSo<Unit>
+    public class NoEffectEntityPassiveSO : EntityPassiveSo<Unit>
     {
         protected override IEnumerator OnAddedEffect(Unit container, PassiveInstance<Unit> instance)
         {

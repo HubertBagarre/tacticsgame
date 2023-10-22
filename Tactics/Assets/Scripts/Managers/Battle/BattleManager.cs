@@ -46,6 +46,9 @@ namespace Battle
         public IBattleEntity CurrentTurnEntity { get; private set; }
         private static EndRoundEntity endRoundEntity;
         public static EndRoundEntity EndRoundEntity => endRoundEntity;
+        
+        private static List<IEnumerator> startRoundPassives = new();
+        private static List<IEnumerator> endRoundPassives = new();
  
         private List<IBattleEntity> entitiesInBattle = new();
         public IBattleEntity[] EntitiesInBattle => entitiesInBattle.Where(entity => entity.Team >= 0).ToArray();
@@ -72,9 +75,12 @@ namespace Battle
             Unit.OnDistanceFromTurnStartChanged += UpdateTurnOrderOnEntityTurnOrderUpdated;
         }
 
-        public void SetupBattle(BattleLevel level)
+        public IEnumerator SetupBattle(BattleLevel level)
         {
             battleLevel = level;
+            
+            startRoundPassives.Clear();
+            endRoundPassives.Clear();
 
             InputManager.SetupCamera(Camera.main);
 
@@ -94,10 +100,12 @@ namespace Battle
             tileManager.SetTiles(battleLevel.Tiles);
             unitManager.SetUnits(battleLevel.Units);
 
+            yield return StartCoroutine(battleLevel.SetupStartingEntities());
+            
             SetupStartingEntities();
 
             doneSetup = true;
-            return;
+            yield break;
 
             void SetupStartingEntities()
             {
@@ -212,6 +220,11 @@ namespace Battle
 
             IEnumerator EndRoundLogicRoutine()
             {
+                foreach (var VARIABLE in endRoundPassives)
+                {
+                    
+                }
+                
                 foreach (var battleEntity in entitiesInBattle)
                 {
                     yield return StartCoroutine(battleEntity.EndRound());
@@ -342,6 +355,28 @@ namespace Battle
             EventManager.Trigger(updateTurnValuesEvent);
 
             deadUnits.Add(ctx.Unit);
+        }
+        
+        public static void AddStartRoundPassive(IEnumerator passive)
+        {
+            if(!endRoundPassives.Contains(passive)) return;
+            startRoundPassives.Add(passive);
+        }
+        
+        public static void RemoveStartRoundPassive(IEnumerator passive)
+        {
+            startRoundPassives.Remove(passive);
+        }
+        
+        public static void AddEndRoundPassive(IEnumerator passive)
+        {
+            endRoundPassives.Add(passive);
+        }
+        
+        public static void RemoveEndRoundPassive(IEnumerator passive)
+        {
+            if(!endRoundPassives.Contains(passive)) return;
+            endRoundPassives.Remove(passive);
         }
     }
 

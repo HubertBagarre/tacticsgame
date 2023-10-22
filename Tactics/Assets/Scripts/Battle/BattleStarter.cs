@@ -16,13 +16,10 @@ namespace Battle
             if(LevelManager.SelectedLevel == null) LevelManager.ChangeSelectedLevel(defaultLevel);
             var level = Instantiate(LevelManager.SelectedLevel);
             level.SetupCallbacks();
-
-            yield return null;
             
             Debug.Log("Setting up level");
-            battleManager.SetupBattle(level);
+            yield return StartCoroutine(battleManager.SetupBattle(level));
             Debug.Log("Done Setting up level");
-            
             
             yield return null;
             

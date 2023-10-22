@@ -15,9 +15,9 @@ namespace Battle.ScriptableObjects.Ability.Effect
             new(){PassiveType.Neutral,PassiveType.Positive,PassiveType.Negative};
         private Dictionary<PassiveType,IEnumerable<PassiveToAdd>> passivesByType = new(){ { PassiveType.Neutral,Enumerable.Empty<PassiveToAdd>()},{ PassiveType.Positive,Enumerable.Empty<PassiveToAdd>()},{ PassiveType.Negative,Enumerable.Empty<PassiveToAdd>()}};
         
-        private IEnumerable<PassiveToAdd> NeutralPassives => passivesToAdd.Where(passiveToAdd => passiveToAdd.Passive.Type != PassiveType.Positive && passiveToAdd.Passive.Type != PassiveType.Negative );
-        private IEnumerable<PassiveToAdd> PositivePassives => passivesToAdd.Where(passiveToAdd => passiveToAdd.Passive.Type == PassiveType.Positive);
-        private IEnumerable<PassiveToAdd> NegativePassives => passivesToAdd.Where(passiveToAdd => passiveToAdd.Passive.Type == PassiveType.Negative);
+        private IEnumerable<PassiveToAdd> NeutralPassives => passivesToAdd.Where(passiveToAdd => !passiveToAdd.IsType(PassiveType.Positive) && !passiveToAdd.IsType(PassiveType.Positive));
+        private IEnumerable<PassiveToAdd> PositivePassives => passivesToAdd.Where(passiveToAdd => passiveToAdd.IsType(PassiveType.Positive));
+        private IEnumerable<PassiveToAdd> NegativePassives => passivesToAdd.Where(passiveToAdd => passiveToAdd.IsType(PassiveType.Negative));
 
         public override bool ConvertDescriptionLinks(Unit caster, string linkKey, out string text)
         {
@@ -28,12 +28,21 @@ namespace Battle.ScriptableObjects.Ability.Effect
             
             if(!int.TryParse(split[1],out var passiveIndex)) return false;
             
-            var passive = passivesToAdd[passiveIndex].Passive;
-
-            text = passive.Description;
+            var unitPassive = passivesToAdd[passiveIndex].UnitPassive;
+            if (unitPassive != null)
+            {
+                text = unitPassive.Description;
+                return true;
+            }
+            
+            var tilePassive = passivesToAdd[passiveIndex].TilePassive;
+            if (tilePassive == null) return false;
+            text = tilePassive.Description;
             return true;
+
         }
 
+        // TODO - Handle all PassiveToAdd fields
         public override string ConvertedDescription(Unit caster)
         {
             var text = string.Empty;
@@ -68,9 +77,9 @@ namespace Battle.ScriptableObjects.Ability.Effect
                 var passivesCount = list.Count;
                 
                 var passiveToAdd = list[0];
-                    
-                enumerableText += $"<color=yellow>{(passiveToAdd.Passive.IsStackable ? $" {passiveToAdd.Stacks} stack{(passiveToAdd.Stacks > 1 ? "s":"")} of ":"")}" +
-                                  $" <u><link=\"passive:{0}\">{passiveToAdd.Passive.Name}</link></u></color>";
+
+                enumerableText += passiveToAdd.GetText();
+                
 
                 if (passivesCount >= 2)
                 {
@@ -79,8 +88,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
                         passiveToAdd = list[i];
 
                         enumerableText += i == passivesCount - 1 ? " and" : ",";
-                        enumerableText += $"<color=yellow>{(passiveToAdd.Passive.IsStackable ? $" {passiveToAdd.Stacks} stack{(passiveToAdd.Stacks > 1 ? "s":"")} of ":"")}" +
-                                          $" <u><link=\"passive:{i}\">{passiveToAdd.Passive.Name}</link></u></color>";
+                        enumerableText += passiveToAdd.GetText();
                     }
                 }
 
@@ -97,19 +105,13 @@ namespace Battle.ScriptableObjects.Ability.Effect
             {
                 //play animation
                 yield return null;
-
-                if(!tile.HasUnit()) continue;
                 
-                var target = tile.Unit;
-
                 foreach (var passiveType in order)
                 {
                     foreach (var passiveToAdd in passivesByType[passiveType])
                     {
-                        var routine = target.AddPassiveEffect(passiveToAdd.Passive, passiveToAdd.Stacks);
-                        if (routine != null) yield return target.StartCoroutine(routine);
+                        yield return caster.StartCoroutine(passiveToAdd.AddPassive(tile));
                     }
-                    yield return null;
                 }
             }
         }
