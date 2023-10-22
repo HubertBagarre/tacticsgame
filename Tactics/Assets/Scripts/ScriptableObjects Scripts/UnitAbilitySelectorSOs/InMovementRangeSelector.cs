@@ -26,7 +26,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
 
         public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)
         {
-            caster.Tile.ClearPath();
+            caster.Tile.ClearLineRendererPath();
             
             var startTile = caster.Tile;
             if (startTile == selectableTile) return false;
@@ -42,7 +42,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
         public override List<Tile> GetAffectedTiles(Unit caster, Tile lastSelected, List<Tile> selectedTiles)
         {
             var tile = caster.Tile;
-            tile.ClearPath();
+            tile.ClearLineRendererPath();
             
             if (tile.GetPath(lastSelected, out var path,false,caster.Stats.Behaviour.WalkableTileSelector))
             {

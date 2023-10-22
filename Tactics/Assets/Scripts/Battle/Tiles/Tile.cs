@@ -263,6 +263,8 @@ namespace Battle
         // https://www.redblobgames.com/pathfinding/a-star/introduction.html
         public bool GetPath(Tile destination, out List<Tile> path, bool includeDiag = false,Func<Tile,bool> condition = null)
         {
+            //Debug.Log($"Getting path from {name} to {destination.name}");
+            
             condition ??= _ => true;
             
             var start = this;
@@ -273,7 +275,7 @@ namespace Battle
             frontier.Enqueue(start);
             cameFromDict.Add(start,null);
 
-            path = new List<Tile>{destination};
+            path = new List<Tile>(); //maybe add {destination}
             while (frontier.Count > 0)
             {
                 var current = frontier.Dequeue();
@@ -284,11 +286,14 @@ namespace Battle
 
                     while (current != start)
                     {
+                        //Debug.Log($"Adding {current} to path");
                         path.Add(current);
                         current = cameFromDict[current];
                     }
-
+                    
                     path.Reverse();
+                    
+                    //Debug.Log($"Has path {path.Count} : {path.Aggregate(string.Empty, (current1, p) => current1 + $"{p.name}, ")}");
                     
                     return true;
                 }
@@ -381,7 +386,7 @@ namespace Battle
             }
         }
 
-        public void ClearPath()
+        public void ClearLineRendererPath()
         {
             lineRenderer.positionCount = 0;
         }

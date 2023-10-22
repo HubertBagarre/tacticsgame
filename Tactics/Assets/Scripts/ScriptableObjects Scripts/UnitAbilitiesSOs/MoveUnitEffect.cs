@@ -15,14 +15,16 @@ namespace Battle.ScriptableObjects.Effect
 
         public override IEnumerator AbilityEffect(Unit caster, Tile[] targetTiles)
         {
+            var tile = caster.Tile;
+            
             var destination = targetTiles[0];
-
-            var hasPath = caster.Tile.GetPath(destination,out var path,false,caster.Stats.Behaviour.WalkableTileSelector);
-
-            if (hasPath)
+            
+            if (tile.GetPath(destination,out var path,false,caster.Stats.Behaviour.WalkableTileSelector))
             {
-                caster.Tile.SetLineRendererPath(path);
-                caster.Tile.ShowLineRendererPath();
+                
+                
+                tile.SetLineRendererPath(path);
+                tile.ShowLineRendererPath();
             }
             
             yield return caster.StartCoroutine(caster.MoveUnit(path,forced));
