@@ -22,21 +22,20 @@ namespace Battle.ScriptableObjects.Requirement
         [SerializeField] private List<RequiredStat> requiredStats = new ();
         private IEnumerable<RequiredStat> ConsumedStats => requiredStats.Where(stat => stat.ConsumeStat);
         private IEnumerable<RequiredStat> RequiredStats => requiredStats.Where(stat => !stat.ConsumeStat);
-        
-        public override string Description(Unit caster)
-        {
-            var text = string.Empty;
 
-            var requiredText = GetStatsText(RequiredStats, "Requires");
-            var consumesText = GetStatsText(ConsumedStats, "Consumes");
+        public override List<(string verb, string content)> Descriptions(Unit caster)
+        {
+            var returnList = new List<(string verb, string content)>();
             
-            if(requiredText != string.Empty) text += requiredText;
-            if(consumesText != string.Empty) text += consumesText;
-            text = text.TrimEnd('\n');
+            var requiredText = GetStatsText(RequiredStats);
+            if(requiredText != string.Empty) returnList.Add(("Requires",requiredText));
+
+            var consumedText = GetStatsText(ConsumedStats);
+            if(consumedText != string.Empty) returnList.Add(("Consumes",consumedText));
+
+            return returnList;
             
-            return text;
-            
-            string GetStatsText(IEnumerable<RequiredStat> enumerable,string enumerableText)
+            string GetStatsText(IEnumerable<RequiredStat> enumerable)
             {
                 var list = enumerable.ToList();
                 
@@ -46,7 +45,7 @@ namespace Battle.ScriptableObjects.Requirement
                 
                 var requiredStat = list[0];
 
-                enumerableText += GetStatText(requiredStat);
+                var enumerableText = GetStatText(requiredStat);
 
                 if (passivesCount >= 2)
                 {
@@ -59,11 +58,10 @@ namespace Battle.ScriptableObjects.Requirement
                         
                     }
                 }
-
-                enumerableText += ".\n";
+                
                 return enumerableText;
             }
-
+            
             string GetStatText(RequiredStat requiredStat)
             {
                 var stat = requiredStat.Stat;
@@ -87,10 +85,10 @@ namespace Battle.ScriptableObjects.Requirement
                 if(requiredStat.RequireMaxValue && requiredStat.ConsumeStat) amountText = "all ";
                 if (requiredStat.ConsumeCurrentValue && requiredStat.ConsumeStat) amountText = "current ";
                 
-                return $" {amountText}{statText}";
+                return $"{amountText}{statText}";
             }
         }
-
+        
         private static int GetStatValue(Unit unit,UnitStat stat)
         {
             var stats = unit.Stats;

@@ -36,21 +36,20 @@ namespace Battle.ScriptableObjects.Requirement
             text = passive.Description;
             return true;
         }
-        
-        public override string Description(Unit caster)
-        {
-            var text = string.Empty;
 
-            var requiredText = GetPassivesText(RequiredPassives, "Requires");
-            var consumesText = GetPassivesText(ConsumedPassives, "Consumes");
+        public override List<(string verb, string content)> Descriptions(Unit caster)
+        {
+            var returnList = new List<(string verb, string content)>();
             
-            if(requiredText != string.Empty) text += requiredText;
-            if(consumesText != string.Empty) text += consumesText;
-            text = text.TrimEnd('\n');
+            var requiredText = GetPassivesText(RequiredPassives);
+            if(requiredText != string.Empty) returnList.Add(("Requires",requiredText));
+
+            var consumedText = GetPassivesText(ConsumedPassives);
+            if(consumedText != string.Empty) returnList.Add(("Consumes",consumedText));
+
+            return returnList;
             
-            return text;
-            
-            string GetPassivesText(IEnumerable<RequiredPassive> enumerable,string enumerableText)
+            string GetPassivesText(IEnumerable<RequiredPassive> enumerable)
             {
                 var list = enumerable.ToList();
                 
@@ -60,7 +59,7 @@ namespace Battle.ScriptableObjects.Requirement
                 
                 var requiredPassive = list[0];
 
-                enumerableText += GetPassiveText(requiredPassive);
+                var enumerableText = GetPassiveText(requiredPassive);
 
                 if (passivesCount >= 2)
                 {
@@ -72,15 +71,13 @@ namespace Battle.ScriptableObjects.Requirement
                         enumerableText += GetPassiveText(requiredPassive);
                     }
                 }
-
-                enumerableText += ".\n";
                 return enumerableText;
             }
 
             string GetPassiveText(RequiredPassive requiredPassive)
             {
                 var amountText = (requiredPassive.RequiresStacks
-                    ? $" {requiredPassive.RequiredStacks} stack{(requiredPassive.RequiredStacks > 1 ? "s" : "")} of "
+                    ? $"{requiredPassive.RequiredStacks} stack{(requiredPassive.RequiredStacks > 1 ? "s" : "")} of "
                     : "");
 
                 return $"<color=yellow>{amountText} <u><link=\"passive:{0}\">{requiredPassive.Passive.Name}</link></u></color>";

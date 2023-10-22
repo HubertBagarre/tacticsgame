@@ -40,7 +40,18 @@ namespace Battle.ScriptableObjects
 
         public virtual string ConvertedDescription(Unit caster)
         {
-            var requirementsText = Requirement == null ? string.Empty : $"<i>{Requirement.Description(caster)}</i>\n";
+            var requirementsText = string.Empty;
+
+            if (Requirement != null)
+            {
+                //requirementsText = $"<i>{Requirement.Description(caster)}</i>\n";
+                var requirementsDescriptions = Requirement.Descriptions(caster);
+                foreach (var tuple in requirementsDescriptions)
+                {
+                    requirementsText += $"<i>{tuple.verb} {tuple.content}</i>\n";
+                }
+                //if(requirementsDescriptions.Count > 0) requirementsText = requirementsText.TrimEnd('\n');
+            }
             
             var effectsText = string.Empty;
             foreach (var effect in Effects)

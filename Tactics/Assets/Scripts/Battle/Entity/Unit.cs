@@ -333,8 +333,6 @@ namespace Battle
 
         public void DecreaseMovement(int value)
         {
-            Debug.Log($"Decreasing movement by {value}");
-            
             MovementLeft -= value;
             if(MovementLeft < 0) MovementLeft = 0;
         }

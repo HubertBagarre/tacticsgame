@@ -11,9 +11,9 @@ namespace Battle.ScriptableObjects
             text = string.Empty;
             return false;
         }
-        
-        public abstract string Description(Unit caster);
 
+        public abstract List<(string verb,string content)> Descriptions(Unit caster);
+        
         public abstract bool CanCastAbility(Unit caster);
 
         public virtual IEnumerator ConsumeRequirement(Unit caster)
