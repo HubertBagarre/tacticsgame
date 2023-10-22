@@ -23,7 +23,7 @@ namespace Battle.ScriptableObjects.Requirement
         private IEnumerable<RequiredStat> ConsumedStats => requiredStats.Where(stat => stat.ConsumeStat);
         private IEnumerable<RequiredStat> RequiredStats => requiredStats.Where(stat => !stat.ConsumeStat);
 
-        public override List<(string verb, string content)> Descriptions(Unit caster)
+        public override List<(string verb, string content)> Descriptions(Tile tile)
         {
             var returnList = new List<(string verb, string content)>();
             
@@ -151,21 +151,29 @@ namespace Battle.ScriptableObjects.Requirement
             _ => true
         };
         
-        public override bool CanCastAbility(Unit caster)
+        public override bool CanCastAbility(Tile tile)
         {
+            if(!tile.HasUnit()) return false;
+
+            var unit = tile.Unit;
+            
             foreach (var requiredPassive in requiredStats)
             {
-                if (!HasStat(caster,requiredPassive)) return false;
+                if (!HasStat(unit,requiredPassive)) return false;
             }
 
             return true;
         }
 
-        public override IEnumerator ConsumeRequirement(Unit caster)
+        public override IEnumerator ConsumeRequirement(Tile tile)
         {
+            if(!tile.HasUnit()) yield break; 
+            
+            var unit = tile.Unit;
+            
             foreach (var requiredStat in requiredStats.Where(requiredStat => requiredStat.ConsumeStat))
             {
-                if (HasStat(caster,requiredStat)) ConsumeStats(requiredStat);
+                if (HasStat(unit,requiredStat)) ConsumeStats(requiredStat);
             }
             yield break;
             
@@ -174,7 +182,7 @@ namespace Battle.ScriptableObjects.Requirement
                 var consumedValue = requiredStat.RequiredValue;
                 var currentValue = requiredStat.ConsumeCurrentValue;
                 
-                var stats = caster.Stats;
+                var stats = unit.Stats;
                 if (requiredStat.RequireMaxValue)
                 {
                     var stat = requiredStat.Stat;
@@ -184,14 +192,14 @@ namespace Battle.ScriptableObjects.Requirement
                     //if max value, consumed value = max value
                     if (!currentValue)
                     {
-                        consumedValue = GetStatMaxValue(caster,stat);
+                        consumedValue = GetStatMaxValue(unit,stat);
                     }
                 }
                 
                 switch (requiredStat.Stat)
                 {
                     case UnitStat.Hp:
-                        caster.TakeHpDamage(currentValue ? stats.CurrentHp : consumedValue);
+                        unit.TakeHpDamage(currentValue ? stats.CurrentHp : consumedValue);
                         return;
                     case UnitStat.MaxHp:
                         stats.IncreaseMaxHpModifier(-(currentValue ? stats.MaxHp : consumedValue));
@@ -200,7 +208,7 @@ namespace Battle.ScriptableObjects.Requirement
                         stats.IncreaseMovementModifier(-(currentValue ? stats.Movement : consumedValue));
                         return;
                     case UnitStat.CurrentMovement:
-                        caster.DecreaseMovement(currentValue ? caster.MovementLeft : consumedValue);
+                        unit.DecreaseMovement(currentValue ? unit.MovementLeft : consumedValue);
                         return;
                     case UnitStat.Speed:
                         stats.IncreaseSpeedModifier(-(currentValue ? stats.Speed : consumedValue));

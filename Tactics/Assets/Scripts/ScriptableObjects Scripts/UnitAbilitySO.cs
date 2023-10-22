@@ -45,7 +45,7 @@ namespace Battle.ScriptableObjects
             if (Requirement != null)
             {
                 //requirementsText = $"<i>{Requirement.Description(caster)}</i>\n";
-                var requirementsDescriptions = Requirement.Descriptions(caster);
+                var requirementsDescriptions = Requirement.Descriptions(caster.Tile);
                 foreach (var tuple in requirementsDescriptions)
                 {
                     requirementsText += $"<i>{tuple.verb} {tuple.content}</i>\n";
@@ -81,7 +81,7 @@ namespace Battle.ScriptableObjects
         {
             var text = linkKey;
             if(Selector != null) if (Selector.ConvertDescriptionLinks(caster,linkKey, out var selectorText)) text = selectorText;
-            if(Requirement != null) if (Requirement.ConvertDescriptionLinks(caster,linkKey, out var requirementText)) text = requirementText;
+            if(Requirement != null) if (Requirement.ConvertDescriptionLinks(caster.Tile,linkKey, out var requirementText)) text = requirementText;
             foreach (var effect in Effects)
             {
                 if (effect.ConvertDescriptionLinks(caster,linkKey, out var effectText)) text = effectText;
@@ -91,14 +91,14 @@ namespace Battle.ScriptableObjects
 
         public bool CanCastAbility(Unit caster)
         {
-            return Requirement == null || Requirement.CanCastAbility(caster);
+            return Requirement == null || Requirement.CanCastAbility(caster.Tile);
         }
         
         public IEnumerator CastAbility(Unit caster, Tile[] targetTiles)
         {
             if(!CanCastAbility(caster)) yield break;
 
-            if(Requirement != null) yield return caster.StartCoroutine(Requirement.ConsumeRequirement(caster));
+            if(Requirement != null) yield return caster.StartCoroutine(Requirement.ConsumeRequirement(caster.Tile));
             
             foreach (var effect in Effects)
             {

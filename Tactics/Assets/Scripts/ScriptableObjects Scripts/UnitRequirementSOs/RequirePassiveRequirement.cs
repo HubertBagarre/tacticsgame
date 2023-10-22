@@ -12,9 +12,19 @@ namespace Battle.ScriptableObjects.Requirement
         [Serializable]
         public class RequiredPassive
         {
-            [field: SerializeField] public PassiveSO<Unit> Passive { get; private set; }
-            [field: SerializeField] public int RequiredStacks { get; private set; } = 0;
-            public bool RequiresStacks => RequiredStacks > 0 && Passive.IsStackable;
+            [field: SerializeField] public PassiveSO<Unit> UnitPassive { get; private set; }
+            public bool HasUnitPassive => UnitPassive != null;
+            [field: SerializeField] public PassiveSO<Tile> TilePassive { get; private set; }
+            public bool HasTilePassive => TilePassive != null;
+            [field: SerializeField,Min(0)] public int RequiredStacks { get; private set; } = 0;
+            public bool RequiresStacks()
+            {
+                if(RequiredStacks <= 0) return false;
+                if(HasUnitPassive) return UnitPassive.IsStackable;
+                if(HasTilePassive) return TilePassive.IsStackable;
+                return false;
+            }
+
             [field: SerializeField] public bool ConsumeStacks { get; private set; } = false;
         }
         
@@ -22,7 +32,7 @@ namespace Battle.ScriptableObjects.Requirement
         private IEnumerable<RequiredPassive> ConsumedPassives => requiredPassives.Where(passive => passive.ConsumeStacks);
         private IEnumerable<RequiredPassive> RequiredPassives => requiredPassives.Where(passive => !passive.ConsumeStacks);
         
-        public override bool ConvertDescriptionLinks(Unit caster, string linkKey, out string text)
+        public override bool ConvertDescriptionLinks(Tile tile, string linkKey, out string text)
         {
             text = string.Empty;
             if (!linkKey.Contains("passive:")) return false;
@@ -31,13 +41,13 @@ namespace Battle.ScriptableObjects.Requirement
 
             if (!int.TryParse(split[1], out var passiveIndex)) return false;
             
-            var passive = requiredPassives[passiveIndex].Passive;
+            var passive = requiredPassives[passiveIndex].UnitPassive;
 
             text = passive.Description;
             return true;
         }
 
-        public override List<(string verb, string content)> Descriptions(Unit caster)
+        public override List<(string verb, string content)> Descriptions(Tile tile)
         {
             var returnList = new List<(string verb, string content)>();
             
@@ -76,51 +86,71 @@ namespace Battle.ScriptableObjects.Requirement
 
             string GetPassiveText(RequiredPassive requiredPassive)
             {
-                var amountText = (requiredPassive.RequiresStacks
+                var amountText = requiredPassive.RequiresStacks()
                     ? $"{requiredPassive.RequiredStacks} stack{(requiredPassive.RequiredStacks > 1 ? "s" : "")} of "
-                    : "");
+                    : "";
 
-                return $"<color=yellow>{amountText} <u><link=\"passive:{0}\">{requiredPassive.Passive.Name}</link></u></color>";
+                return $"<color=yellow>{amountText} <u><link=\"passive:{0}\">{requiredPassive.UnitPassive.Name}</link></u></color>";
             }
         }
         
-        private static bool Condition(PassiveInstance<Unit> instance,RequiredPassive requiredPassive)
+        private static bool Condition<T>(PassiveInstance<T> instance,RequiredPassive requiredPassive) where T : IPassivesContainer<T>
         {
-            var matchingSo = instance.SO == requiredPassive.Passive;
+            var matchingSo = instance.SO == requiredPassive.UnitPassive;
             if(!matchingSo) return false;
                     
-            var requireStacks = requiredPassive.RequiresStacks;
+            var requireStacks = requiredPassive.RequiresStacks();
 
             if (!requireStacks) return true;
                     
             return instance.CurrentStacks >= requiredPassive.RequiredStacks;
         }
         
-        public override bool CanCastAbility(Unit caster)
+        public override bool CanCastAbility(Tile tile)
         {
+            var unit = tile.Unit;
             foreach (var requiredPassive in requiredPassives)
             {
-                if (caster.GetPassiveEffectCount(Func, out _) == 0) return false;
+                if(requiredPassive.HasTilePassive)
+                {
+                    if(tile.GetPassiveEffectCount(TileCondition, out _) == 0) return false;
+                }
+
+                if(requiredPassive.HasUnitPassive && unit != null)
+                {
+                    if(unit.GetPassiveEffectCount(UnitCondition, out _) == 0) return false;
+                }
                 
                 continue;
 
-                bool Func(PassiveInstance<Unit> instance) => Condition(instance, requiredPassive);
+                bool TileCondition(PassiveInstance<Tile> instance) => Condition(instance, requiredPassive);
+                bool UnitCondition(PassiveInstance<Unit> instance) => Condition(instance, requiredPassive);
             }
 
             return true;
         }
 
-        public override IEnumerator ConsumeRequirement(Unit caster)
+        public override IEnumerator ConsumeRequirement(Tile tile)
         {
+            var unit = tile.Unit;
             foreach (var requiredPassive in ConsumedPassives)
             {
-                caster.GetPassiveEffectCount(Func, out var passiveInstance);
-                
-                if(passiveInstance != null) yield return caster.StartCoroutine(passiveInstance.DecreaseStacks(requiredPassive.RequiredStacks));
+                if(requiredPassive.TilePassive != null)
+                {
+                    tile.GetPassiveEffectCount(TileCondition, out var passiveInstance);
+                    if(passiveInstance != null) yield return tile.StartCoroutine(passiveInstance.DecreaseStacks(requiredPassive.RequiredStacks));
+                }
+
+                if (requiredPassive.UnitPassive != null && unit != null)
+                {
+                    unit.GetPassiveEffectCount(UnitCondition, out var passiveInstance);
+                    if(passiveInstance != null) yield return unit.StartCoroutine(passiveInstance.DecreaseStacks(requiredPassive.RequiredStacks));
+                }
                 
                 continue;
 
-                bool Func(PassiveInstance<Unit> instance) => Condition(instance, requiredPassive);
+                bool TileCondition(PassiveInstance<Tile> instance) => Condition(instance, requiredPassive);
+                bool UnitCondition(PassiveInstance<Unit> instance) => Condition(instance, requiredPassive);
             }
         }
     }

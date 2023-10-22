@@ -79,9 +79,9 @@ namespace Battle
         public string GetText()
         {
             var unitText = UnitPassive != null ? $"<color=yellow>{(UnitPassive.IsStackable ? $" {UnitStacks} stack{(UnitStacks > 1 ? "s":"")} of ":"")}" + 
-                                                 $" <u><link=\"passive:{0}\">{UnitPassive.Name}</link></u></color>" : string.Empty;
+                                                 $"<u><link=\"passive:{0}\">{UnitPassive.Name}</link></u></color>" : string.Empty;
             var tileText =  TilePassive != null ? $"<color=yellow>{(TilePassive.IsStackable ? $" {TileStacks} stack{(TileStacks > 1 ? "s":"")} of ":"")}" + 
-                                                  $" <u><link=\"passive:{0}\">{TilePassive.Name}</link></u></color>" : string.Empty;
+                                                  $"<u><link=\"passive:{0}\">{TilePassive.Name}</link></u></color>" : string.Empty;
             
             if(unitText == string.Empty && tileText == string.Empty) return string.Empty;
             if(unitText == string.Empty && tileText != string.Empty) return $"{tileText}";

@@ -6,17 +6,17 @@ namespace Battle.ScriptableObjects
 {
     public abstract class UnitAbilityRequirementSO : ScriptableObject
     {
-        public virtual bool ConvertDescriptionLinks(Unit caster,string linkKey,out string text)
+        public virtual bool ConvertDescriptionLinks(Tile tile,string linkKey,out string text)
         {
             text = string.Empty;
             return false;
         }
 
-        public abstract List<(string verb,string content)> Descriptions(Unit caster);
+        public abstract List<(string verb,string content)> Descriptions(Tile tile);
         
-        public abstract bool CanCastAbility(Unit caster);
+        public abstract bool CanCastAbility(Tile tile);
 
-        public virtual IEnumerator ConsumeRequirement(Unit caster)
+        public virtual IEnumerator ConsumeRequirement(Tile tile)
         {
             yield break;
         }
