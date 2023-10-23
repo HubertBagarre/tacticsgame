@@ -16,11 +16,11 @@ namespace Battle.ScriptableObjects.Ability.Selector
         public override bool ConvertDescriptionLinks(Unit caster, string linkKey, out string text)
         {
             text = string.Empty;
-            if (!linkKey.Contains("ring:")) return false;
+            if (!linkKey.Contains("ring:")) return ConvertRequirementsDescriptionLinks(out text);
             
             var split = linkKey.Split(":");
             
-            if(!int.TryParse(split[1],out var ring)) return false;
+            if(!int.TryParse(split[1],out var ring)) return ConvertRequirementsDescriptionLinks(out text);
             
             var tiles = 0;
             for (int i = 0; i < ring+1; i++)
@@ -30,6 +30,19 @@ namespace Battle.ScriptableObjects.Ability.Selector
             
             text = $"The {tiles} tiles surrounding the caster's tile"; //TODO - make generic ring shower (actually a shape shower)
             return true;
+            
+            bool ConvertRequirementsDescriptionLinks(out string text)
+            {
+                text = string.Empty;
+                if (requirements.Count <= 0) return false;
+
+                foreach (var requirement in requirements)
+                {
+                    if(requirement.ConvertDescriptionLinks(caster.Tile,linkKey,out text)) return true;
+                }
+
+                return false;
+            }
         }
 
         public override string Description(Unit caster)
@@ -47,7 +60,23 @@ namespace Battle.ScriptableObjects.Ability.Selector
             
             var rangeText = range > 0 ? $" within <u><link=\"ring:{range}\">{range} rings</link></u></color>" : "</color>";
             
-            return $"{targetText}{rangeText}";
+            // TODO - manage multiple requirements, add "and" and "," and stuff
+            var requirementsText = string.Empty;
+            if (requirements.Count > 0)
+            {
+                requirementsText = " with";
+                foreach (var requirement in requirements)
+                {
+                    foreach (var tuple in requirement.Descriptions(caster.Tile))
+                    {
+                        requirementsText += $" {tuple.content}";
+                        requirementsText += $",";
+                    }
+                }
+                requirementsText = requirementsText.Remove(requirementsText.Length - 1);
+            }
+            
+            return $"{targetText}{rangeText}{requirementsText}";
         }
         
         public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)

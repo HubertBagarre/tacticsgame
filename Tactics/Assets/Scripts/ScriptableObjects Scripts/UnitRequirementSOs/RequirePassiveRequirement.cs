@@ -29,6 +29,13 @@ namespace Battle.ScriptableObjects.Requirement
                 return false;
             }
 
+            public string PassiveDescription()
+            {
+                if (HasUnitPassive) return UnitPassive.Description;
+                if (HasTilePassive) return TilePassive.Description;
+                return string.Empty;
+            }
+
             [field: SerializeField] public bool ConsumeStacks { get; private set; } = false;
         }
         
@@ -45,9 +52,8 @@ namespace Battle.ScriptableObjects.Requirement
 
             if (!int.TryParse(split[1], out var passiveIndex)) return false;
             
-            var passive = requiredPassives[passiveIndex].UnitPassive;
-
-            text = passive.Description;
+            text =requiredPassives[passiveIndex].PassiveDescription();
+            
             return true;
         }
 
@@ -94,7 +100,11 @@ namespace Battle.ScriptableObjects.Requirement
                     ? $"{requiredPassive.RequiredStacks} stack{(requiredPassive.RequiredStacks > 1 ? "s" : "")} of "
                     : "";
 
-                return $"<color=yellow>{amountText} <u><link=\"passive:{0}\">{requiredPassive.UnitPassive.Name}</link></u></color>";
+                var passiveName = string.Empty;
+                if (requiredPassive.HasTilePassive) passiveName = requiredPassive.TilePassive.Name;
+                if(requiredPassive.HasUnitPassive) passiveName = requiredPassive.UnitPassive.Name;
+                
+                return $"<color=yellow>{amountText} <u><link=\"passive:{0}\">{passiveName}</link></u></color>";
             }
         }
         
