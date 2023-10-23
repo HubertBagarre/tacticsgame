@@ -42,7 +42,14 @@ namespace Battle
         [SerializeField] private Tile[] neighbors; //0 is top (x,y+1), then clockwise, adjacent before diag
         public enum Direction
         {
-            Top=0,Right=1,Down=2,Left=3,TopRight=4,DownRight=5,DownLeft=6,TopLeft=7
+            Top=0,
+            Right=1,
+            Down=2,
+            Left=3,
+            TopRight=4,
+            DownRight=5,
+            DownLeft=6,
+            TopLeft=7
         }
         
         [field: SerializeField] public int PathRing { get; private set; }
@@ -85,9 +92,10 @@ namespace Battle
             neighbors = tiles;
         }
         
-        public Tile GetNeighbor(int direction)
+        public Tile GetNeighbor(Direction direction)
         {
-            return direction is < 0 or >= 8 ? null : neighbors[direction];
+            var dir = (int)direction;
+            return dir is < 0 or >= 8 ? null : neighbors[dir];
         }
 
         public void SetWalkable(bool value)
@@ -233,7 +241,7 @@ namespace Battle
             return -1;
         }
 
-        public List<Tile> GetTilesInDirection(int direction)
+        public List<Tile> GetTilesInDirection(Direction direction)
         {
             var startingTile = this;
             var neighborInDirection = startingTile.GetNeighbor(direction);
@@ -330,25 +338,26 @@ namespace Battle
             }
         }
         
-        public void ShowBorder(int direction, bool value)
+        public void ShowBorder(Direction direction, bool value)
         {
-            if(direction < 0 || direction >= bordersGo.Count) return;
-            bordersGo[direction].SetActive(value);
+            var dir = (int)direction;
+            if(direction < 0 || dir >= bordersGo.Count) return;
+            bordersGo[dir].SetActive(value);
         }
 
         public static void ShowBorder(List<Tile> tiles)
         {
             foreach (var tile in tiles)
             {
-                for (int direction = 0; direction < 8; direction++)
+                for (var direction = 0; direction < 8; direction++)
                 {
-                    TryShowBorder(direction);
+                    TryShowBorder((Direction)direction);
                 }
                 continue;
 
-                void TryShowBorder(int direction)
+                void TryShowBorder(Direction direction)
                 {
-                    var adjacentTile = tile.neighbors[direction];
+                    var adjacentTile = tile.neighbors[(int)direction];
                     if (adjacentTile == null)
                     {
                         tile.ShowBorder(direction,true);
@@ -361,8 +370,6 @@ namespace Battle
                     }
                 }
             }
-            
-            
         }
 
         public void ShowLineRendererPath()
