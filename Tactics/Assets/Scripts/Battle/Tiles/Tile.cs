@@ -254,6 +254,24 @@ namespace Battle
 
             return list;
         }
+        
+        //public void GetDirection
+
+        public Direction GetOppositeDirection(Direction direction)
+        {
+            return direction switch
+            {
+                Direction.Top => Direction.Down,
+                Direction.Right => Direction.Left,
+                Direction.Down => Direction.Top,
+                Direction.Left => Direction.Right,
+                Direction.TopRight => Direction.DownLeft,
+                Direction.DownRight => Direction.TopLeft,
+                Direction.DownLeft => Direction.TopRight,
+                Direction.TopLeft => Direction.DownRight,
+                _ => direction
+            };
+        }
 
         public void SetAppearance(Appearance appearance)
         {
