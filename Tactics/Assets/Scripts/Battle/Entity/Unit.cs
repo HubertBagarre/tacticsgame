@@ -484,9 +484,9 @@ namespace Battle
         public IEnumerator AddPassiveEffect(PassiveSO<Unit> passiveSo, int amount = 1)
         {
             //add passive instance to list
-            if (!passiveSo.IsStackable) amount = 1;
+            if (!passiveSo.IsStackable || (passiveSo.IsStackable && amount <= 0)) amount = 1;
 
-            if (passiveSo is EntityPassiveSo<Unit> entityPassiveSo)
+            if (passiveSo is EntityPassiveSo<Unit>)
             {
                 var entityPassive = GetPassiveInstance<EntityPassiveInstance<Unit>>(passiveSo);
 

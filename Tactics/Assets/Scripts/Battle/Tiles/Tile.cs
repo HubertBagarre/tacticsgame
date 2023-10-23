@@ -404,7 +404,7 @@ namespace Battle
         public IEnumerator AddPassiveEffect(PassiveSO<Tile> passiveSo, int amount = 1)
         {
             //add passive instance to list
-            if (!passiveSo.IsStackable) amount = 1;
+            if (!passiveSo.IsStackable || (passiveSo.IsStackable && amount <= 0)) amount = 1;
             
             var normalPassive = GetPassiveInstance<PassiveInstance<Tile>>(passiveSo);
 
@@ -424,7 +424,7 @@ namespace Battle
                     
                         PassiveInstances.Add(instance);
                         
-                        Debug.Log($"Added {instance.SO.Name} to {this}");
+                        //Debug.Log($"Added {instance.SO.Name} to {this}");
                     
                         void RemovePassiveModel(PassiveInstance<Tile> passiveInstance)
                         {
