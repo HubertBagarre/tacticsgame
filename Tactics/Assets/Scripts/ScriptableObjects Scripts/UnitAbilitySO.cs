@@ -230,8 +230,8 @@ namespace Battle
             }
             
             currentSelectedTiles.Add(tile);
-            var affectedTiles = Selector.GetAffectedTiles(caster, tile, currentSelectedTiles);
-            
+            var affectedTiles = Selector.GetAffectedTiles(caster, tile, currentSelectedTiles).Where(affectedTile => affectedTile != null).Distinct().ToList();
+
             affectedTilesDict.Add(tile,affectedTiles);
             currentAffectedTiles.AddRange(affectedTiles);
             

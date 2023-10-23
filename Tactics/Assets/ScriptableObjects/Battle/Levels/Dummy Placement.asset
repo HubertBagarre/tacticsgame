@@ -17,11 +17,11 @@ MonoBehaviour:
       type: 3}
     so: {fileID: 11400000, guid: 61a3f0fc4fd04034798ec0fc6883ad4e, type: 2}
     team: 1
-    position: {x: 4, y: 4}
+    position: {x: 1, y: 1}
     orientation: 6
   - prefab: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
       type: 3}
     so: {fileID: 11400000, guid: ce006ab0bef781c41bcdfbffb35f3e6b, type: 2}
     team: 0
-    position: {x: 1, y: 1}
+    position: {x: 3, y: 3}
     orientation: 4

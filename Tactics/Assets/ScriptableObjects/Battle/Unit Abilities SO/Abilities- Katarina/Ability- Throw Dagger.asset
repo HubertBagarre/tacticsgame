@@ -16,13 +16,12 @@ MonoBehaviour:
   <Name>k__BackingField: Throw Dagger
   <Type>k__BackingField: 2
   description: 
-  <Selector>k__BackingField: {fileID: 11400000, guid: a0355caa0bfa62c478d8275ea8a6c520,
+  <Selector>k__BackingField: {fileID: 11400000, guid: 4b5f657073874d3409c6c362420e94dd,
     type: 2}
   <Requirement>k__BackingField: {fileID: 11400000, guid: 832c5cc794e383842a61ba015dcba11b,
     type: 2}
   <Effects>k__BackingField:
-  - {fileID: 11400000, guid: 613b3f78832c3254483fa8922386357a, type: 2}
-  - {fileID: 11400000, guid: 065560f273b5fbc4c8c7ae6b92b2472c, type: 2}
+  - {fileID: 11400000, guid: 98c4410bd0b53344bad0804543858564, type: 2}
   <Cooldown>k__BackingField: 0
   <Cost>k__BackingField: 1
   <IsUltimate>k__BackingField: 0

@@ -17,3 +17,4 @@ MonoBehaviour:
   range: -1
   targetAllies: 0
   targetEnemies: 0
+  requirements: []

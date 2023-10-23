@@ -241,6 +241,68 @@ namespace Battle
             return -1;
         }
 
+        // returns which direction to go from this tile to other tile
+        public Direction GetTileDirection(Tile other)
+        {
+            var posDif = other.Position - Position;
+            var positiveDif = posDif;
+            if (positiveDif.x < 0) positiveDif.x *= -1;
+            if (positiveDif.y < 0) positiveDif.y *= -1;
+            
+            //check direct top, right, down, left
+            if (posDif.x == 0)
+            {
+                return posDif.y > 0 ? Direction.Top : Direction.Down;
+            }
+            if(posDif.y == 0)
+            {
+                return posDif.x > 0 ? Direction.Right : Direction.Left;
+            }
+            
+            var isDiag = IsDiag();
+
+            return posDif switch
+            {
+                {x: > 0, y: > 0} => isDiag switch
+                {
+                    1 => Direction.Top,
+                    -1 => Direction.Right,
+                    _ => Direction.TopRight
+                },
+                {x: > 0, y: < 0} => isDiag switch
+                {
+                    1 => Direction.Down,
+                    -1 => Direction.Right,
+                    _ => Direction.DownRight
+                },
+                {x: < 0, y: < 0} => isDiag switch
+                {
+                    1 => Direction.Down,
+                    -1 => Direction.Left,
+                    _ => Direction.DownLeft
+                },
+                {x: < 0, y: > 0} => isDiag switch
+                {
+                    1 => Direction.Top,
+                    -1 => Direction.Left,
+                    _ => Direction.TopLeft
+                },
+                _ => Direction.Top
+            };
+
+            int IsDiag()
+            {
+                // checks if Positive dif is above lines y = (6/pi) * x (returns 1) or below y = (1/(6/pi)) * x (returns -1) if not returns 0;
+                var value = 0;
+
+                const double fraction = 6.5f / Math.PI; // change to 6/pi if diag feels off
+                if(positiveDif.y > (fraction) * positiveDif.x) value = 1;
+                if(positiveDif.y < (1/fraction) * positiveDif.x) value = -1;
+                
+                return value;
+            }
+        }
+
         public List<Tile> GetTilesInDirection(Direction direction)
         {
             var startingTile = this;

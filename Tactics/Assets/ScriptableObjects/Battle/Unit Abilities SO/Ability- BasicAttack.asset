@@ -10,17 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9aee06dd214c82043a27b1dc41ab3dc7, type: 3}
-  m_Name: Ability
+  m_Name: Ability- BasicAttack
   m_EditorClassIdentifier: 
   <Sprite>k__BackingField: {fileID: 0}
-  <Name>k__BackingField: Damage And Heal
+  <Name>k__BackingField: Basic Attack
   <Type>k__BackingField: 1
   description: 
-  <Selector>k__BackingField: {fileID: 11400000, guid: 634360fedee1dfa4586fbfa7d33903bb,
+  <Selector>k__BackingField: {fileID: 11400000, guid: 712a197ea8638fa418c7da7533c9a8af,
     type: 2}
   <Effects>k__BackingField:
-  - {fileID: 11400000, guid: e721124eff9e98e42970cf7d5ea35057, type: 2}
-  - {fileID: 11400000, guid: 613b3f78832c3254483fa8922386357a, type: 2}
+  - {fileID: 11400000, guid: 2a84ab598746c3446a8f57915d1179f7, type: 2}
   <Cooldown>k__BackingField: 0
   <Cost>k__BackingField: 0
   <IsUltimate>k__BackingField: 0

@@ -9,8 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: edc45528157a92f4694f85660c33e13c, type: 3}
-  m_Name: Selector- True
+  m_Script: {fileID: 11500000, guid: 5c921bfce05f7a745a0998089f4e4cd0, type: 3}
+  m_Name: Selector- Any Unit
   m_EditorClassIdentifier: 
   expectedSelections: 1
-  <UseSelectionOrder>k__BackingField: 1
+  <UseSelectionOrder>k__BackingField: 0
+  range: -1
+  targetAllies: 1
+  targetEnemies: 1
+  requirements: []

@@ -79,7 +79,7 @@ namespace Battle.ScriptableObjects.Requirement
                     _ => string.Empty
                 };
                 
-                var amountText = $"{requiredStat.RequiredValue}";
+                var amountText = $"{requiredStat.RequiredValue} ";
                 if(requiredStat.RequireMaxValue && HasNoMaxValue(stat)) amountText = string.Empty;
                 if(requiredStat.RequireMaxValue && !HasNoMaxValue(stat)) amountText = "max ";
                 if(requiredStat.RequireMaxValue && requiredStat.ConsumeStat) amountText = "all ";
