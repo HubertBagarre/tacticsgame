@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Battle.ScriptableObjects.Ability.Effect
 {

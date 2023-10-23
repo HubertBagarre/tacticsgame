@@ -10,7 +10,7 @@ namespace Battle.ScriptableObjects.Selector
         
         public override string Description(Unit caster)
         {
-            return "Selects a tile behind the target.";
+            return "a tile behind the target";
         }
 
         public override bool TileSelectionMethod(Unit caster, Tile selectableTile, List<Tile> currentlySelectedTiles)

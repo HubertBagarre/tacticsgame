@@ -20,6 +20,15 @@ namespace Battle.ScriptableObjects.Effect
                 effectsText += $"{desc}";
             }
             effectsText = effectsText.TrimEnd('\n');
+            
+            if (behindTileEffects.Count > 0) effectsText += "\nThen, to the tile behind the target:\n";
+            foreach (var effect in behindTileEffects)
+            {
+                var desc = effect.ConvertedDescription(caster);
+                if(!desc.EndsWith("\n")) desc += "\n";
+                effectsText += $"{desc}";
+            }
+            effectsText = effectsText.TrimEnd('\n');
             return effectsText;
         }
 
