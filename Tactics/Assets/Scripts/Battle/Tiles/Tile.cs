@@ -28,8 +28,8 @@ namespace Battle
         
         public List<PassiveInstance<Tile>> PassiveInstances { get; } = new();
         private List<PassiveInstance<Tile>> passivesToRemove = new();
-        public event Action<PassiveInstance<Tile>> OnPassiveAdded; 
-        public event Action<PassiveInstance<Tile>> OnPassiveRemoved;
+        public event IPassivesContainer<Tile>.PassiveInstanceDelegate OnPassiveAdded; 
+        public event IPassivesContainer<Tile>.PassiveInstanceDelegate OnPassiveRemoved;
         
         //pathing
         [Header("Path Rendering")]
@@ -513,9 +513,9 @@ namespace Battle
                         
                         //Debug.Log($"Added {instance.SO.Name} to {this}");
                     
-                        void RemovePassiveModel(PassiveInstance<Tile> passiveInstance)
+                        IEnumerator RemovePassiveModel(PassiveInstance<Tile> passiveInstance)
                         {
-                            if(passiveInstance != instance) return;
+                            if(passiveInstance != instance) yield break;
                         
                             OnPassiveRemoved -= RemovePassiveModel;
                             Destroy(model);
@@ -523,7 +523,7 @@ namespace Battle
                     }
                 }
             
-                OnPassiveAdded?.Invoke(instance);
+                if (OnPassiveAdded != null) StartCoroutine(OnPassiveAdded?.Invoke(instance));
                 
                 return instance.AddPassive(this);
             }
@@ -540,7 +540,7 @@ namespace Battle
             if (!PassiveInstances.Contains(passiveInstance)) return null;
             PassiveInstances.Remove(passiveInstance);
             
-            OnPassiveRemoved?.Invoke(passiveInstance);
+            if (OnPassiveRemoved != null) StartCoroutine(OnPassiveRemoved?.Invoke(passiveInstance));
             
             return passiveInstance.RemovePassive(this);
         }

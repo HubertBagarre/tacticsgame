@@ -108,7 +108,7 @@ namespace Battle.ScriptableObjects.Requirement
             }
         }
         
-        private static bool Condition<T>(PassiveInstance<T> instance,RequiredPassive requiredPassive) where T : IPassivesContainer<T>
+        private static bool Condition<T>(PassiveInstance<T> instance,RequiredPassive requiredPassive) where T : MonoBehaviour, IPassivesContainer<T>
         {
             var matchingSo = false;
             if(requiredPassive.HasUnitPassive) matchingSo = instance.SO == requiredPassive.UnitPassive;

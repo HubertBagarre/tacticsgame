@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Battle;
 using UnityEngine;
 
 /// <summary>
@@ -25,6 +26,9 @@ public interface IBattleEntity
     public void PreStartRound();
     public IEnumerator StartRound();
     public IEnumerator EndRound();
+    public delegate IEnumerator BattleEntityDelegate(IBattleEntity entity) ;
+    public event BattleEntityDelegate OnTurnStart;
+    public event BattleEntityDelegate OnTurnEnd;
     public IEnumerator StartTurn(Action onBehaviourEnd);
     public IEnumerator EndTurn();
 }

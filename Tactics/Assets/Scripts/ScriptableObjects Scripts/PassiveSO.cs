@@ -10,7 +10,7 @@ namespace Battle.ScriptableObjects
         Kit,Positive,Negative,Neutral
     }
     
-    public abstract class PassiveSO<T> : ScriptableObject where T : IPassivesContainer<T>
+    public abstract class PassiveSO<T> : ScriptableObject where T : MonoBehaviour, IPassivesContainer<T>
     {
         [field: Header("Ability Details")]
         [field: SerializeField]
@@ -51,7 +51,7 @@ namespace Battle.ScriptableObjects
         }
     }
 
-    public abstract class RoundPassiveSo<T> : PassiveSO<T> where T : IPassivesContainer<T>
+    public abstract class RoundPassiveSo<T> : PassiveSO<T> where T : MonoBehaviour, IPassivesContainer<T>
     {
         [field: SerializeField] public bool HasStartRoundEffect { get; private set; } = false;
         [field: SerializeField] public bool HasEndRoundEffect { get; private set; } = false;
@@ -100,26 +100,46 @@ namespace Battle.ScriptableObjects
         protected abstract IEnumerator UnitEnterEffect(Tile tile, PassiveInstance<T> instance);
         protected abstract IEnumerator UnitExitEffect(Tile tile, PassiveInstance<T> instance);
     }
-
-    public abstract class EntityPassiveSo<T> : PassiveSO<T> where T : IPassivesContainer<T>, IBattleEntity
+    
+    public abstract class EntityPassiveSo<T> : PassiveSO<T> where T : MonoBehaviour, IPassivesContainer<T>, IBattleEntity
     {
         [field: SerializeField] public bool HasStartTurnEffect { get; private set; } = false;
         [field: SerializeField] public bool HasEndTurnEffect { get; private set; } = false;
         [field: SerializeField] public bool RemoveOnTurnEnd { get; private set; } = false;
         [field: SerializeField] public bool RemoveOnTurnStart { get; private set; }= false;
         
-        public IEnumerator EndTurnEffect(T container, EntityPassiveInstance<T> instance)
+        public override IEnumerator AddPassive(T entity, PassiveInstance<T> instance)
         {
-            return OnTurnEndEffect(container, instance);
-        }
-
-        public IEnumerator StartTurnEffect(T container, EntityPassiveInstance<T> instance)
-        {
-            return OnTurnStartEvent(container, instance);
+            if (HasStartTurnEffect) entity.OnTurnStart += TurnStartEffect;
+            if (HasEndTurnEffect) entity.OnTurnEnd += TurnEndEffect;
+            
+            return base.AddPassive(entity, instance);
         }
         
-        protected abstract IEnumerator OnTurnEndEffect(T container, EntityPassiveInstance<T> instance);
-        protected abstract IEnumerator OnTurnStartEvent(T container, EntityPassiveInstance<T> instance);
+        public override IEnumerator RemovePassive(T entity, PassiveInstance<T> instance)
+        {
+            if (HasStartTurnEffect) entity.OnTurnStart -= TurnStartEffect;
+            if (HasEndTurnEffect) entity.OnTurnEnd -= TurnEndEffect;
+            
+            return base.RemovePassive(entity, instance);
+        }
+
+        private IEnumerator TurnStartEffect(IBattleEntity entity)
+        {
+            if(entity is T battleEntity) return OnUnitTurnStartEffect(battleEntity);
+            return OnTurnStartEffect(entity);
+        }
+
+        private IEnumerator TurnEndEffect(IBattleEntity entity)
+        {
+            if(entity is T battleEntity) return OnUnitTurnEndEffect(battleEntity);
+            return OnTurnEndEffect(entity);
+        }
+        
+        protected virtual IEnumerator OnTurnEndEffect(IBattleEntity battleEntity) { yield break; }
+        protected virtual IEnumerator OnTurnStartEffect(IBattleEntity battleEntity) { yield break; }
+        protected abstract IEnumerator OnUnitTurnEndEffect(T battleEntity);
+        protected abstract IEnumerator OnUnitTurnStartEffect(T battleEntity);
     }
 }
 
@@ -127,10 +147,11 @@ namespace Battle
 {
     using ScriptableObjects;
 
-    public interface IPassivesContainer<T> where T : IPassivesContainer<T>
+    public interface IPassivesContainer<T> where T : MonoBehaviour,IPassivesContainer<T>
     {
-        public event Action<PassiveInstance<T>> OnPassiveAdded; 
-        public event Action<PassiveInstance<T>> OnPassiveRemoved;
+        public delegate IEnumerator PassiveInstanceDelegate(PassiveInstance<T> passiveInstance);
+        public event PassiveInstanceDelegate OnPassiveAdded; 
+        public event PassiveInstanceDelegate OnPassiveRemoved;
         public TPassiveInstance GetPassiveInstance<TPassiveInstance>(PassiveSO<T> passiveSo) where TPassiveInstance : PassiveInstance<T>;
         public IEnumerator AddPassiveEffect(PassiveSO<T> passiveSo, int amount = 1);
         public IEnumerator RemovePassiveEffect(PassiveSO<T> passiveSo);
@@ -138,7 +159,7 @@ namespace Battle
         public int GetPassiveEffectCount(Func<PassiveInstance<T>, bool> condition, out PassiveInstance<T> firstPassiveInstance);
     }
     
-    public class PassiveInstance<T> where T : IPassivesContainer<T>
+    public class PassiveInstance<T> where T : MonoBehaviour, IPassivesContainer<T>
     {
         public PassiveSO<T> SO { get; private set; }
         public bool IsStackable => SO.IsStackable;
@@ -163,7 +184,7 @@ namespace Battle
             if (HasMoreStacksThanMax) CurrentStacks = SO.MaxStacks;
             OnCurrentStacksChanged?.Invoke(CurrentStacks);
             
-            Debug.Log($"Adding passive {SO.Name} to {container}");
+            //Debug.Log($"Adding passive {SO.Name} to {container}");
             
             return SO.AddPassive(container,this);
         }
@@ -194,48 +215,6 @@ namespace Battle
             OnCurrentStacksChanged?.Invoke(CurrentStacks);
             
             yield return RemovePassive(associatedPassiveContainer);
-        }
-    }
-
-    public class TilePassiveInstance<T> : PassiveInstance<T> where T : Tile,IPassivesContainer<T>
-    {
-        
-    }
-
-    public class EntityPassiveInstance<T> : PassiveInstance<T> where T : IPassivesContainer<T>,IBattleEntity
-    {
-        private EntityPassiveSo<T> castedSo;
-        public bool HasStartTurnEffect => castedSo.HasStartTurnEffect;
-        public bool HasEndTurnEffect => castedSo.HasEndTurnEffect;
-        public bool NeedRemoveOnTurnStart { get; private set; }
-        public bool NeedRemoveOnTurnEnd { get; private set; }
-
-        public override void Init(PassiveSO<T> so, int startingStacks = 1)
-        {
-            base.Init(so, startingStacks);
-            castedSo = (EntityPassiveSo<T>) so;
-            NeedRemoveOnTurnEnd = castedSo.RemoveOnTurnEnd;
-            NeedRemoveOnTurnStart = castedSo.RemoveOnTurnStart;
-        }
-
-        public void SetRemoveOnTurnStart(bool value)
-        {
-            NeedRemoveOnTurnStart = value;
-        }
-        
-        public void SetRemoveOnTurnEnd(bool value)
-        {
-            NeedRemoveOnTurnEnd = value;
-        }
-        
-        public IEnumerator EndTurnEffect(T container)
-        {
-            return castedSo.EndTurnEffect(container,this);
-        }
-        
-        public IEnumerator StartTurnEffect(T container)
-        {
-            return castedSo.StartTurnEffect(container,this);
         }
     }
 }

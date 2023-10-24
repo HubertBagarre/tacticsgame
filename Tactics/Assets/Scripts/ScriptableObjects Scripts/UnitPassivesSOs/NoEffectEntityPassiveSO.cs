@@ -16,12 +16,12 @@ namespace Battle.ScriptableObjects.Passive
             yield break;
         }
 
-        protected override IEnumerator OnTurnEndEffect(Unit container, EntityPassiveInstance<Unit> instance)
+        protected override IEnumerator OnUnitTurnEndEffect(Unit battleEntity)
         {
             yield break;
         }
 
-        protected override IEnumerator OnTurnStartEvent(Unit container, EntityPassiveInstance<Unit> instance)
+        protected override IEnumerator OnUnitTurnStartEffect(Unit battleEntity)
         {
             yield break;
         }

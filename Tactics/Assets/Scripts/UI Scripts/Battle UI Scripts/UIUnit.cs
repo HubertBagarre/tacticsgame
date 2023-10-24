@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -88,12 +89,14 @@ namespace Battle.UIComponent
             shieldBarImage.fillAmount = current / (float)max;
         }
         
-        private void AddPassiveIcon(PassiveInstance<Unit>  passiveInstance)
+        private IEnumerator AddPassiveIcon(PassiveInstance<Unit> passiveInstance)
         {
+            Debug.Log("Here");
+            
             var associatedPassive =
                 unitPassiveIcons.FirstOrDefault(passiveIcon => passiveIcon.PassiveInstance == passiveInstance);
 
-            if (associatedPassive != null) return;
+            if (associatedPassive != null) yield break;
             
             associatedPassive = Instantiate(passiveIconPrefab, passiveIconParent);
             unitPassiveIcons.Add(associatedPassive);
@@ -101,11 +104,11 @@ namespace Battle.UIComponent
             associatedPassive.LinkToPassive(passiveInstance);
         }
 
-        private void RemovePassiveIcon(PassiveInstance<Unit>  passiveInstance)
+        private IEnumerator RemovePassiveIcon(PassiveInstance<Unit> passiveInstance)
         {
             var associatedPassive =
                 unitPassiveIcons.FirstOrDefault(passiveIcon => passiveIcon.PassiveInstance == passiveInstance);
-            if(associatedPassive == null) return;
+            if(associatedPassive == null) yield break;
 
             unitPassiveIcons.Remove(associatedPassive);
             Destroy(associatedPassive.gameObject);

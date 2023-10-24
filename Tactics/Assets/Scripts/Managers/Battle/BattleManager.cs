@@ -434,6 +434,9 @@ namespace Battle
             yield return null;
         }
 
+        public event IBattleEntity.BattleEntityDelegate OnTurnStart;
+        public event IBattleEntity.BattleEntityDelegate OnTurnEnd;
+
         public IEnumerator StartTurn(Action _)
         {
             yield return null;
@@ -515,6 +518,9 @@ namespace Battle
         {
             yield return null;
         }
+
+        public event IBattleEntity.BattleEntityDelegate OnTurnStart;
+        public event IBattleEntity.BattleEntityDelegate OnTurnEnd;
 
         public IEnumerator StartTurn(Action _)
         {

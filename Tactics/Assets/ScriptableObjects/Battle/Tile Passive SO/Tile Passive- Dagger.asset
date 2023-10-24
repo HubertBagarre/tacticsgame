@@ -18,7 +18,7 @@ MonoBehaviour:
   <Type>k__BackingField: 3
   <Name>k__BackingField: Thrown Dagger
   <Description>k__BackingField: A Lost Dagger
-  <IsStackable>k__BackingField: 1
+  <IsStackable>k__BackingField: 0
   <MaxStacks>k__BackingField: 0
   <IsUnmovable>k__BackingField: 0
   <HasUnitEnterEffect>k__BackingField: 0
@@ -27,12 +27,4 @@ MonoBehaviour:
   removeOnUnitEnter: 1
   stacksModifierOnUnitEnter: 0
   stacksModifierOnUnitExit: 0
-  passiveToAddOnUnitEnter:
-  - <UnitPassive>k__BackingField: {fileID: 11400000, guid: 982021c890af1ae47bcba873d8994375,
-      type: 2}
-    <UnitStacks>k__BackingField: 1
-    <TilePassive>k__BackingField: {fileID: 0}
-    <TileStacks>k__BackingField: 0
-    <TargetTileFirst>k__BackingField: 0
-    <IgnoreTileIfUnit>k__BackingField: 0
-    <IgnoreUnitIfTile>k__BackingField: 0
+  passiveToAddOnUnitEnter: []

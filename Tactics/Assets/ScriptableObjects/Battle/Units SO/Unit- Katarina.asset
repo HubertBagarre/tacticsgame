@@ -41,4 +41,12 @@ MonoBehaviour:
   - <Ability>k__BackingField: {fileID: 11400000, guid: bfd55d89b0ea6604ba9a1ee2c155afa8,
       type: 2}
     <ShowInUI>k__BackingField: 0
-  <StartingPassives>k__BackingField: []
+  <StartingPassives>k__BackingField:
+  - <UnitPassive>k__BackingField: {fileID: 11400000, guid: 6fcd7d4f362d1874f820c459430e18b8,
+      type: 2}
+    <UnitStacks>k__BackingField: 0
+    <TilePassive>k__BackingField: {fileID: 0}
+    <TileStacks>k__BackingField: 0
+    <TargetTileFirst>k__BackingField: 0
+    <IgnoreTileIfUnit>k__BackingField: 0
+    <IgnoreUnitIfTile>k__BackingField: 0

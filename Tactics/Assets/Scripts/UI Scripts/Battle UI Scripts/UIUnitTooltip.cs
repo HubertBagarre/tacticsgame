@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -129,7 +130,7 @@ namespace Battle.UIComponent
             }
         }
 
-        private void AddPassive(PassiveInstance<Unit>  passiveInstance)
+        private IEnumerator AddPassive(PassiveInstance<Unit>  passiveInstance)
         {
             if (!passiveIconDict.ContainsKey(passiveInstance))
             {
@@ -140,9 +141,10 @@ namespace Battle.UIComponent
             }
             
             UpdateCurrentPassives();
+            yield break;
         }
 
-        private void RemovePassive(PassiveInstance<Unit>  passiveInstance)
+        private IEnumerator RemovePassive(PassiveInstance<Unit>  passiveInstance)
         {
             if (passiveIconDict.ContainsKey(passiveInstance))
             {
@@ -152,6 +154,7 @@ namespace Battle.UIComponent
             }
             
             UpdateCurrentPassives();
+            yield break;
         }
 
         private void UpdateCurrentPassives()
