@@ -150,8 +150,10 @@ namespace Battle
     public interface IPassivesContainer<T> where T : MonoBehaviour,IPassivesContainer<T>
     {
         public delegate IEnumerator PassiveInstanceDelegate(PassiveInstance<T> passiveInstance);
-        public event PassiveInstanceDelegate OnPassiveAdded; 
-        public event PassiveInstanceDelegate OnPassiveRemoved;
+        public void AddOnPassiveAddedCallback(PassiveInstanceDelegate callback); 
+        public void AddOnPassiveRemovedCallback(PassiveInstanceDelegate callback);
+        public void RemoveOnPassiveAddedCallback(PassiveInstanceDelegate callback); 
+        public void RemoveOnPassiveRemovedCallback(PassiveInstanceDelegate callback); 
         public TPassiveInstance GetPassiveInstance<TPassiveInstance>(PassiveSO<T> passiveSo) where TPassiveInstance : PassiveInstance<T>;
         public IEnumerator AddPassiveEffect(PassiveSO<T> passiveSo, int amount = 1);
         public IEnumerator RemovePassiveEffect(PassiveSO<T> passiveSo);

@@ -217,8 +217,8 @@ namespace Battle.UIComponent
             
             unit.OnMovementLeftChanged += UpdateUnitStatElementsForMovement;
             
-            unit.OnPassiveAdded += AddPassive;
-            unit.OnPassiveRemoved += RemovePassive;
+            unit.AddOnPassiveAddedCallback(AddPassive);
+            unit.AddOnPassiveRemovedCallback(RemovePassive);
         }
 
         private void RemoveCallbacks(Unit unit)
@@ -234,8 +234,8 @@ namespace Battle.UIComponent
             
             unit.OnMovementLeftChanged -= UpdateUnitStatElementsForMovement;
             
-            unit.OnPassiveAdded -= AddPassive;
-            unit.OnPassiveRemoved -= RemovePassive;
+            unit.RemoveOnPassiveAddedCallback(AddPassive);
+            unit.RemoveOnPassiveRemovedCallback(RemovePassive);
         }
 
         private void UpdateHpStatElement(UnitStatsInstance statsInstance)

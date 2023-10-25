@@ -87,8 +87,8 @@ namespace Battle
         public event IBattleEntity.BattleEntityDelegate OnTurnStart;
         public event IBattleEntity.BattleEntityDelegate OnTurnEnd;
         public event Action OnDeath;
-        public event IPassivesContainer<Unit>.PassiveInstanceDelegate OnPassiveAdded; 
-        public event IPassivesContainer<Unit>.PassiveInstanceDelegate OnPassiveRemoved;
+        private List<IPassivesContainer<Unit>.PassiveInstanceDelegate> PassiveAddedCallbacks { get; } = new();
+        private List<IPassivesContainer<Unit>.PassiveInstanceDelegate>  PassiveRemovedCallbacks { get; } = new();
         public delegate IEnumerator TileDelegate(Unit unit,Tile tile);
         public event TileDelegate OnTileEnter;
         public event TileDelegate OnTileExit;
@@ -111,6 +111,9 @@ namespace Battle
             Team = team;
             Stats = so.CreateInstance(this);
             
+            PassiveAddedCallbacks.Clear();
+            PassiveRemovedCallbacks.Clear();
+            
             if(Tile != null) yield return StartCoroutine( tile.SetUnit(this));
             
             OnUnitInit?.Invoke(this);
@@ -131,6 +134,8 @@ namespace Battle
                 AbilityInstances.Add(abilityToAdd.CreateInstance());
             }
             behaviourRoutine = null;
+            
+            onAttackOtherUnitRoutines.Clear();
         }
 
         public IEnumerator LateInitEntityForBattle()
@@ -446,7 +451,31 @@ namespace Battle
 
             OnUltimatePointsAmountChanged?.Invoke(previous, CurrentUltimatePoints);
         }
-        
+
+        public void AddOnPassiveAddedCallback(IPassivesContainer<Unit>.PassiveInstanceDelegate callback)
+        {
+            PassiveAddedCallbacks.Add(callback);
+            Debug.Log($"Added callback, now {PassiveAddedCallbacks.Count} callbacks");
+        }
+
+        public void AddOnPassiveRemovedCallback(IPassivesContainer<Unit>.PassiveInstanceDelegate callback)
+        {
+            PassiveRemovedCallbacks.Add(callback);
+        }
+
+        public void RemoveOnPassiveAddedCallback(IPassivesContainer<Unit>.PassiveInstanceDelegate callback)
+        {
+            if (!PassiveAddedCallbacks.Contains(callback)) return;
+            
+            PassiveAddedCallbacks.Remove(callback);
+            Debug.Log($"Removed callback, now {PassiveAddedCallbacks.Count} callbacks");
+        }
+
+        public void RemoveOnPassiveRemovedCallback(IPassivesContainer<Unit>.PassiveInstanceDelegate callback)
+        {
+            if(PassiveRemovedCallbacks.Contains(callback)) PassiveRemovedCallbacks.Remove(callback);
+        }
+
         public TPassiveInstance GetPassiveInstance<TPassiveInstance>(PassiveSO<Unit> passiveSo) where TPassiveInstance : PassiveInstance<Unit>
         {
             var instance = PassiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
@@ -479,11 +508,14 @@ namespace Battle
                     PassiveInstances.Add(instance);
                 }
 
-                Debug.Log("Invoking Passive Added Event");
-                if (OnPassiveAdded != null) StartCoroutine(OnPassiveAdded?.Invoke(instance));
-                Debug.Log($"Done Invoking Passive Added Event (is null now : {OnPassiveAdded == null})");
+                var callbacks = PassiveAddedCallbacks.ToList();
+                Debug.Log($"Found {callbacks.Count} callbacks");
+                foreach (var callback in callbacks)
+                {
+                    yield return StartCoroutine(callback.Invoke(instance));
+                }
                 
-                return instance.AddPassive(this);
+                yield return StartCoroutine(instance.AddPassive(this));
             }
         }
 
@@ -505,12 +537,16 @@ namespace Battle
         /// <returns></returns>
         public IEnumerator RemovePassiveEffect(PassiveInstance<Unit> passiveInstance)
         {
-            if (!PassiveInstances.Contains(passiveInstance)) return null;
+            if (!PassiveInstances.Contains(passiveInstance)) yield break;
             PassiveInstances.Remove(passiveInstance);
+
+            var callbacks = PassiveRemovedCallbacks.ToList();
+            foreach (var callback in callbacks)
+            {
+                yield return StartCoroutine(callback.Invoke(passiveInstance));
+            }
             
-            if (OnPassiveRemoved != null) StartCoroutine(OnPassiveRemoved?.Invoke(passiveInstance));
-            
-            return passiveInstance.RemovePassive(this);
+            yield return StartCoroutine(passiveInstance.RemovePassive(this));
         }
         
         public int GetPassiveEffectCount(Func<PassiveInstance<Unit>,bool> condition,out PassiveInstance<Unit> firstPassiveInstance)

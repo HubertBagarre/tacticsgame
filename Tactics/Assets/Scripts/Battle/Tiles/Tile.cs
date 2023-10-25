@@ -2,12 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Battle.ScriptableObjects;
 using TMPro;
 using UnityEngine;
 
 namespace Battle
 {
+    using ScriptableObjects;
+    
     /// <summary>
     /// Data Container for Tile Info
     /// (tile position, adjacent Tiles, current Unit)
@@ -28,8 +29,8 @@ namespace Battle
         
         public List<PassiveInstance<Tile>> PassiveInstances { get; } = new();
         private List<PassiveInstance<Tile>> passivesToRemove = new();
-        public event IPassivesContainer<Tile>.PassiveInstanceDelegate OnPassiveAdded; 
-        public event IPassivesContainer<Tile>.PassiveInstanceDelegate OnPassiveRemoved;
+        private List<IPassivesContainer<Tile>.PassiveInstanceDelegate> PassiveAddedCallbacks { get; } = new();
+        private List<IPassivesContainer<Tile>.PassiveInstanceDelegate>  PassiveRemovedCallbacks { get; } = new();
         
         //pathing
         [Header("Path Rendering")]
@@ -481,6 +482,26 @@ namespace Battle
             lineRenderer.positionCount = 0;
         }
 
+        public void AddOnPassiveAddedCallback(IPassivesContainer<Tile>.PassiveInstanceDelegate callback)
+        {
+            PassiveAddedCallbacks.Add(callback);
+        }
+
+        public void AddOnPassiveRemovedCallback(IPassivesContainer<Tile>.PassiveInstanceDelegate callback)
+        {
+            PassiveRemovedCallbacks.Add(callback);
+        }
+
+        public void RemoveOnPassiveAddedCallback(IPassivesContainer<Tile>.PassiveInstanceDelegate callback)
+        {
+            if(PassiveAddedCallbacks.Contains(callback)) PassiveAddedCallbacks.Remove(callback);
+        }
+
+        public void RemoveOnPassiveRemovedCallback(IPassivesContainer<Tile>.PassiveInstanceDelegate callback)
+        {
+            if(PassiveRemovedCallbacks.Contains(callback)) PassiveRemovedCallbacks.Remove(callback);
+        }
+
         public TPassiveInstance GetPassiveInstance<TPassiveInstance>(PassiveSO<Tile> passiveSo) where TPassiveInstance : PassiveInstance<Tile>
         {
             var instance = PassiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
@@ -507,7 +528,8 @@ namespace Battle
                     if (instance.SO.Model != null)
                     {
                         var model = Instantiate(instance.SO.Model, passiveAnchor);
-                        OnPassiveRemoved += RemovePassiveModel;
+                        
+                        AddOnPassiveRemovedCallback(RemovePassiveModel);
                     
                         PassiveInstances.Add(instance);
                         
@@ -516,16 +538,20 @@ namespace Battle
                         IEnumerator RemovePassiveModel(PassiveInstance<Tile> passiveInstance)
                         {
                             if(passiveInstance != instance) yield break;
-                        
-                            OnPassiveRemoved -= RemovePassiveModel;
+                            
+                            RemoveOnPassiveRemovedCallback(RemovePassiveModel);
                             Destroy(model);
                         }
                     }
                 }
-            
-                if (OnPassiveAdded != null) StartCoroutine(OnPassiveAdded?.Invoke(instance));
+
+                var callbacks = PassiveAddedCallbacks.ToList();
+                foreach (var callback in callbacks)
+                {
+                    yield return StartCoroutine(callback.Invoke(instance));
+                }
                 
-                return instance.AddPassive(this);
+                yield return StartCoroutine(instance.AddPassive(this));
             }
         }
 
@@ -537,12 +563,16 @@ namespace Battle
 
         public IEnumerator RemovePassiveEffect(PassiveInstance<Tile> passiveInstance)
         {
-            if (!PassiveInstances.Contains(passiveInstance)) return null;
+            if (!PassiveInstances.Contains(passiveInstance)) yield break;
             PassiveInstances.Remove(passiveInstance);
+
+            var callbacks = PassiveRemovedCallbacks.ToList();
+            foreach (var callback in callbacks)
+            {
+                yield return StartCoroutine(callback.Invoke(passiveInstance));
+            }
             
-            if (OnPassiveRemoved != null) StartCoroutine(OnPassiveRemoved?.Invoke(passiveInstance));
-            
-            return passiveInstance.RemovePassive(this);
+            yield return StartCoroutine(passiveInstance.RemovePassive(this));
         }
         
         private IEnumerator RemoveAllPassivesToRemove()

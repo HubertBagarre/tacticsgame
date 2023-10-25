@@ -56,8 +56,8 @@ namespace Battle.UIComponent
             associatedUnit.Stats.OnMaxShieldModified += UpdateShieldBar;
             associatedUnit.Stats.OnCurrentShieldModified += UpdateShieldBar;
             
-            associatedUnit.OnPassiveAdded += AddPassiveIcon;
-            associatedUnit.OnPassiveRemoved += RemovePassiveIcon;
+            associatedUnit.AddOnPassiveAddedCallback(AddPassiveIcon);
+            associatedUnit.AddOnPassiveRemovedCallback(RemovePassiveIcon);
         }
 
         private void Update()

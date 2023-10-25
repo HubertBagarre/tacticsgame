@@ -11,7 +11,7 @@ namespace Battle.ScriptableObjects.Passive
         
         protected override IEnumerator OnAddedEffect(Unit unit, PassiveInstance<Unit> instance)
         {
-            unit.OnPassiveAdded += EffectOnDaggerAdded;
+            unit.AddOnPassiveAddedCallback(EffectOnDaggerAdded);
             unit.OnTileEnter += AddDaggerOnThrownDaggerPickup;
             
             yield break;
@@ -36,7 +36,7 @@ namespace Battle.ScriptableObjects.Passive
 
         protected override IEnumerator OnRemovedEffect(Unit unit, PassiveInstance<Unit> instance)
         {
-            unit.OnPassiveAdded -= EffectOnDaggerAdded;
+            unit.RemoveOnPassiveAddedCallback(EffectOnDaggerAdded);
             unit.OnTileEnter -= AddDaggerOnThrownDaggerPickup;
             yield break;
         }
