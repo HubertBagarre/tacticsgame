@@ -9,46 +9,11 @@ namespace Battle
     
     public class BattleActionManager : MonoBehaviour
     {
-        private BattleAction currentAction;
-
-        private void Start()
+        private BattleAction mainAction;
+        
+        public void Run()
         {
-            StartAction();
-        }
-
-        public void StartAction()
-        {
-            var mainAction = new MainBattleAction(this);
-
             mainAction.Start();
-        }
-    }
-    
-    public class MainBattleAction : BattleAction
-    {
-        protected override WaitForSeconds Wait { get; }
-        protected override MonoBehaviour CoroutineInvoker { get; }
-
-        public MainBattleAction(MonoBehaviour coroutineInvoker)
-        {
-            CoroutineInvoker = coroutineInvoker;
-            Wait = new WaitForSeconds(0.1f);
-        }
-        
-        protected override void AssignedAction()
-        {
-            Debug.Log("Main action");
-        }
-        
-        // Copy this in every BattleAction (replace MainBattleAction with the name of the class)
-        protected override void StartActionEvent()
-        {
-            EventManager.Trigger(new StartBattleAction<MainBattleAction>(this));
-        }
-
-        protected override void EndActionEvent()
-        {
-            EventManager.Trigger(new EndBattleAction<MainBattleAction>(this));
         }
     }
 }
@@ -57,7 +22,9 @@ namespace Battle.ActionSystem
 {
     public abstract class BattleAction
     {
+        private static BattleAction CurrentRunningAction { get; set; }
         private BattleAction Parent { get; set; }
+        
         protected virtual MonoBehaviour CoroutineInvoker => Parent.CoroutineInvoker;
 
         private bool IsStarted { get; set; }
@@ -90,16 +57,21 @@ namespace Battle.ActionSystem
             IsOver = false;
             step = 0;
             
-            actionsTriggeredDuringStart.Clear();
-            actionsTriggeredDuringAction.Clear();
-            actionsTriggeredDuringEnd.Clear();
+            CurrentRunningAction = this;
             
             ExecuteStep();
         }
         
-        public void StartBattleAction(BattleAction battleAction)
+        public static void StartNewBattleAction(BattleAction battleAction)
         {
-            if(battleAction.IsStarted || battleAction.IsOver) return;
+            Debug.Log($"Starting {battleAction.GetType()} from {CurrentRunningAction}");
+            
+            CurrentRunningAction?.StartBattleAction(battleAction);
+        }
+        
+        private void StartBattleAction(BattleAction battleAction)
+        {
+            if(battleAction.IsOver) return;
 
             battleAction.Parent = this;
 
@@ -137,6 +109,8 @@ namespace Battle.ActionSystem
             if(actionsTriggeredDuringStart.Any(battleAction => !battleAction.IsOver)) return;
             if(actionsTriggeredDuringAction.Any(battleAction => !battleAction.IsOver)) return;
             if(actionsTriggeredDuringEnd.Any(battleAction => !battleAction.IsOver)) return;
+
+            CurrentRunningAction = this;
             
             ExecuteStep();
         }
@@ -252,10 +226,16 @@ namespace Battle.ActionSystem
         private void Step6()
         {
             IsOver = true;
+            CurrentRunningAction = null;
             Parent?.ResumeAction();
         }
         
         protected abstract void AssignedAction();
+        
+        protected void SetAsCurrentRunningAction()
+        {
+            CurrentRunningAction = this;
+        }
     }
 
     public class StartBattleAction<T> where T : BattleAction

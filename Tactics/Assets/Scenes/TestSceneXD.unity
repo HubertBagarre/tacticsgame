@@ -132,8 +132,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 107337556}
-  - component: {fileID: 107337555}
   - component: {fileID: 107337557}
+  - component: {fileID: 107337558}
   m_Layer: 0
   m_Name: BattleActionManager
   m_TagString: Untagged
@@ -141,18 +141,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &107337555
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 107337554}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e1b677a261819a4486c77fdb539eaf8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &107337556
 Transform:
   m_ObjectHideFlags: 0
@@ -178,6 +166,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93a0abf3f779493468bf2a820880d3d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &107337558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 107337554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c51a0a2b13bbb64f889734e3b9d5ef0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &677444922
