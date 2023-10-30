@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using Battle.ActionSystem.TimelineActions;
 using UnityEngine;
@@ -34,6 +32,7 @@ namespace Battle
             var test = new TimelineEntity();
             
             BattleAction.StartNewBattleAction(new StartTurnAction(test));
+            BattleAction.StartNewBattleAction(new EndTurnAction(test));
             
             mainBattleAction.Start();
         }
@@ -74,9 +73,6 @@ namespace Battle
 
 namespace Battle
 {
-    using ActionSystem;
-    using ActionSystem.TimelineActions;
-    
     public class TimelineEntity
     {
         public Sprite Portrait { get; protected set; }
@@ -89,9 +85,6 @@ namespace Battle
         public void StartTurn()
         {
             Debug.Log("Turn Started");
-            
-            // for testing, this class should be abstract
-            BattleAction.StartNewBattleAction(new EndTurnAction(this));
         }
 
         public void EndTurn()

@@ -3,21 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Battle
-{
-    using ActionSystem;
-    
-    public class BattleActionManager : MonoBehaviour
-    {
-        private BattleAction mainAction;
-        
-        public void Run()
-        {
-            mainAction.Start();
-        }
-    }
-}
-
 namespace Battle.ActionSystem
 {
     public abstract class BattleAction
@@ -64,8 +49,6 @@ namespace Battle.ActionSystem
         
         public static void StartNewBattleAction(BattleAction battleAction)
         {
-            Debug.Log($"Starting {battleAction.GetType()} from {CurrentRunningAction}");
-            
             CurrentRunningAction?.StartBattleAction(battleAction);
         }
         
@@ -74,7 +57,7 @@ namespace Battle.ActionSystem
             if(battleAction.IsOver) return;
 
             battleAction.Parent = this;
-
+            
             switch (step)
             {
                 case 0:
@@ -106,9 +89,11 @@ namespace Battle.ActionSystem
 
         private void ResumeAction()
         {
+            /*
             if(actionsTriggeredDuringStart.Any(battleAction => !battleAction.IsOver)) return;
             if(actionsTriggeredDuringAction.Any(battleAction => !battleAction.IsOver)) return;
             if(actionsTriggeredDuringEnd.Any(battleAction => !battleAction.IsOver)) return;
+            */
 
             CurrentRunningAction = this;
             
@@ -156,6 +141,8 @@ namespace Battle.ActionSystem
         // send Start Action Event
         private void Step0()
         {
+            Debug.Log($"Started {this}");
+            
             StartActionEvent();
 
             NextStep();
@@ -225,6 +212,8 @@ namespace Battle.ActionSystem
         // end this action and resume parent action
         private void Step6()
         {
+            Debug.Log($"Ended {this}");
+            
             IsOver = true;
             CurrentRunningAction = null;
             Parent?.ResumeAction();
