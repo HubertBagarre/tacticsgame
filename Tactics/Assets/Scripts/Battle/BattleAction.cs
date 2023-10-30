@@ -89,6 +89,8 @@ namespace Battle.ActionSystem
 
         private void ResumeAction()
         {
+            // No to check if actions are over because they play one by one, so when one is over execute step will 
+            // try to dequeue again and the next action will be started
             /*
             if(actionsTriggeredDuringStart.Any(battleAction => !battleAction.IsOver)) return;
             if(actionsTriggeredDuringAction.Any(battleAction => !battleAction.IsOver)) return;
