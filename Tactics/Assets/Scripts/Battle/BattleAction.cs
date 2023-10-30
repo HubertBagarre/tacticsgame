@@ -15,7 +15,8 @@ namespace Battle.ActionSystem
         private bool IsStarted { get; set; }
         private bool IsOver { get; set; }
 
-        protected abstract WaitForSeconds Wait { get; }
+        protected abstract YieldInstruction YieldInstruction { get; }
+        protected abstract CustomYieldInstruction CustomYieldInstruction { get; }
         protected abstract void StartActionEvent();
         protected abstract void EndActionEvent();
 
@@ -143,7 +144,7 @@ namespace Battle.ActionSystem
         // send Start Action Event
         private void Step0()
         {
-            Debug.Log($"Started {this}");
+            Debug.Log($"Started {this}",CoroutineInvoker);
             
             StartActionEvent();
 
@@ -171,8 +172,13 @@ namespace Battle.ActionSystem
 
             IEnumerator DelayAssignedAction()
             {
-                AssignedAction();
-                yield return Wait;
+                AssignedActionPreWait();
+
+                yield return CustomYieldInstruction;
+                yield return YieldInstruction;
+                
+                AssignedActionPostWait();
+                
                 NextStep();
             }
         }
@@ -214,14 +220,21 @@ namespace Battle.ActionSystem
         // end this action and resume parent action
         private void Step6()
         {
-            Debug.Log($"Ended {this}");
+            Debug.Log($"Ended {this}",CoroutineInvoker);
             
             IsOver = true;
             CurrentRunningAction = null;
             Parent?.ResumeAction();
         }
         
-        protected abstract void AssignedAction();
+        /// <summary>
+        /// What does this action do ?
+        /// </summary>
+        protected abstract void AssignedActionPreWait();
+        /// <summary>
+        /// Used to reset bools and stuff
+        /// </summary>
+        protected abstract void AssignedActionPostWait();
         
         protected void SetAsCurrentRunningAction()
         {

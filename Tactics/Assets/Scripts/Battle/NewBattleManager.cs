@@ -21,37 +21,54 @@ namespace Battle
     {
         private List<TimelineEntity> timelineEntities;
         private MainBattleAction mainBattleAction;
+        public static bool isBattleOver;
+        
+        private TimelineEntity currentTimelineEntity;
 
         private void Awake()
         {
             mainBattleAction = new MainBattleAction(this);
         }
 
+        [ContextMenu("Test")]
+        private void Test()
+        {
+            isBattleOver = true;
+            currentTimelineEntity.EndTurn();
+        }
+
         private void Start()
         {
-            var test = new TimelineEntity();
+            currentTimelineEntity = new TimelineEntity();
             
-            BattleAction.StartNewBattleAction(new StartTurnAction(test));
-            BattleAction.StartNewBattleAction(new EndTurnAction(test));
+            BattleAction.StartNewBattleAction(new TimelineEntityTurnAction(currentTimelineEntity));
+
+            isBattleOver = false;
             
             mainBattleAction.Start();
         }
 
         public class MainBattleAction : BattleAction
         {
-            protected override WaitForSeconds Wait { get; }
+            protected override YieldInstruction YieldInstruction { get; }
+            protected override CustomYieldInstruction CustomYieldInstruction { get; }
             protected override MonoBehaviour CoroutineInvoker { get; }
 
-            public MainBattleAction(MonoBehaviour coroutineInvoker)
+            public MainBattleAction(MonoBehaviour battleManager)
             {
-                CoroutineInvoker = coroutineInvoker;
-                Wait = new WaitForSeconds(0.1f);
+                CoroutineInvoker = battleManager;
+                CustomYieldInstruction = new WaitUntil(()=>isBattleOver);
                 SetAsCurrentRunningAction();
             }
 
-            protected override void AssignedAction()
+            protected override void AssignedActionPreWait()
             {
                 Debug.Log("Main action");
+            }
+
+            protected override void AssignedActionPostWait()
+            {
+                
             }
 
             // Copy this in every BattleAction (replace MainBattleAction with the name of the class)
@@ -81,72 +98,61 @@ namespace Battle
         public int Speed { get; protected set; }
         public float DistanceFromTurnStart { get; protected set; }
         public float TurnOrder => DistanceFromTurnStart / (Speed / 100f);
+        public bool InTurn { get; protected set; } = false;
 
-        public void StartTurn()
+        public void OnTurnStart()
         {
+            InTurn = true;
             Debug.Log("Turn Started");
+        }
+
+        public void OnTurnEnd()
+        {
+            Debug.Log("Turn Ended");
         }
 
         public void EndTurn()
         {
-            Debug.Log("Turn Ended");
+            InTurn = false;
+            Debug.Log("Ending turn");
         }
+
     }
 }
 
 namespace Battle.ActionSystem.TimelineActions
 {
-    public class StartTurnAction : BattleAction
+    public class TimelineEntityTurnAction : BattleAction
     {
         public TimelineEntity Entity { get; }
 
-        public StartTurnAction(TimelineEntity entity)
+        public TimelineEntityTurnAction(TimelineEntity entity)
         {
             Entity = entity;
+            CustomYieldInstruction = new WaitUntil(()=>!Entity.InTurn);
         }
-
-        protected override WaitForSeconds Wait { get; } = new WaitForSeconds(0f);
+        
+        protected override YieldInstruction YieldInstruction { get; }
+        protected override CustomYieldInstruction CustomYieldInstruction { get; }
 
         protected override void StartActionEvent()
         {
-            EventManager.Trigger(new StartBattleAction<StartTurnAction>(this));
+            EventManager.Trigger(new StartBattleAction<TimelineEntityTurnAction>(this));
         }
 
         protected override void EndActionEvent()
         {
-            EventManager.Trigger(new EndBattleAction<StartTurnAction>(this));
+            EventManager.Trigger(new EndBattleAction<TimelineEntityTurnAction>(this));
         }
 
-        protected override void AssignedAction()
+        protected override void AssignedActionPreWait()
         {
-            Entity.StartTurn();
-        }
-    }
-
-    public class EndTurnAction : BattleAction
-    {
-        public TimelineEntity Entity { get; }
-
-        public EndTurnAction(TimelineEntity entity)
-        {
-            Entity = entity;
+            Entity.OnTurnStart();
         }
 
-        protected override WaitForSeconds Wait { get; } = new WaitForSeconds(0f);
-
-        protected override void StartActionEvent()
+        protected override void AssignedActionPostWait()
         {
-            EventManager.Trigger(new StartBattleAction<EndTurnAction>(this));
-        }
-
-        protected override void EndActionEvent()
-        {
-            EventManager.Trigger(new EndBattleAction<EndTurnAction>(this));
-        }
-
-        protected override void AssignedAction()
-        {
-            Entity.EndTurn();
+            Entity.OnTurnEnd();
         }
     }
 }
