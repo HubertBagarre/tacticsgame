@@ -8,7 +8,6 @@ using UnityEngine.UI;
 namespace Battle
 {
     using AbilityEvents;
-    using ScriptableObjects.Ability;
     using BattleEvents;
     using UIEvents;
     using UIComponent;

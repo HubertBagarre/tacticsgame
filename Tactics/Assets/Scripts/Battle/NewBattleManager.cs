@@ -34,9 +34,8 @@ namespace Battle
 
         private List<TimelineEntity> entitiesInTimeline;
         public TimelineEntity CurrentTimelineEntity { get; private set; }
-
-        public IEnumerable<TimelineEntity> OrderedTimelineEntities => entitiesInTimeline.OrderBy(entity => entity.TurnOrder);
         public TimelineEntity FirstTimelineEntity => entitiesInTimeline.First();
+        private int totalEntityAddedToTimeline = 0;
 
         //Round
         private int CurrentRound { get; set; }
@@ -66,14 +65,15 @@ namespace Battle
 
 
             entitiesInTimeline = new List<TimelineEntity>();
+            totalEntityAddedToTimeline = 0;
             
             // 1 - Spawn Tiles
 
 
             // 3 - Spawn Units (timeline should be set up and they should spawn with their passives)
             var entity0 = new TestEntity(100, 10, "0");
-            var entity1 = new TestEntity(100, 10, "1");
-            var entity2 = new TestEntity(100, 10, "2");
+            var entity1 = new TestEntity(100, 11, "1");
+            var entity2 = new TestEntity(100, 12, "2");
             
             AddEntitiesToTimeline(true,new List<TimelineEntity>{entity0,entity1,entity2});
 
@@ -111,57 +111,21 @@ namespace Battle
 
         public void InsertEntityInTimeline(TimelineEntity entityToInsert,float distanceFromTurnStart)
         {
-            Func<TimelineEntity,bool> isOverlaping = (entityToTest) => (entityToTest.DistanceFromTurnStart == distanceFromTurnStart) && entityToTest.Speed == entityToInsert.Speed;
-
-            Debug.Log($"Inserting {entityToInsert.Name} at {distanceFromTurnStart}");
+            entityToInsert.SetJoinIndex(totalEntityAddedToTimeline);
+            totalEntityAddedToTimeline++;
+            
             entityToInsert.SetDistanceFromTurnStart(distanceFromTurnStart);
-            
-            var overlappingEntity = entitiesInTimeline.FirstOrDefault(isOverlaping);
-            
-            if (overlappingEntity != null)
-            {
-                Debug.Log($"Entity is overlapping with {overlappingEntity.Name}");
-                
-                var indexOfOverlappingEntity = entitiesInTimeline.IndexOf(overlappingEntity);
-
-                if (indexOfOverlappingEntity == 0)
-                {
-                    overlappingEntity.SetDistanceFromTurnStart(-1);
-                    ReorderTimeline(OrderedTimelineEntities);
-                }
-                else
-                {
-                    var entity = entitiesInTimeline[indexOfOverlappingEntity - 1];
-                    /*
-                    Debug.Log($"{overlappingEntity.Name} needs to be place between {entityToInsert.Name} and {entity.Name}");
-                    
-                    Debug.Log($"{entity.Name} is at {entity.TurnOrder} from start");
-                    
-                    Debug.Log($"{overlappingEntity.Name} is at {overlappingEntity.TurnOrder} from start");
-                    */
-                    var stepsToMove = overlappingEntity.TurnOrder - entity.TurnOrder;
-                    stepsToMove /= 2;
-                    var newDistance = overlappingEntity.TurnOrder - stepsToMove*overlappingEntity.DecayRate;
-                    
-                    overlappingEntity.SetDistanceFromTurnStart(newDistance);
-                }
-            }
-            
             
             entitiesInTimeline.Add(entityToInsert);
             
-            ReorderTimeline(OrderedTimelineEntities);
+            ReorderTimeline();
         }
 
-        public void ReorderTimeline(IEnumerable<TimelineEntity> newOrder)
+        public void ReorderTimeline()
         {
-            entitiesInTimeline = newOrder.ToList();
+            entitiesInTimeline.Sort();
             
-            Debug.Log("Time line reordered :");
-            foreach (var timelineEntity in entitiesInTimeline)
-            {
-                Debug.Log($"{timelineEntity.Name} : {timelineEntity.DistanceFromTurnStart} (speed : {timelineEntity.Speed})");
-            }
+            EventManager.Trigger(entitiesInTimeline);
         }
 
         public void ResetTimelineEntityDistanceFromTurnStart(TimelineEntity timelineEntity)
@@ -181,18 +145,26 @@ namespace Battle
 
         public void AdvanceTimeline()
         {
+            //Debug.Log("Advancing Timeline");
+            
+            //Debug.Log($"Resetting CurrentTimelineEntity's ({CurrentTimelineEntity.Name}) turn value (to {ResetTurnValue})");
             ResetTimelineEntityDistanceFromTurnStart(CurrentTimelineEntity);
+            //Debug.Log($"{CurrentTimelineEntity.Name}'s turn value is now {ResetTurnValue}");
+            
+            //Debug.Log($"Reordering Timeline");
+            ReorderTimeline();
 
-            ReorderTimeline(OrderedTimelineEntities);
-
+            //Debug.Log($"Setting {FirstTimelineEntity.Name} to CurrentTimelineEntity");
             CurrentTimelineEntity = FirstTimelineEntity;
 
+            //Debug.Log($"Decaying all entities' turn values by {CurrentTimelineEntity.TurnOrder}");
             var amountToDecay = CurrentTimelineEntity.TurnOrder;
             
             foreach (var entity in entitiesInTimeline)
             {
                 DecayEntitiesTurnValues(entity, amountToDecay);
             }
+            //Debug.Log($"Done advancing timeline");
         }
 
         private class MainBattleAction : BattleAction
@@ -228,41 +200,7 @@ namespace Battle
                 EventManager.Trigger(new EndBattleAction<MainBattleAction>(this));
             }
         }
-
-        public class ReorderTimelineAction : BattleAction
-        {
-            protected override YieldInstruction YieldInstruction { get; }
-            protected override CustomYieldInstruction CustomYieldInstruction { get; }
-            protected override MonoBehaviour CoroutineInvoker => BattleManager;
-            protected NewBattleManager BattleManager { get; }
-            public IEnumerable<TimelineEntity> NewOrder { get; } 
-
-            public ReorderTimelineAction(NewBattleManager battleManager, IEnumerable<TimelineEntity> newOrder)
-            {
-                BattleManager = battleManager;
-                NewOrder = newOrder;
-            }
-
-            protected override void StartActionEvent()
-            {
-                EventManager.Trigger(new StartBattleAction<ReorderTimelineAction>(this));
-            }
-
-            protected override void EndActionEvent()
-            {
-                EventManager.Trigger(new EndBattleAction<ReorderTimelineAction>(this));
-            }
-
-            protected override void AssignedActionPreWait()
-            {
-                BattleManager.ReorderTimeline(BattleManager.OrderedTimelineEntities);
-            }
-
-            protected override void AssignedActionPostWait()
-            {
-            }
-        }
-
+        
         public class RoundAction : BattleAction
         {
             protected override YieldInstruction YieldInstruction { get; }
@@ -296,7 +234,7 @@ namespace Battle
 
             protected override void AssignedActionPostWait()
             {
-                //Debug.Log($"CurrentTimelineEntity != Round End ? {(BattleManager.CurrentTimelineEntity != BattleManager.RoundEndEntity)}");
+                Debug.Log($"CurrentTimelineEntity != Round End ? {(BattleManager.CurrentTimelineEntity != BattleManager.RoundEndEntity)}");
                 if (BattleManager.CurrentTimelineEntity != BattleManager.RoundEndEntity)
                 {
                     // enqueue Current Entity Turn action

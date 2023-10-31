@@ -11,22 +11,36 @@ public class UIBattleEntityTimeline : MonoBehaviour
     [SerializeField] private TextMeshProUGUI turnValueText;
     [SerializeField] private GameObject turnValueObj;
     [SerializeField] private GameObject obj;
-    
+    [SerializeField] private TextMeshProUGUI debugText;
+
     public TimelineEntity TimelineEntity { get; private set; }
-     public IBattleEntity AssociatedEntity { get; private set; }
-    
+    public IBattleEntity AssociatedEntity { get; private set; }
+
+    public void ConnectToEntity(TimelineEntity entity)
+    {
+        if(entity == null) return;
+        TimelineEntity = entity;
+        debugText.text = TimelineEntity.Name;
+        
+        ChangeBorderColor(TimelineEntity.Team);
+        ChangeImage(TimelineEntity.Portrait);
+        ChangeValue(TimelineEntity.DistanceFromTurnStart);
+
+        TimelineEntity.OnDistanceFromTurnStartChanged += ChangeValue;
+    }
+
     public void ConnectToEntity(IBattleEntity entity)
     {
         AssociatedEntity = entity;
-        ChangeBorderColor(AssociatedEntity.Team); 
-        
+        ChangeBorderColor(AssociatedEntity.Team);
+
         gameObject.name = $"{AssociatedEntity}'s time";
-        
+
         ChangeImage(AssociatedEntity.Portrait);
-        ChangeValue((int)AssociatedEntity.DistanceFromTurnStart);
+        ChangeValue((int) AssociatedEntity.DistanceFromTurnStart);
 
         EventManager.AddListener<UpdateTurnValuesEvent>(UpdateTurnValue);
-        
+
         Show(false);
 
         entity.OnDeath += DestroySelf;
@@ -47,9 +61,10 @@ public class UIBattleEntityTimeline : MonoBehaviour
     {
         borderImage.color = team == 0 ? Color.cyan : Color.red;
     }
-    
-    public void ChangeValue(int value)
+
+    public void ChangeValue(float value)
     {
+        value = (int) value;
         turnValueText.text = $"{value}";
         turnValueObj.SetActive(value >= 0);
     }
@@ -70,11 +85,10 @@ public class UIBattleEntityTimeline : MonoBehaviour
         col.a = value ? 0.7f : 1f;
         portraitImage.color = col;
     }
-    
+
     private void UpdateTurnValue(UpdateTurnValuesEvent ctx)
     {
         ChangeImage(AssociatedEntity.Portrait);
-        ChangeValue((int)AssociatedEntity.TurnOrder);
+        ChangeValue((int) AssociatedEntity.TurnOrder);
     }
-
 }
