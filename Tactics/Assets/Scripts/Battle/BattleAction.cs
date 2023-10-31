@@ -1,22 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Battle.ActionSystem
 {
     public abstract class BattleAction
     {
-        private static BattleAction CurrentRunningAction { get; set; }
-        private BattleAction Parent { get; set; }
+        public static bool showLog = false;
+        
+        public static BattleAction CurrentRunningAction { get; private set; }
+        private static Queue<BattleAction> OrphanedActions { get; } = new();
+        protected BattleAction Parent { get; private set; }
         
         protected virtual MonoBehaviour CoroutineInvoker => Parent.CoroutineInvoker;
 
         private bool IsStarted { get; set; }
         private bool IsOver { get; set; }
 
-        protected abstract YieldInstruction YieldInstruction { get; }
-        protected abstract CustomYieldInstruction CustomYieldInstruction { get; }
+        protected abstract YieldInstruction YieldInstruction { get; } // wait for seconds
+        protected abstract CustomYieldInstruction CustomYieldInstruction { get; } // waitUntil or waitWhile (or another coroutine i guess)
         protected abstract void StartActionEvent();
         protected abstract void EndActionEvent();
 
@@ -50,47 +52,81 @@ namespace Battle.ActionSystem
         
         public static void StartNewBattleAction(BattleAction battleAction)
         {
-            CurrentRunningAction?.StartBattleAction(battleAction);
+            if (CurrentRunningAction != null && CurrentRunningAction.CoroutineInvoker != null)
+            {
+                CurrentRunningAction.StartBattleAction(battleAction);
+                return;
+            }
+
+            OrphanedActions.Enqueue(battleAction);
+        }
+
+        public void EnqueueInActionStart(BattleAction battleAction)
+        {
+            Log($"Enqueued {battleAction} to {this} (at start)");
+            battleAction.Parent = this;
+            actionsTriggeredDuringStart.Enqueue(battleAction);
+        }
+        
+        public void EnqueueInAction(BattleAction battleAction)
+        {
+            Log($"Enqueued {battleAction} to {this} (at action)");
+            battleAction.Parent = this;
+            actionsTriggeredDuringAction.Enqueue(battleAction);
+        }
+        
+        public void EnqueueInActionEnd(BattleAction battleAction)
+        {
+            Log($"Enqueued {battleAction} to {this} (at end)");
+            battleAction.Parent = this;
+            actionsTriggeredDuringEnd.Enqueue(battleAction);
+        }
+        
+        public void EnqueueInParent(BattleAction battleAction)
+        {
+            Parent?.StartBattleAction(battleAction);
         }
         
         private void StartBattleAction(BattleAction battleAction)
         {
             if(battleAction.IsOver) return;
-
+            
             battleAction.Parent = this;
             
             switch (step)
             {
                 case 0:
-                    actionsTriggeredDuringStart.Enqueue(battleAction);
+                    EnqueueInActionStart(battleAction);
                     break;
                 case 1:
-                    actionsTriggeredDuringAction.Enqueue(battleAction);
+                    EnqueueInAction(battleAction);
                     break;
                 case 2:
-                    actionsTriggeredDuringAction.Enqueue(battleAction);
+                    EnqueueInAction(battleAction);
                     break;
                 case 3:
-                    actionsTriggeredDuringEnd.Enqueue(battleAction);
+                    EnqueueInActionEnd(battleAction);
                     break;
                 case 4:
-                    actionsTriggeredDuringEnd.Enqueue(battleAction);
+                    EnqueueInActionEnd(battleAction);
                     break;
                 case 5:
-                    Parent?.StartBattleAction(battleAction);
+                    EnqueueInParent(battleAction);
                     break;
                 case 6:
-                    Parent?.StartBattleAction(battleAction);
+                    EnqueueInParent(battleAction);
                     break;
                 default:
-                    Parent?.StartBattleAction(battleAction);
+                    EnqueueInParent(battleAction);
                     break;
             }
         }
 
         private void ResumeAction()
         {
-            // No to check if actions are over because they play one by one, so when one is over execute step will 
+            Log($"Resumed {this} (at step {step})");
+            
+            // No need to check if actions are over because they play one by one, so when one is over execute step will 
             // try to dequeue again and the next action will be started
             /*
             if(actionsTriggeredDuringStart.Any(battleAction => !battleAction.IsOver)) return;
@@ -101,6 +137,11 @@ namespace Battle.ActionSystem
             CurrentRunningAction = this;
             
             ExecuteStep();
+        }
+
+        protected void SetStep(int value)
+        {
+            step = value;
         }
 
         private void NextStep()
@@ -144,7 +185,7 @@ namespace Battle.ActionSystem
         // send Start Action Event
         private void Step0()
         {
-            Debug.Log($"Started {this}",CoroutineInvoker);
+            Log($"Started {this}");
             
             StartActionEvent();
 
@@ -220,7 +261,7 @@ namespace Battle.ActionSystem
         // end this action and resume parent action
         private void Step6()
         {
-            Debug.Log($"Ended {this}",CoroutineInvoker);
+            Log($"Ended {this}");
             
             IsOver = true;
             CurrentRunningAction = null;
@@ -239,6 +280,18 @@ namespace Battle.ActionSystem
         protected void SetAsCurrentRunningAction()
         {
             CurrentRunningAction = this;
+            if(CurrentRunningAction == null) return;
+            while (OrphanedActions.Count > 0)
+            {
+                StartNewBattleAction(OrphanedActions.Dequeue());
+            }
+        }
+
+        private void Log(string text)
+        {
+            if(!showLog) return;
+
+            Debug.Log(text,CoroutineInvoker);
         }
     }
 

@@ -180,6 +180,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c51a0a2b13bbb64f889734e3b9d5ef0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  showLog: 0
+  tileManager: {fileID: 0}
+  unitManager: {fileID: 0}
+  abilityManager: {fileID: 0}
+  <ResetTurnValue>k__BackingField: 100
 --- !u!1 &677444922
 GameObject:
   m_ObjectHideFlags: 0
