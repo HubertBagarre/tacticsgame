@@ -15,7 +15,7 @@ MonoBehaviour:
   <Sprite>k__BackingField: {fileID: 0}
   <Name>k__BackingField: Throw Dagger
   <Type>k__BackingField: 2
-  description: 
+  description: <link="YOLO">text</link> ggggg
   <Selector>k__BackingField: {fileID: 11400000, guid: 15ba02784cce29c478f9ac8f842a576d,
     type: 2}
   <Requirement>k__BackingField: {fileID: 0}

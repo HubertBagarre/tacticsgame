@@ -1,3 +1,4 @@
+using Battle;
 using Battle.BattleEvents;
 using TMPro;
 using UnityEngine;
@@ -11,8 +12,8 @@ public class UIBattleEntityTimeline : MonoBehaviour
     [SerializeField] private GameObject turnValueObj;
     [SerializeField] private GameObject obj;
     
-    [field:Header("Debug")]
-    [field:SerializeField,SerializeReference] public IBattleEntity AssociatedEntity { get; private set; }
+    public TimelineEntity TimelineEntity { get; private set; }
+     public IBattleEntity AssociatedEntity { get; private set; }
     
     public void ConnectToEntity(IBattleEntity entity)
     {

@@ -17,11 +17,11 @@ MonoBehaviour:
   <Model>k__BackingField: {fileID: 0}
   <Type>k__BackingField: 1
   <Name>k__BackingField: Dagger
-  <Description>k__BackingField: It's a dagger lmao.
+  <Description>k__BackingField: ' XD'
   <IsStackable>k__BackingField: 1
   <MaxStacks>k__BackingField: 0
+  <IsUnmovable>k__BackingField: 0
   <HasStartTurnEffect>k__BackingField: 0
   <HasEndTurnEffect>k__BackingField: 0
-  <IsUnmovable>k__BackingField: 0
   <RemoveOnTurnEnd>k__BackingField: 0
   <RemoveOnTurnStart>k__BackingField: 0
