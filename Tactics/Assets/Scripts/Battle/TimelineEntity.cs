@@ -13,8 +13,9 @@ namespace Battle
         public Sprite Portrait { get; protected set; }
         public int Team { get; protected set; } = 0;
         public int Initiative { get; protected set; }
-        public int Speed { get; protected set; }
-        public float DistanceFromTurnStart { get; protected set; }
+        public int Speed { get; private set; }
+        public event Action<int> OnSpeedChanged;
+        public float DistanceFromTurnStart { get; private set; }
         public event Action<float> OnDistanceFromTurnStartChanged;
         public float TurnOrder => DistanceFromTurnStart / (Speed / 100f);
         public int JoinedIndex { get; private set; }
@@ -47,6 +48,12 @@ namespace Battle
             OnDistanceFromTurnStartChanged?.Invoke(DistanceFromTurnStart);
         }
 
+        public virtual void SetSpeed(int value)
+        {
+            Speed = value;
+            OnSpeedChanged?.Invoke(Speed);
+        }
+
         public void OnTurnStart()
         {
             InTurn = true;
@@ -74,10 +81,13 @@ namespace Battle
 
         public int CompareTo(TimelineEntity other)
         {
-            if (ReferenceEquals(this, other)) return 0;
-            if (ReferenceEquals(null, other)) return 1;
             var turnOrder = TurnOrder.CompareTo(other.TurnOrder);
-            return turnOrder != 0 ? turnOrder : JoinedIndex.CompareTo(other.JoinedIndex);
+            if (turnOrder != 0) return turnOrder;
+            
+            Debug.Log($"Same turn order ({Name} and {other.Name} : {TurnOrder}/{other.TurnOrder})");
+            if (JoinedIndex < 0) return 1;
+            
+            return JoinedIndex.CompareTo(other.JoinedIndex);
         }
     }
 }

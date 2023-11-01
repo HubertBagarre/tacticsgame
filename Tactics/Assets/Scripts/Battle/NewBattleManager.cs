@@ -31,7 +31,6 @@ namespace Battle
         [field: Header("Timeline")]
         [field: SerializeField]
         public int ResetTurnValue { get; private set; } = 100;
-
         private List<TimelineEntity> entitiesInTimeline;
         public TimelineEntity CurrentTimelineEntity { get; private set; }
         public TimelineEntity FirstTimelineEntity => entitiesInTimeline.First();
@@ -73,12 +72,13 @@ namespace Battle
             // 3 - Spawn Units (timeline should be set up and they should spawn with their passives)
             var entity0 = new TestEntity(100, 10, "0");
             var entity1 = new TestEntity(100, 11, "1");
-            var entity2 = new TestEntity(100, 12, "2");
+            var entity2 = new TestEntity(50, 10, "2");
             
             AddEntitiesToTimeline(true,new List<TimelineEntity>{entity0,entity1,entity2});
 
             RoundEndEntity = new TestEntity(50, 10, "End Round");
             AddEntityToTimeline(RoundEndEntity,false);
+            ResetRoundEntityDistanceFromTurnStart();
 
 
             // 4 - Setup Win/Lose Conditions
@@ -113,6 +113,11 @@ namespace Battle
         {
             entityToInsert.SetJoinIndex(totalEntityAddedToTimeline);
             totalEntityAddedToTimeline++;
+            if (entityToInsert == RoundEndEntity)
+            {
+                entityToInsert.SetJoinIndex(-1);
+                totalEntityAddedToTimeline--;
+            }
             
             entityToInsert.SetDistanceFromTurnStart(distanceFromTurnStart);
             
@@ -121,16 +126,57 @@ namespace Battle
             ReorderTimeline();
         }
 
+        [ContextMenu("Reorder Timeline")]
         public void ReorderTimeline()
         {
-            entitiesInTimeline.Sort();
+            entitiesInTimeline = entitiesInTimeline.OrderBy(entity => entity).ToList();
+
+            for (int i = 1; i < entitiesInTimeline.Count; i++)
+            {
+                //Debug.Log(entitiesInTimeline[i-1].CompareTo(entitiesInTimeline[i]));
+            }
             
             EventManager.Trigger(entitiesInTimeline);
         }
 
         public void ResetTimelineEntityDistanceFromTurnStart(TimelineEntity timelineEntity)
         {
+            if (timelineEntity == RoundEndEntity)
+            {
+                ResetRoundEntityDistanceFromTurnStart();
+                return;
+            }
             SetTimelineEntityDistanceFromTurnStart(timelineEntity,ResetTurnValue);
+        }
+        
+        public void ResetRoundEntityDistanceFromTurnStart()
+        {
+            //Debug.Log("Resetting Round End Entity's distance from turn start");
+            var distance = RoundEndEntity.DistanceFromTurnStart;
+            var speed = RoundEndEntity.Speed;
+            if (entitiesInTimeline.Count > 1)
+            {
+                ReorderTimeline();
+                
+                var slowestEntity = entitiesInTimeline.Where(entity => entity != RoundEndEntity)
+                    .OrderBy(entity => entity.Speed).First();
+                speed = slowestEntity.Speed;
+
+                /*
+                foreach (var entity in entitiesInTimeline.Where(entity => entity != RoundEndEntity))
+                {
+                    Debug.Log($"{entity.Name} (distance of {entity.DistanceFromTurnStart} (turn order : {entity.TurnOrder}))");
+                }*/
+                var furthestEntity = entitiesInTimeline.Where(entity => entity != RoundEndEntity)
+                    .OrderBy(entity => entity.TurnOrder).Last();
+                distance = furthestEntity.DistanceFromTurnStart + 0.01f; // TODO : find a better way to do this (+0.01f should not be necessary)
+                
+                //Debug.Log($"slowest unit : {slowestEntity.Name} (speed of {speed})");
+                //Debug.Log($"furthest unit : {furthestEntity.Name} (distance of {furthestEntity.DistanceFromTurnStart} (turn order : {furthestEntity.TurnOrder}))");
+            }
+            
+            RoundEndEntity.SetSpeed(speed);
+            RoundEndEntity.SetDistanceFromTurnStart(distance);
         }
 
         public void SetTimelineEntityDistanceFromTurnStart(TimelineEntity timelineEntity,float value)
@@ -145,26 +191,18 @@ namespace Battle
 
         public void AdvanceTimeline()
         {
-            //Debug.Log("Advancing Timeline");
-            
-            //Debug.Log($"Resetting CurrentTimelineEntity's ({CurrentTimelineEntity.Name}) turn value (to {ResetTurnValue})");
             ResetTimelineEntityDistanceFromTurnStart(CurrentTimelineEntity);
-            //Debug.Log($"{CurrentTimelineEntity.Name}'s turn value is now {ResetTurnValue}");
             
-            //Debug.Log($"Reordering Timeline");
             ReorderTimeline();
 
-            //Debug.Log($"Setting {FirstTimelineEntity.Name} to CurrentTimelineEntity");
             CurrentTimelineEntity = FirstTimelineEntity;
 
-            //Debug.Log($"Decaying all entities' turn values by {CurrentTimelineEntity.TurnOrder}");
             var amountToDecay = CurrentTimelineEntity.TurnOrder;
             
             foreach (var entity in entitiesInTimeline)
             {
                 DecayEntitiesTurnValues(entity, amountToDecay);
             }
-            //Debug.Log($"Done advancing timeline");
         }
 
         private class MainBattleAction : BattleAction
@@ -234,7 +272,7 @@ namespace Battle
 
             protected override void AssignedActionPostWait()
             {
-                Debug.Log($"CurrentTimelineEntity != Round End ? {(BattleManager.CurrentTimelineEntity != BattleManager.RoundEndEntity)}");
+                //Debug.Log($"CurrentTimelineEntity != Round End ? {(BattleManager.CurrentTimelineEntity != BattleManager.RoundEndEntity)}");
                 if (BattleManager.CurrentTimelineEntity != BattleManager.RoundEndEntity)
                 {
                     // enqueue Current Entity Turn action
@@ -255,6 +293,7 @@ namespace Battle
             }
         }
 
+        [Serializable]
         private class TestEntity : TimelineEntity
         {
             public TestEntity(int speed, int initiative, string name = "Test Entity") : base(speed, initiative, name)
