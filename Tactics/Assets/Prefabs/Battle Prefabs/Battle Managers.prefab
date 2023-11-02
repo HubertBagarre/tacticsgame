@@ -161,6 +161,8 @@ MonoBehaviour:
   entityLayers:
     serializedVersion: 2
     m_Bits: 256
+  unitRendererPrefab: {fileID: -6834392554711149442, guid: f073adfeede148c4ca78b751551c873f,
+    type: 3}
   units: []
 --- !u!1 &5325066679504934663
 GameObject:
@@ -207,7 +209,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   battleManager: {fileID: 4749299947456972236}
-  defaultLevel: {fileID: 558228172500973346, guid: d9a4f41f3fbfe5240b61e8ab5ad15637,
+  newBattleManager: {fileID: 0}
+  defaultLevel: {fileID: 558228172500973346, guid: 8fce1aeb1902f3b45bcc74daeaba4ead,
     type: 3}
 --- !u!1 &8949087217103233743
 GameObject:

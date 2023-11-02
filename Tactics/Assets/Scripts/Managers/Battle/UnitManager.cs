@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Battle.InputEvent;
+using Battle.ScriptableObjects;
 using UnityEngine;
 
 namespace Battle
@@ -17,12 +18,25 @@ namespace Battle
     {
         [Header("Settings")] [SerializeField] protected LayerMask entityLayers;
 
+        [SerializeField] private UnitRenderer unitRendererPrefab;
+        
         [Header("Debug")] [SerializeField] private List<Unit> units = new List<Unit>();
+        
         public List<Unit> AllUnits => units.ToList();
 
         public void Start()
         {
             InputManager.RightClickEvent += ClickUnit;
+        }
+
+        public UnitRenderer SpawnUnit(NewUnit unit)
+        {
+            var unitRenderer = Instantiate(unitRendererPrefab);
+            unitRenderer.SetUnit(unit);
+            
+            unitRenderer.name = unit.Name;
+
+            return unitRenderer;
         }
 
         public void SetUnits(List<Unit> list)

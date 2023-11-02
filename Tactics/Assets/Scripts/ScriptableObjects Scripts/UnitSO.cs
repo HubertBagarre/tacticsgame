@@ -26,12 +26,13 @@ namespace Battle.ScriptableObjects
         [field: SerializeField, Tooltip("Turn Value Decay Rate, higher is faster")]
         public int BaseSpeed { get; private set; } = 100;
         [field: SerializeField, Tooltip("Start Turn Value, lower is faster")]
-        public float Initiative { get; private set; } = 1000;
+        public int Initiative { get; private set; } = 1000;
         [field: SerializeField] public UnitBehaviourSO Behaviour { get; private set; }
         [field: SerializeField] public List<AbilityToAdd> Abilities { get; private set; }
         
         [field: SerializeField] public List<PassiveToAdd> StartingPassives { get; private set; }
         public UnitStatsInstance CreateInstance(Unit unit) => new UnitStatsInstance(this,unit);
+        public UnitStatsInstance CreateInstance() => new UnitStatsInstance(this);
     }
 }
 
@@ -250,6 +251,22 @@ namespace Battle
             CurrentShield = MaxShield;
             
             Behaviour.InitBehaviour(unit);
+        }
+        
+        public UnitStatsInstance(UnitSO so)
+        {
+            So = so;
+            
+            BaseSpeed = So.BaseSpeed;
+            Initiative = So.Initiative;
+            Behaviour = So.Behaviour;
+            
+            ResetModifiers();
+            
+            CurrentHp = MaxHp;
+            CurrentShield = MaxShield;
+            
+            //Behaviour.InitBehaviour(unit);
         }
 
         public void ResetModifiers()

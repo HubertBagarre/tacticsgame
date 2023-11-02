@@ -14,6 +14,7 @@ namespace Battle.ScriptableObjects
         public class PlacedUnit
         {
             public Unit prefab;
+            public UnitRenderer rendererPrefab;
             public UnitSO so;
             public int team;
             public Vector2Int position;

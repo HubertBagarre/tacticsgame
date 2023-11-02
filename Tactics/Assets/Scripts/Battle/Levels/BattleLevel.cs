@@ -12,16 +12,12 @@ namespace Battle
     public class BattleLevel : MonoBehaviour
     {
         [SerializeField] private UnitPlacementSO unitPlacement;
+        public List<UnitPlacementSO.PlacedUnit>  PlacedUnits => unitPlacement.PlacedUnits;
         public List<IBattleEntity> StartingEntities { get; private set; }
         
         [field:SerializeField] public List<Tile> Tiles { get; private set; }
         [field:SerializeField] public List<Unit> Units { get; private set; }
-
-        public virtual void SetupCallbacks()
-        {
-            
-        }
-
+        
         public virtual void SetupEndBattleConditions(BattleManager battleManager)
         {
             EventManager.AddListener<UnitDeathEvent>(TryEndBattle);

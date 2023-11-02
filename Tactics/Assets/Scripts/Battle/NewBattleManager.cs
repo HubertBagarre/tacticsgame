@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Battle.ScriptableObjects;
 using UnityEngine;
 
 namespace Battle
@@ -23,7 +24,8 @@ namespace Battle
     {
         [SerializeField] private bool showLog;
 
-        [Header("Managers")] [SerializeField] private TileManager tileManager;
+        [Header("Managers")]
+        [SerializeField] private TileManager tileManager;
         [SerializeField] private UnitManager unitManager;
         [SerializeField] private AbilityManager abilityManager;
 
@@ -36,9 +38,13 @@ namespace Battle
         public TimelineEntity FirstTimelineEntity => entitiesInTimeline.First();
         private int totalEntityAddedToTimeline = 0;
 
+        //Level
+        private BattleLevel CurrentLevel { get; set; }
+        
         //Round
         private int CurrentRound { get; set; }
-
+        
+        //Battle
         private bool IsBattleStarted { get; set; }
 
         private MainBattleAction mainBattleAction;
@@ -46,7 +52,7 @@ namespace Battle
         private TestEntity RoundEndEntity;
 
         [ContextMenu("End Unit Turn")]
-        private void EndUnitTurn()
+        private void EndCurrentTimelineEntityTurn()
         {
             CurrentTimelineEntity.EndTurn();
         }
@@ -58,30 +64,33 @@ namespace Battle
             mainBattleAction = new MainBattleAction(this);
         }
 
-        private void Start()
+        public void SetLevel(BattleLevel level)
+        {
+            CurrentLevel = level;
+        }
+
+        public void StartBattle()
         {
             // 0 - Setup default values (lists, dictionaries, etc)
-
-
             entitiesInTimeline = new List<TimelineEntity>();
             totalEntityAddedToTimeline = 0;
-            
             // 1 - Spawn Tiles
-
-
-            // 3 - Spawn Units (timeline should be set up and they should spawn with their passives)
-            var entity0 = new TestEntity(100, 10, "0");
-            var entity1 = new TestEntity(100, 11, "1");
-            var entity2 = new TestEntity(50, 10, "2");
+            // Already there cuz of BattleLevel
             
-            AddEntitiesToTimeline(true,new List<TimelineEntity>{entity0,entity1,entity2});
-
+            tileManager.SetTiles(CurrentLevel.Tiles);
+            
+            // 3 - Spawn Units (timeline should be set up and they should spawn with their passives)
+            foreach (var placedUnit in CurrentLevel.PlacedUnits)
+            {
+                AddUnitToTimeline(placedUnit,true);
+            }
+            
             RoundEndEntity = new TestEntity(50, 10, "End Round");
-            AddEntityToTimeline(RoundEndEntity,false);
+            AddEntityToTimeline(RoundEndEntity, false);
             ResetRoundEntityDistanceFromTurnStart();
-
-
+            
             // 4 - Setup Win/Lose Conditions
+            
 
             // 5 - Start Round Entity's turn (a round starts at the end of Round entity's turn and end at the end of Round entity's turn)
             CurrentRound = 0;
@@ -108,6 +117,21 @@ namespace Battle
         {
             InsertEntityInTimeline(entityToAdd, useInitiative ? entityToAdd.Initiative : ResetTurnValue);
         }
+        
+        public void AddUnitToTimeline(UnitPlacementSO.PlacedUnit placedUnit,bool useInitiative)
+        {
+            var tile = tileManager.AllTiles.FirstOrDefault(tile => tile.Position == placedUnit.position);
+                
+            var unit = new NewUnit(placedUnit.so,tile);
+            var unitRenderer = unitManager.SpawnUnit(unit);
+            
+            var unitTr = unitRenderer.transform;
+            unitTr.position = tile.transform.position;
+            unitTr.rotation = Quaternion.identity;
+            unitTr.SetParent(transform);
+            
+            AddEntityToTimeline(unit, useInitiative);
+        }
 
         public void InsertEntityInTimeline(TimelineEntity entityToInsert,float distanceFromTurnStart)
         {
@@ -124,6 +148,8 @@ namespace Battle
             entitiesInTimeline.Add(entityToInsert);
             
             ReorderTimeline();
+            
+            entityToInsert.OnAddedToTimeline();
         }
 
         [ContextMenu("Reorder Timeline")]
@@ -151,7 +177,6 @@ namespace Battle
         
         public void ResetRoundEntityDistanceFromTurnStart()
         {
-            //Debug.Log("Resetting Round End Entity's distance from turn start");
             var distance = RoundEndEntity.DistanceFromTurnStart;
             var speed = RoundEndEntity.Speed;
             if (entitiesInTimeline.Count > 1)
@@ -161,18 +186,11 @@ namespace Battle
                 var slowestEntity = entitiesInTimeline.Where(entity => entity != RoundEndEntity)
                     .OrderBy(entity => entity.Speed).First();
                 speed = slowestEntity.Speed;
-
-                /*
-                foreach (var entity in entitiesInTimeline.Where(entity => entity != RoundEndEntity))
-                {
-                    Debug.Log($"{entity.Name} (distance of {entity.DistanceFromTurnStart} (turn order : {entity.TurnOrder}))");
-                }*/
+                
                 var furthestEntity = entitiesInTimeline.Where(entity => entity != RoundEndEntity)
                     .OrderBy(entity => entity.TurnOrder).Last();
                 distance = furthestEntity.DistanceFromTurnStart + 0.01f; // TODO : find a better way to do this (+0.01f should not be necessary)
                 
-                //Debug.Log($"slowest unit : {slowestEntity.Name} (speed of {speed})");
-                //Debug.Log($"furthest unit : {furthestEntity.Name} (distance of {furthestEntity.DistanceFromTurnStart} (turn order : {furthestEntity.TurnOrder}))");
             }
             
             RoundEndEntity.SetSpeed(speed);
@@ -298,6 +316,11 @@ namespace Battle
         {
             public TestEntity(int speed, int initiative, string name = "Test Entity") : base(speed, initiative, name)
             {
+            }
+
+            protected override void AddedToTimelineEffect()
+            {
+                
             }
 
             protected override void TurnStart()

@@ -37,7 +37,6 @@ namespace Battle
 
         public void DecayTurnValue(float amount)
         {
-            //Debug.Log($"Decaying {Name}'s turn value by {amount} (rate : {DecayRate})");
             DistanceFromTurnStart -= amount * DecayRate;
             OnDistanceFromTurnStartChanged?.Invoke(DistanceFromTurnStart);
         }
@@ -53,11 +52,17 @@ namespace Battle
             Speed = value;
             OnSpeedChanged?.Invoke(Speed);
         }
+        
+        public void OnAddedToTimeline()
+        {
+            AddedToTimelineEffect();
+        }
+
+        protected abstract void AddedToTimelineEffect();
 
         public void OnTurnStart()
         {
             InTurn = true;
-            //Debug.Log($"Turn Started {Name}");
 
             TurnStart();
         }
@@ -67,8 +72,6 @@ namespace Battle
         public void OnTurnEnd()
         {
             TurnEnd();
-
-            //Debug.Log($"Turn Ended {Name}");
         }
 
         protected abstract void TurnEnd();
@@ -76,7 +79,6 @@ namespace Battle
         public void EndTurn()
         {
             InTurn = false;
-            Debug.Log("Ending turn");
         }
 
         public int CompareTo(TimelineEntity other)
@@ -84,7 +86,6 @@ namespace Battle
             var turnOrder = TurnOrder.CompareTo(other.TurnOrder);
             if (turnOrder != 0) return turnOrder;
             
-            Debug.Log($"Same turn order ({Name} and {other.Name} : {TurnOrder}/{other.TurnOrder})");
             if (JoinedIndex < 0) return 1;
             
             return JoinedIndex.CompareTo(other.JoinedIndex);
