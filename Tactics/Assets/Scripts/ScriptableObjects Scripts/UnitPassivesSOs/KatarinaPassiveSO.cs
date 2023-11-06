@@ -1,44 +1,55 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects.Passive
 {
     [CreateAssetMenu(fileName = "KatarinaPassive", menuName = "Battle Scriptables/Unique Passive/Katarina Passive")]
-    public class KatarinaPassiveSO : PassiveSO<Unit>
+    public class KatarinaPassiveSO : PassiveSO
     {
-        [SerializeField] private PassiveSO<Unit> daggerPassive;
-        [SerializeField] private PassiveSO<Tile> tileDaggerPassive;
+        [SerializeField] private PassiveSO daggerPassive;
+        [SerializeField] private PassiveSO tileDaggerPassive;
         
-        protected override IEnumerator OnAddedEffect(Unit unit, PassiveInstance<Unit> instance)
+        public override IPassivesContainer GetContainer(NewTile tile)
         {
-            unit.AddOnPassiveAddedCallback(EffectOnDaggerAdded);
-            unit.OnTileEnter += AddDaggerOnThrownDaggerPickup;
-            
-            yield break;
+            return tile.Unit;
         }
 
-        private IEnumerator EffectOnDaggerAdded(PassiveInstance<Unit> instance)
+        protected override void OnAddedEffect(IPassivesContainer container, PassiveInstance instance)
         {
-            if (instance.SO != daggerPassive) yield break;
+            EventManager.AddListener<AddPassiveBattleAction>(EffectOnDaggerAdded,true);
+
+            EventManager.EventCallback<AddPassiveBattleAction> action = EffectOnDaggerAdded;
+            instance.Data.Add("EffectOnDaggerAdded",action);
             
-            Debug.Log("Spin");
+            // TODO - Tile Enter event
+            //container.OnTileEnter += AddDaggerOnThrownDaggerPickup;
             
-            //Damage here (spin)
+            return;
+            void EffectOnDaggerAdded(AddPassiveBattleAction ctx)
+            {
+                if(ctx.Container != container) return;
+                if(ctx.PassiveSo != daggerPassive) return;
+                
+                Debug.Log("Spin");
+            }
         }
         
-        private IEnumerator AddDaggerOnThrownDaggerPickup(Unit unit,Tile tile)
+        private void AddDaggerOnThrownDaggerPickup(NewUnit unit,NewTile tile)
         {
-            if(tile == null) yield break;
-            if (tile.GetPassiveInstance<PassiveInstance<Tile>>(tileDaggerPassive) == null) yield break;
+            if (tile?.GetPassiveInstance(tileDaggerPassive) == null) return;
 
-            yield return unit.StartCoroutine(unit.AddPassiveEffect(daggerPassive));
+            unit.AddPassiveEffect(daggerPassive);
         }
 
-        protected override IEnumerator OnRemovedEffect(Unit unit, PassiveInstance<Unit> instance)
+        protected override void OnRemovedEffect(IPassivesContainer container, PassiveInstance instance)
         {
-            unit.RemoveOnPassiveAddedCallback(EffectOnDaggerAdded);
-            unit.OnTileEnter -= AddDaggerOnThrownDaggerPickup;
-            yield break;
+            if(instance.Data.TryGetValue("EffectOnDaggerAdded",out var action))
+            {
+                EventManager.RemoveListener<AddPassiveBattleAction>(action as EventManager.EventCallback<AddPassiveBattleAction>);
+            }
+            
+            //unit.OnTileEnter -= AddDaggerOnThrownDaggerPickup;
         }
     }
 }

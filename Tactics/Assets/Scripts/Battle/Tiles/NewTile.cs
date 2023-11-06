@@ -1,29 +1,44 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Battle.ActionSystem;
+using UnityEngine;
 
 namespace Battle
 {
     using ScriptableObjects;
+    using ActionSystem;
     
-    public class NewUnit : TimelineEntity, IPassivesContainer
+    public class NewTile : IPassivesContainer
     {
-        public UnitStatsInstance Stats { get; private set; }
-        public UnitSO UnitSo => Stats.So;
         public Tile Tile { get; private set; }
+        public NewUnit Unit { get; private set; }
+        public Vector2Int Position { get; }
         
-        private List<PassiveInstance> passiveInstances;
+        public bool IsWalkable { get; private set; }
+        private int CostToMove => 1; // If we need weights its here lmao (not used btw)
+        private Tile[] neighbors; //0 is top (x,y+1), then clockwise, adjacent before diag
         
-        private List<UnitAbilityInstance> abilityInstances;
-        
-        public NewUnit(UnitSO so,Tile tile) : base(so.BaseSpeed, so.Initiative, so.Name)
+        public enum Direction
         {
-            Stats = so.CreateInstance();
+            Top=0,
+            Right=1,
+            Down=2,
+            Left=3,
+            TopRight=4,
+            DownRight=5,
+            DownLeft=6,
+            TopLeft=7
+        }
+        
+        private List<PassiveInstance> passiveInstances { get; }
+
+        public NewTile(Vector2Int position,Tile tile)
+        {
+            Position = position;
             Tile = tile;
-            
+            Tile.SetNewTile(this);
+
             passiveInstances = new List<PassiveInstance>();
-            abilityInstances = new List<UnitAbilityInstance>();
             
             EventManager.AddListener<AddPassiveBattleAction>(AddPassiveInstanceToList);
         }
@@ -35,32 +50,6 @@ namespace Battle
             passiveInstances.Add(ctx.PassiveInstance);
         }
         
-        protected override void AddedToTimelineEffect()
-        {
-            foreach (var passiveToAdd in UnitSo.StartingPassives)
-            {
-                passiveToAdd.AddPassiveToContainer(this);
-            }
-        }
-
-        protected override void TurnStart()
-        {
-            Stats.CurrentMovement = Stats.Movement;
-            
-            foreach (var abilityInstance in abilityInstances)
-            {
-                abilityInstance.DecreaseCurrentCooldown(1);
-            }
-            
-            // this should go in battle manager, end current entity turn
-            UIBattleManager.OnEndTurnButtonClicked += EndTurn;
-        }
-
-        protected override void TurnEnd()
-        {
-            UIBattleManager.OnEndTurnButtonClicked -= EndTurn;
-        }
-
         public PassiveInstance GetPassiveInstance(PassiveSO passiveSo)
         {
             return passiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
@@ -93,6 +82,6 @@ namespace Battle
             return passiveInstances.Count(condition);
         }
     }
-}
 
+}
 

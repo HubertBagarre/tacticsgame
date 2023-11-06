@@ -16,9 +16,9 @@ namespace Battle.ScriptableObjects
         
         public abstract bool CanCastAbility(Tile tile);
 
-        public virtual IEnumerator ConsumeRequirement(Tile tile)
+        public virtual void ConsumeRequirement(Tile tile)
         {
-            yield break;
+            
         }
     }
 }

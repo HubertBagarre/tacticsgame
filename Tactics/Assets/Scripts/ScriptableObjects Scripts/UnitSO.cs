@@ -16,7 +16,6 @@ namespace Battle.ScriptableObjects
         
         [field:Header("Stats")]
         [field: SerializeField] public int MaxHp { get; private set; }
-
         [field: SerializeField] public int MaxShield { get; private set; } = 3;
         [field: SerializeField] public int Attack { get; private set; } = 1; // TODO - probably change name
         [field: SerializeField] public int AttackRange { get; private set; } = 3;
@@ -44,7 +43,7 @@ namespace Battle
     public class AbilityToAdd
     {
         [field: SerializeField] public UnitAbilitySO Ability { get; private set; }
-        [field: SerializeField] public bool ShowInUI { get; private set; } = true;
+        [field: SerializeField] public bool ShowInUI { get; private set; }
 
         public AbilityToAdd(UnitAbilitySO ability,bool showInUI = true)
         {
@@ -61,45 +60,33 @@ namespace Battle
     [Serializable]
     public class PassiveToAdd
     {
-        [field: SerializeField] public PassiveSO<Unit> UnitPassive { get; private set; }
-        [field: SerializeField] public int UnitStacks { get; private set; } = 1;
-        [field: SerializeField] public PassiveSO<Tile> TilePassive { get; private set; }
-        [field: SerializeField] public int TileStacks { get; private set; } = 1;
-        [field: SerializeField] public bool TargetTileFirst { get; private set; } = false;
-        [field: SerializeField] public bool IgnoreTileIfUnit { get; private set; } = false;
-        [field: SerializeField] public bool IgnoreUnitIfTile { get; private set; } = false;
-
-        public bool IsType(PassiveType type)
-        {
-            var unitMatch = UnitPassive != null ? UnitPassive.Type == type : false;
-            var tileMatch = TilePassive != null ? TilePassive.Type == type : false;
-            
-            return TargetTileFirst ? tileMatch : unitMatch;
-        }
+        [field: SerializeField] public PassiveSO SO { get; private set; }
+        [field: SerializeField] public int Stacks { get; private set; } = 1;
         
         public string GetText()
         {
-            var unitText = UnitPassive != null ? $"<color=yellow>{(UnitPassive.IsStackable ? $" {UnitStacks} stack{(UnitStacks > 1 ? "s":"")} of ":"")}" + 
-                                                 $"<u><link=\"passive:{0}\">{UnitPassive.Name}</link></u></color>" : string.Empty;
-            var tileText =  TilePassive != null ? $"<color=yellow>{(TilePassive.IsStackable ? $" {TileStacks} stack{(TileStacks > 1 ? "s":"")} of ":"")}" + 
+            var text = SO != null ? $"<color=yellow>{(SO.IsStackable ? $" {Stacks} stack{(Stacks > 1 ? "s":"")} of ":"")}" + 
+                                                 $"<u><link=\"passive:{0}\">{SO.Name}</link></u></color>" : string.Empty;
+            /*var tileText =  TilePassive != null ? $"<color=yellow>{(TilePassive.IsStackable ? $" {TileStacks} stack{(TileStacks > 1 ? "s":"")} of ":"")}" + 
                                                   $"<u><link=\"passive:{0}\">{TilePassive.Name}</link></u></color>" : string.Empty;
             
             if(unitText == string.Empty && tileText == string.Empty) return string.Empty;
             if(unitText == string.Empty && tileText != string.Empty) return $"{tileText}";
             if(unitText != string.Empty && tileText == string.Empty) return $"{unitText}";
 
-            if (TargetTileFirst) return $"{tileText} and {unitText}";
-            return $"{unitText} and {tileText}";
+            if (TargetTileFirst) return $"{tileText} and {unitText}";*/
+            return $"{text}";
         }
         
 
-        public IEnumerator AddPassive(Tile tile)
+        public void AddPassiveToContainer(IPassivesContainer container)
         {
-            if(tile == null) yield break;
+            container?.AddPassiveEffect(SO,Stacks);
             
+            /*
             var tileRoutine = TilePassive != null ? tile.AddPassiveEffect(TilePassive,TileStacks) : null;
-            var unitRoutine = UnitPassive != null
-                ? tile.HasUnit() ? tile.Unit.AddPassiveEffect(UnitPassive, UnitStacks) : null
+            var unitRoutine = SO != null
+                ? tile.HasUnit() ? tile.Unit.AddPassiveEffect(SO, Stacks) : null
                 : null;
 
             if (IgnoreUnitIfTile && tileRoutine != null) unitRoutine = null;
@@ -107,7 +94,7 @@ namespace Battle
 
             if(TargetTileFirst && tileRoutine != null) yield return tile.StartCoroutine(tileRoutine);
             if (unitRoutine != null) yield return tile.StartCoroutine(unitRoutine);
-            if(!TargetTileFirst && tileRoutine != null) yield return tile.StartCoroutine(tileRoutine);
+            if(!TargetTileFirst && tileRoutine != null) yield return tile.StartCoroutine(tileRoutine);*/
         }
     }
 
@@ -184,6 +171,21 @@ namespace Battle
                 OnCurrentShieldModified?.Invoke(this);
             } 
         }
+        
+        // Break
+        private bool isBroken;
+        public event Action<UnitStatsInstance> OnBreakValueChanged; 
+        public bool IsBroken
+        {
+            get => isBroken;
+            private set
+            {
+                var changed = isBroken != value;
+                isBroken = value;
+                if(changed) OnBreakValueChanged?.Invoke(this);
+            } 
+        }
+        
 
         // Attack
         public int BaseAttack => So.Attack;
@@ -219,6 +221,18 @@ namespace Battle
         {
             MovementModifier += amount;
             OnMovementModified?.Invoke(this);
+        }
+        
+        private int currentMovement;
+        public event Action<UnitStatsInstance> OnCurrentMovementModified;
+        public int CurrentMovement
+        {
+            get => currentMovement;
+            set
+            {
+                currentMovement = value;
+                OnCurrentMovementModified?.Invoke(this);
+            } 
         }
         
         // Turn Order
@@ -265,7 +279,9 @@ namespace Battle
             
             CurrentHp = MaxHp;
             CurrentShield = MaxShield;
-            
+
+            IsBroken = false;
+
             //Behaviour.InitBehaviour(unit);
         }
 

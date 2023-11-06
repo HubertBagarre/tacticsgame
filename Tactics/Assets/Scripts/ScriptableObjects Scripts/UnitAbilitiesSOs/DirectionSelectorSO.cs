@@ -62,7 +62,7 @@ namespace Battle.ScriptableObjects.Ability.Selector
             var directionTile = lastSelected;
             
             var direction = startingTile.GetNeighborIndex(directionTile);
-            return startingTile.GetTilesInDirection((Tile.Direction)direction);
+            return startingTile.GetTilesInDirection((NewTile.Direction)direction);
         }
     }
 }

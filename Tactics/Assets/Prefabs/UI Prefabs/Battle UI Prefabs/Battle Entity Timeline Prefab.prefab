@@ -88,12 +88,12 @@ GameObject:
   - component: {fileID: 7229959207824768732}
   - component: {fileID: 2316586326227875210}
   m_Layer: 5
-  m_Name: Text Background (2)
+  m_Name: Debug Text2 Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &565953219397837058
 RectTransform:
   m_ObjectHideFlags: 0
@@ -300,12 +300,12 @@ GameObject:
   - component: {fileID: 1899320842136157648}
   - component: {fileID: 1539680858074465068}
   m_Layer: 5
-  m_Name: Text Background (1)
+  m_Name: Speed Text Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8860870845083556424
 RectTransform:
   m_ObjectHideFlags: 0

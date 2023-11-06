@@ -18,7 +18,7 @@ namespace Battle.ScriptableObjects
             public UnitSO so;
             public int team;
             public Vector2Int position;
-            public Tile.Direction orientation;
+            public NewTile.Direction orientation;
         }
     }
 }

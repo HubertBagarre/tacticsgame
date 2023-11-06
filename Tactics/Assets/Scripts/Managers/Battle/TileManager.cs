@@ -20,6 +20,7 @@ namespace Battle
         [Header("Settings")] [SerializeField] protected LayerMask worldLayers;
 
         [Header("Debug")] [SerializeField] private List<Tile> tiles = new List<Tile>();
+        private List<NewTile> newTiles = new List<NewTile>();
 
         public List<Tile> AllTiles => tiles.ToList();
         
@@ -48,6 +49,14 @@ namespace Battle
         public void SetTiles(List<Tile> list)
         {
             tiles = list;
+
+            //TODO - This should create NewTiles and instantiate tiles (now creates new tile based on old tile)
+            foreach (var tile in tiles)
+            {
+                var t = new NewTile(tile.Position,tile);
+                newTiles.Add(t);
+            }
+            
             ResetTileAppearance();
         }
         

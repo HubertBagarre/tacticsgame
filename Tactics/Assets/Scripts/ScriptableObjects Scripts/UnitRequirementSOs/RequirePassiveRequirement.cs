@@ -12,28 +12,17 @@ namespace Battle.ScriptableObjects.Requirement
         [Serializable]
         public class RequiredPassive
         {
-            [field: SerializeField] public PassiveSO<Unit> UnitPassive { get; private set; }
-            public bool HasUnitPassive => UnitPassive != null;
-            [field: SerializeField] public PassiveSO<Tile> TilePassive { get; private set; }
-            public bool HasTilePassive => TilePassive != null;
-            
-            [field: SerializeField] public bool TargetTileFirst { get; private set; } = false;
-            [field: SerializeField] public bool IgnoreTileIfUnit { get; private set; } = false;
-            [field: SerializeField] public bool IgnoreUnitIfTile { get; private set; } = false;
+            [field: SerializeField] public PassiveSO PassiveSo { get; private set; }
             [field: SerializeField,Min(0)] public int RequiredStacks { get; private set; } = 0;
             public bool RequiresStacks()
             {
                 if(RequiredStacks <= 0) return false;
-                if(HasUnitPassive) return UnitPassive.IsStackable;
-                if(HasTilePassive) return TilePassive.IsStackable;
-                return false;
+                return PassiveSo.IsStackable;
             }
 
             public string PassiveDescription()
             {
-                if (HasUnitPassive) return UnitPassive.Description;
-                if (HasTilePassive) return TilePassive.Description;
-                return string.Empty;
+                return PassiveSo.Description;
             }
 
             [field: SerializeField] public bool ConsumeStacks { get; private set; } = false;
@@ -101,18 +90,16 @@ namespace Battle.ScriptableObjects.Requirement
                     : "";
 
                 var passiveName = string.Empty;
-                if (requiredPassive.HasTilePassive) passiveName = requiredPassive.TilePassive.Name;
-                if(requiredPassive.HasUnitPassive) passiveName = requiredPassive.UnitPassive.Name;
+                passiveName = requiredPassive.PassiveSo.Name;
                 
                 return $"<color=yellow>{amountText} <u><link=\"passive:{0}\">{passiveName}</link></u></color>";
             }
         }
         
-        private static bool Condition<T>(PassiveInstance<T> instance,RequiredPassive requiredPassive) where T : MonoBehaviour, IPassivesContainer<T>
+        private static bool Condition(PassiveInstance instance,RequiredPassive requiredPassive)
         {
             var matchingSo = false;
-            if(requiredPassive.HasUnitPassive) matchingSo = instance.SO == requiredPassive.UnitPassive;
-            if(requiredPassive.HasTilePassive) matchingSo = instance.SO == requiredPassive.TilePassive;
+            matchingSo = instance.SO == requiredPassive.PassiveSo;
             
             if(!matchingSo) return false;
             
@@ -132,72 +119,33 @@ namespace Battle.ScriptableObjects.Requirement
             var unit = tile.Unit;
             foreach (var requiredPassive in requiredPassives)
             {
-                var ignoreTile = requiredPassive.IgnoreTileIfUnit && requiredPassive.HasUnitPassive && unit != null;
-                var ignoreUnit = requiredPassive.IgnoreUnitIfTile && requiredPassive.HasTilePassive;
-
-                if (!ignoreTile)
+                if (unit.GetPassiveEffectCount(UnitCondition, out _) == 0)
                 {
-                    if(requiredPassive.HasTilePassive)
-                    {
-                        if (tile.GetPassiveEffectCount(TileCondition, out _) == 0)
-                        {
-                            //Debug.Log($"Missing Tile Passive : {requiredPassive.TilePassive.Name}");
-                            return false;
-                        }
-                    }
+                    //Debug.Log($"Missing Unit Passive : {requiredPassive.UnitPassive.Name}");
+                    return false;
                 }
-
-                if (!ignoreUnit)
-                {
-                    if(requiredPassive.HasUnitPassive && unit != null)
-                    {
-                        if (unit.GetPassiveEffectCount(UnitCondition, out _) == 0)
-                        {
-                            //Debug.Log($"Missing Unit Passive : {requiredPassive.UnitPassive.Name}");
-                            return false;
-                        }
-                    }
-                }
-                
                 continue;
 
-                bool TileCondition(PassiveInstance<Tile> instance) => Condition(instance, requiredPassive);
-                bool UnitCondition(PassiveInstance<Unit> instance) => Condition(instance, requiredPassive);
+                bool UnitCondition(PassiveInstance instance) => Condition(instance, requiredPassive);
             }
 
             return true;
         }
 
-        public override IEnumerator ConsumeRequirement(Tile tile)
+        public override void ConsumeRequirement(Tile tile)
         {
             var unit = tile.Unit;
             foreach (var requiredPassive in ConsumedPassives)
             {
-                var ignoreTile = requiredPassive.IgnoreTileIfUnit && requiredPassive.HasUnitPassive && unit != null;
-                var ignoreUnit = requiredPassive.IgnoreUnitIfTile && requiredPassive.HasTilePassive;
-
-                if (!ignoreTile)
+                if (requiredPassive.PassiveSo != null && unit != null)
                 {
-                    if(requiredPassive.TilePassive != null)
-                    {
-                        tile.GetPassiveEffectCount(TileCondition, out var passiveInstance);
-                        if(passiveInstance != null) yield return tile.StartCoroutine(passiveInstance.DecreaseStacks(requiredPassive.RequiredStacks));
-                    }
-                }
-
-                if (!ignoreUnit)
-                {
-                    if (requiredPassive.UnitPassive != null && unit != null)
-                    {
-                        unit.GetPassiveEffectCount(UnitCondition, out var passiveInstance);
-                        if(passiveInstance != null) yield return unit.StartCoroutine(passiveInstance.DecreaseStacks(requiredPassive.RequiredStacks));
-                    }
+                    unit.GetPassiveEffectCount(UnitCondition, out var passiveInstance);
+                    passiveInstance?.DecreaseStacks(requiredPassive.RequiredStacks);
                 }
                 
                 continue;
                 
-                bool TileCondition(PassiveInstance<Tile> instance) => Condition(instance, requiredPassive);
-                bool UnitCondition(PassiveInstance<Unit> instance) => Condition(instance, requiredPassive);
+                bool UnitCondition(PassiveInstance instance) => Condition(instance, requiredPassive);
             }
         }
     }

@@ -4,26 +4,16 @@ using UnityEngine;
 namespace Battle.ScriptableObjects.Passive
 {
     [CreateAssetMenu(menuName = "Battle Scriptables/Unit Passive/NoEffect")]
-    public class NoEffectEntityPassiveSO : EntityPassiveSo<Unit>
+    public class NoEffectUnitPassiveSo : UnitPassiveSo
     {
-        protected override IEnumerator OnAddedEffect(Unit container, PassiveInstance<Unit> instance)
+        protected override void OnAddedEffect(IPassivesContainer container, PassiveInstance instance)
         {
-            yield break;
+            
         }
 
-        protected override IEnumerator OnRemovedEffect(Unit container, PassiveInstance<Unit> instance)
+        protected override void OnRemovedEffect(IPassivesContainer container, PassiveInstance instance)
         {
-            yield break;
-        }
-
-        protected override IEnumerator OnUnitTurnEndEffect(Unit battleEntity)
-        {
-            yield break;
-        }
-
-        protected override IEnumerator OnUnitTurnStartEffect(Unit battleEntity)
-        {
-            yield break;
+            
         }
     }
 }

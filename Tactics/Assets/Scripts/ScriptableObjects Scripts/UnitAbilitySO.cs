@@ -98,7 +98,7 @@ namespace Battle.ScriptableObjects
         {
             if(!CanCastAbility(caster)) yield break;
 
-            if(Requirement != null) yield return caster.StartCoroutine(Requirement.ConsumeRequirement(caster.Tile));
+            if(Requirement != null) Requirement.ConsumeRequirement(caster.Tile);
             
             foreach (var effect in Effects)
             {

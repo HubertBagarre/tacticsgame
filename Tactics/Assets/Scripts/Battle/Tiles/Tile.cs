@@ -7,14 +7,14 @@ using UnityEngine;
 
 namespace Battle
 {
-    using ScriptableObjects;
-    
     /// <summary>
     /// Data Container for Tile Info
     /// (tile position, adjacent Tiles, current Unit)
     /// </summary>
-    public class Tile : MonoBehaviour, IPassivesContainer<Tile>
+    public class Tile : MonoBehaviour
     {
+        public NewTile NewTile { get; private set; }
+        
         //generation
         [SerializeField] private Vector2Int position;
         public Vector2Int Position => position;
@@ -27,10 +27,9 @@ namespace Battle
         [Header("Passives")]
         [SerializeField] private Transform passiveAnchor;
         
-        public List<PassiveInstance<Tile>> PassiveInstances { get; } = new();
-        private List<PassiveInstance<Tile>> passivesToRemove = new();
-        private List<IPassivesContainer<Tile>.PassiveInstanceDelegate> PassiveAddedCallbacks { get; } = new();
-        private List<IPassivesContainer<Tile>.PassiveInstanceDelegate>  PassiveRemovedCallbacks { get; } = new();
+        private List<PassiveInstance> passivesToRemove = new();
+        //private List<IPassivesContainer<Tile>.PassiveInstanceDelegate> PassiveAddedCallbacks { get; } = new();
+        //private List<IPassivesContainer<Tile>.PassiveInstanceDelegate>  PassiveRemovedCallbacks { get; } = new();
         
         //pathing
         [Header("Path Rendering")]
@@ -41,17 +40,6 @@ namespace Battle
         [field: SerializeField] public bool IsWalkable { get; private set; }
         private int CostToMove => 1; // If we need weights its here lmao (not used btw)
         [SerializeField] private Tile[] neighbors; //0 is top (x,y+1), then clockwise, adjacent before diag
-        public enum Direction
-        {
-            Top=0,
-            Right=1,
-            Down=2,
-            Left=3,
-            TopRight=4,
-            DownRight=5,
-            DownLeft=6,
-            TopLeft=7
-        }
         
         [field: SerializeField] public int PathRing { get; private set; }
 
@@ -73,7 +61,7 @@ namespace Battle
         [field: Header("Debug")]
         [field: SerializeField]
         public TextMeshProUGUI DebugText { get; private set; }
-
+        
         public enum Appearance
         {
             Default,
@@ -81,6 +69,11 @@ namespace Battle
             Selected,
             Affected,
             Unselectable,
+        }
+
+        public void SetNewTile(NewTile tile)
+        {
+            NewTile = tile;
         }
 
         public void InitPosition(int x, int y)
@@ -93,7 +86,7 @@ namespace Battle
             neighbors = tiles;
         }
         
-        public Tile GetNeighbor(Direction direction)
+        public Tile GetNeighbor(NewTile.Direction direction)
         {
             var dir = (int)direction;
             return dir is < 0 or >= 8 ? null : neighbors[dir];
@@ -243,7 +236,7 @@ namespace Battle
         }
 
         // returns which direction to go from this tile to other tile
-        public Direction GetTileDirection(Tile other)
+        public NewTile.Direction GetTileDirection(Tile other)
         {
             var posDif = other.Position - Position;
             var positiveDif = posDif;
@@ -253,11 +246,11 @@ namespace Battle
             //check direct top, right, down, left
             if (posDif.x == 0)
             {
-                return posDif.y > 0 ? Direction.Top : Direction.Down;
+                return posDif.y > 0 ? NewTile.Direction.Top : NewTile.Direction.Down;
             }
             if(posDif.y == 0)
             {
-                return posDif.x > 0 ? Direction.Right : Direction.Left;
+                return posDif.x > 0 ? NewTile.Direction.Right : NewTile.Direction.Left;
             }
             
             var isDiag = IsDiag();
@@ -266,29 +259,29 @@ namespace Battle
             {
                 {x: > 0, y: > 0} => isDiag switch
                 {
-                    1 => Direction.Top,
-                    -1 => Direction.Right,
-                    _ => Direction.TopRight
+                    1 => NewTile.Direction.Top,
+                    -1 => NewTile.Direction.Right,
+                    _ => NewTile.Direction.TopRight
                 },
                 {x: > 0, y: < 0} => isDiag switch
                 {
-                    1 => Direction.Down,
-                    -1 => Direction.Right,
-                    _ => Direction.DownRight
+                    1 => NewTile.Direction.Down,
+                    -1 => NewTile.Direction.Right,
+                    _ => NewTile.Direction.DownRight
                 },
                 {x: < 0, y: < 0} => isDiag switch
                 {
-                    1 => Direction.Down,
-                    -1 => Direction.Left,
-                    _ => Direction.DownLeft
+                    1 => NewTile.Direction.Down,
+                    -1 => NewTile.Direction.Left,
+                    _ => NewTile.Direction.DownLeft
                 },
                 {x: < 0, y: > 0} => isDiag switch
                 {
-                    1 => Direction.Top,
-                    -1 => Direction.Left,
-                    _ => Direction.TopLeft
+                    1 => NewTile.Direction.Top,
+                    -1 => NewTile.Direction.Left,
+                    _ => NewTile.Direction.TopLeft
                 },
-                _ => Direction.Top
+                _ => NewTile.Direction.Top
             };
 
             int IsDiag()
@@ -304,7 +297,7 @@ namespace Battle
             }
         }
 
-        public List<Tile> GetTilesInDirection(Direction direction)
+        public List<Tile> GetTilesInDirection(NewTile.Direction direction)
         {
             var startingTile = this;
             var neighborInDirection = startingTile.GetNeighbor(direction);
@@ -320,18 +313,18 @@ namespace Battle
         
         //public void GetDirection
 
-        public Direction GetOppositeDirection(Direction direction)
+        public NewTile.Direction GetOppositeDirection(NewTile.Direction direction)
         {
             return direction switch
             {
-                Direction.Top => Direction.Down,
-                Direction.Right => Direction.Left,
-                Direction.Down => Direction.Top,
-                Direction.Left => Direction.Right,
-                Direction.TopRight => Direction.DownLeft,
-                Direction.DownRight => Direction.TopLeft,
-                Direction.DownLeft => Direction.TopRight,
-                Direction.TopLeft => Direction.DownRight,
+                NewTile.Direction.Top => NewTile.Direction.Down,
+                NewTile.Direction.Right => NewTile.Direction.Left,
+                NewTile.Direction.Down => NewTile.Direction.Top,
+                NewTile.Direction.Left => NewTile.Direction.Right,
+                NewTile.Direction.TopRight => NewTile.Direction.DownLeft,
+                NewTile.Direction.DownRight => NewTile.Direction.TopLeft,
+                NewTile.Direction.DownLeft => NewTile.Direction.TopRight,
+                NewTile.Direction.TopLeft => NewTile.Direction.DownRight,
                 _ => direction
             };
         }
@@ -419,7 +412,7 @@ namespace Battle
             }
         }
         
-        public void ShowBorder(Direction direction, bool value)
+        public void ShowBorder(NewTile.Direction direction, bool value)
         {
             var dir = (int)direction;
             if(direction < 0 || dir >= bordersGo.Count) return;
@@ -432,11 +425,11 @@ namespace Battle
             {
                 for (var direction = 0; direction < 8; direction++)
                 {
-                    TryShowBorder((Direction)direction);
+                    TryShowBorder((NewTile.Direction)direction);
                 }
                 continue;
 
-                void TryShowBorder(Direction direction)
+                void TryShowBorder(NewTile.Direction direction)
                 {
                     var adjacentTile = tile.neighbors[(int)direction];
                     if (adjacentTile == null)
@@ -480,117 +473,6 @@ namespace Battle
         public void ClearLineRendererPath()
         {
             lineRenderer.positionCount = 0;
-        }
-
-        public void AddOnPassiveAddedCallback(IPassivesContainer<Tile>.PassiveInstanceDelegate callback)
-        {
-            PassiveAddedCallbacks.Add(callback);
-        }
-
-        public void AddOnPassiveRemovedCallback(IPassivesContainer<Tile>.PassiveInstanceDelegate callback)
-        {
-            PassiveRemovedCallbacks.Add(callback);
-        }
-
-        public void RemoveOnPassiveAddedCallback(IPassivesContainer<Tile>.PassiveInstanceDelegate callback)
-        {
-            if(PassiveAddedCallbacks.Contains(callback)) PassiveAddedCallbacks.Remove(callback);
-        }
-
-        public void RemoveOnPassiveRemovedCallback(IPassivesContainer<Tile>.PassiveInstanceDelegate callback)
-        {
-            if(PassiveRemovedCallbacks.Contains(callback)) PassiveRemovedCallbacks.Remove(callback);
-        }
-
-        public TPassiveInstance GetPassiveInstance<TPassiveInstance>(PassiveSO<Tile> passiveSo) where TPassiveInstance : PassiveInstance<Tile>
-        {
-            var instance = PassiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
-            
-            return instance as TPassiveInstance;
-        }
-
-        public IEnumerator AddPassiveEffect(PassiveSO<Tile> passiveSo, int amount = 1)
-        {
-            //add passive instance to list
-            if (!passiveSo.IsStackable || (passiveSo.IsStackable && amount <= 0)) amount = 1;
-            
-            var normalPassive = GetPassiveInstance<PassiveInstance<Tile>>(passiveSo);
-
-            return AddToPassives(normalPassive);
-            
-            IEnumerator AddToPassives(PassiveInstance<Tile> instance)
-            {
-                //if current instance == null, no passive yet, creating new and adding to list
-                //if passive isn't stackable, creating new and adding to list
-                if (instance == null || !passiveSo.IsStackable)
-                {
-                    instance = passiveSo.CreateInstance<PassiveInstance<Tile>>(amount);
-                    if (instance.SO.Model != null)
-                    {
-                        var model = Instantiate(instance.SO.Model, passiveAnchor);
-                        
-                        AddOnPassiveRemovedCallback(RemovePassiveModel);
-                    
-                        PassiveInstances.Add(instance);
-                        
-                        //Debug.Log($"Added {instance.SO.Name} to {this}");
-                    
-                        IEnumerator RemovePassiveModel(PassiveInstance<Tile> passiveInstance)
-                        {
-                            if(passiveInstance != instance) yield break;
-                            
-                            RemoveOnPassiveRemovedCallback(RemovePassiveModel);
-                            Destroy(model);
-                        }
-                    }
-                }
-
-                var callbacks = PassiveAddedCallbacks.ToList();
-                foreach (var callback in callbacks)
-                {
-                    yield return StartCoroutine(callback.Invoke(instance));
-                }
-                
-                yield return StartCoroutine(instance.AddPassive(this));
-            }
-        }
-
-        public IEnumerator RemovePassiveEffect(PassiveSO<Tile> passiveSo)
-        {
-            var currentInstance = GetPassiveInstance<PassiveInstance<Tile>>(passiveSo);
-            return currentInstance == null ? null : RemovePassiveEffect(currentInstance);
-        }
-
-        public IEnumerator RemovePassiveEffect(PassiveInstance<Tile> passiveInstance)
-        {
-            if (!PassiveInstances.Contains(passiveInstance)) yield break;
-            PassiveInstances.Remove(passiveInstance);
-
-            var callbacks = PassiveRemovedCallbacks.ToList();
-            foreach (var callback in callbacks)
-            {
-                yield return StartCoroutine(callback.Invoke(passiveInstance));
-            }
-            
-            yield return StartCoroutine(passiveInstance.RemovePassive(this));
-        }
-        
-        private IEnumerator RemoveAllPassivesToRemove()
-        {
-            foreach (var passiveToRemove in passivesToRemove)
-            {
-                yield return StartCoroutine(RemovePassiveEffect(passiveToRemove)); 
-            }
-            passivesToRemove.Clear();
-        }
-
-        public int GetPassiveEffectCount(Func<PassiveInstance<Tile>, bool> condition, out PassiveInstance<Tile> firstPassiveInstance)
-        {
-            condition ??= _ => true;
-            
-            firstPassiveInstance = PassiveInstances.Where(condition).FirstOrDefault();
-            
-            return PassiveInstances.Count(condition);
         }
     }
 }

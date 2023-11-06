@@ -165,9 +165,9 @@ namespace Battle.ScriptableObjects.Requirement
             return true;
         }
 
-        public override IEnumerator ConsumeRequirement(Tile tile)
+        public override void ConsumeRequirement(Tile tile)
         {
-            if(!tile.HasUnit()) yield break; 
+            if(!tile.HasUnit()) return; 
             
             var unit = tile.Unit;
             
@@ -175,7 +175,7 @@ namespace Battle.ScriptableObjects.Requirement
             {
                 if (HasStat(unit,requiredStat)) ConsumeStats(requiredStat);
             }
-            yield break;
+            return; 
             
             void ConsumeStats(RequiredStat requiredStat)
             {

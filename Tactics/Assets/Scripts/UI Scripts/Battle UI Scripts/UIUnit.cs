@@ -56,8 +56,8 @@ namespace Battle.UIComponent
             associatedUnit.Stats.OnMaxShieldModified += UpdateShieldBar;
             associatedUnit.Stats.OnCurrentShieldModified += UpdateShieldBar;
             
-            associatedUnit.AddOnPassiveAddedCallback(AddPassiveIcon);
-            associatedUnit.AddOnPassiveRemovedCallback(RemovePassiveIcon);
+            EventManager.AddListener<AddPassiveBattleAction>(AddPassiveIcon);
+            EventManager.AddListener<RemovePassiveBattleAction>(RemovePassiveIcon);
         }
 
         private void Update()
@@ -89,14 +89,16 @@ namespace Battle.UIComponent
             shieldBarImage.fillAmount = current / (float)max;
         }
         
-        private IEnumerator AddPassiveIcon(PassiveInstance<Unit> passiveInstance)
+        private void AddPassiveIcon(AddPassiveBattleAction ctx)
         {
-            Debug.Log("Here");
+            if((Unit) ctx.Container != associatedUnit) return;
+
+            var passiveInstance = ctx.PassiveInstance;
             
             var associatedPassive =
                 unitPassiveIcons.FirstOrDefault(passiveIcon => passiveIcon.PassiveInstance == passiveInstance);
 
-            if (associatedPassive != null) yield break;
+            if (associatedPassive != null) return;
             
             associatedPassive = Instantiate(passiveIconPrefab, passiveIconParent);
             unitPassiveIcons.Add(associatedPassive);
@@ -104,11 +106,15 @@ namespace Battle.UIComponent
             associatedPassive.LinkToPassive(passiveInstance);
         }
 
-        private IEnumerator RemovePassiveIcon(PassiveInstance<Unit> passiveInstance)
+        private void RemovePassiveIcon(RemovePassiveBattleAction ctx)
         {
+            if((Unit) ctx.Container != associatedUnit) return;
+
+            var passiveInstance = ctx.PassiveInstance;
+            
             var associatedPassive =
                 unitPassiveIcons.FirstOrDefault(passiveIcon => passiveIcon.PassiveInstance == passiveInstance);
-            if(associatedPassive == null) yield break;
+            if (associatedPassive == null) return;
 
             unitPassiveIcons.Remove(associatedPassive);
             Destroy(associatedPassive.gameObject);

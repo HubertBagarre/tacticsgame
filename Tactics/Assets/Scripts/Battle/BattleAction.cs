@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -214,7 +215,7 @@ namespace Battle.ActionSystem
             IEnumerator DelayAssignedAction()
             {
                 AssignedActionPreWait();
-
+                
                 yield return CustomYieldInstruction;
                 yield return YieldInstruction;
                 
@@ -295,6 +296,55 @@ namespace Battle.ActionSystem
         }
     }
 
+    public class CustomBattleAction : BattleAction
+    {
+        protected override YieldInstruction YieldInstruction { get; }
+        protected override CustomYieldInstruction CustomYieldInstruction { get; }
+        public Action ActionPreWait { get; }
+        public Action ActionPostWait { get; }
+        
+        public CustomBattleAction(Action actionPreWait,Action actionPostWait = null)
+        {
+            ActionPreWait = actionPreWait;
+            ActionPostWait = actionPostWait;
+        }
+        
+        public CustomBattleAction(Action actionPreWait,YieldInstruction yieldInstruction, Action actionPostWait = null)
+        {
+            ActionPreWait = actionPreWait;
+            ActionPostWait = actionPostWait;
+            YieldInstruction = yieldInstruction;
+        }
+        
+        public CustomBattleAction(Action actionPreWait,CustomYieldInstruction customYieldInstruction, Action actionPostWait = null)
+        {
+            ActionPreWait = actionPreWait;
+            ActionPostWait = actionPostWait;
+            CustomYieldInstruction = customYieldInstruction;
+        }
+        
+        
+        protected override void StartActionEvent()
+        {
+            EventManager.Trigger(new StartBattleAction<CustomBattleAction>(this));
+        }
+
+        protected override void EndActionEvent()
+        {
+            EventManager.Trigger(new StartBattleAction<CustomBattleAction>(this));
+        }
+
+        protected override void AssignedActionPreWait()
+        {
+            ActionPreWait?.Invoke();
+        }
+
+        protected override void AssignedActionPostWait()
+        {
+            ActionPostWait?.Invoke();
+        }
+    }
+
     public class StartBattleAction<T> where T : BattleAction
     {
         public T BattleAction { get; }
@@ -304,7 +354,7 @@ namespace Battle.ActionSystem
             BattleAction = battleAction;
         }
     }
-
+    
     public class EndBattleAction<T> where T : BattleAction
     {
         public T BattleAction { get; }

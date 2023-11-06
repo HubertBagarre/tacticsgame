@@ -7,7 +7,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
     [CreateAssetMenu(menuName = "Battle Scriptables/Ability Effect/Remove Passives")]
     public class RemovePassivesEffectSo : UnitAbilityEffectSO
     {
-        [SerializeField] private List<PassiveSO<Unit>> passivesToRemove = new();
+        [SerializeField] private List<PassiveSO> passivesToRemove = new();
 
         public override string ConvertedDescription(Unit caster)
         {
@@ -51,8 +51,7 @@ namespace Battle.ScriptableObjects.Ability.Effect
             
                 foreach (var passive in passivesToRemove)
                 {
-                    var routine = target.RemovePassiveEffect(passive);
-                    if (routine != null) yield return target.StartCoroutine(routine);
+                    target.RemovePassiveEffect(passive);
                 }
             }
             

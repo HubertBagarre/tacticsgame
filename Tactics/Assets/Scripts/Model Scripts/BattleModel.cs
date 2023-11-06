@@ -8,23 +8,23 @@ namespace Battle
         [field: SerializeField] public BattleModel GhostModel { get; private set; }
         private bool IsGhost => GhostModel == null;
 
-        public Vector3 ConvertOrientation(Tile.Direction direction)
+        public Vector3 ConvertOrientation(NewTile.Direction direction)
         {
             return direction switch
             {
-                Tile.Direction.Top => Vector3.forward,
-                Tile.Direction.Right => Vector3.right,
-                Tile.Direction.Down => Vector3.back,    
-                Tile.Direction.Left => Vector3.left,
-                Tile.Direction.TopRight => (Vector3.forward + Vector3.right).normalized,
-                Tile.Direction.DownRight => (Vector3.back + Vector3.right).normalized,
-                Tile.Direction.DownLeft => (Vector3.back + Vector3.left).normalized,
-                Tile.Direction.TopLeft => (Vector3.forward + Vector3.left).normalized,
+                NewTile.Direction.Top => Vector3.forward,
+                NewTile.Direction.Right => Vector3.right,
+                NewTile.Direction.Down => Vector3.back,    
+                NewTile.Direction.Left => Vector3.left,
+                NewTile.Direction.TopRight => (Vector3.forward + Vector3.right).normalized,
+                NewTile.Direction.DownRight => (Vector3.back + Vector3.right).normalized,
+                NewTile.Direction.DownLeft => (Vector3.back + Vector3.left).normalized,
+                NewTile.Direction.TopLeft => (Vector3.forward + Vector3.left).normalized,
                 _ => Vector3.forward
             };
         }
 
-        public void SetOrientation(Tile.Direction direction)
+        public void SetOrientation(NewTile.Direction direction)
         {
             SetOrientation(ConvertOrientation(direction));
         }

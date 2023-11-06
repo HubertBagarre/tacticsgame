@@ -9,7 +9,7 @@ namespace Battle
     using UnitEvents;
     using ScriptableObjects;
 
-    public class Unit : MonoBehaviour, IBattleEntity, IPassivesContainer<Unit>
+    public class Unit : MonoBehaviour, IBattleEntity, IPassivesContainer
     {
         [SerializeField] private UnitSO defaultUnitSo;
         
@@ -75,7 +75,7 @@ namespace Battle
         public event Action<int, int> OnUltimatePointsAmountChanged;
         
         public List<UnitAbilityInstance> AbilityInstances { get; } = new();
-        public List<PassiveInstance<Unit>> PassiveInstances { get; } = new();
+        public List<PassiveInstance> PassiveInstances { get; } = new();
 
         private List<IEnumerator> onAttackOtherUnitRoutines = new ();
         private List<IEnumerator> onAttackedRoutines = new ();
@@ -87,14 +87,14 @@ namespace Battle
         public event IBattleEntity.BattleEntityDelegate OnTurnStart;
         public event IBattleEntity.BattleEntityDelegate OnTurnEnd;
         public event Action OnDeath;
-        private List<IPassivesContainer<Unit>.PassiveInstanceDelegate> PassiveAddedCallbacks { get; } = new();
-        private List<IPassivesContainer<Unit>.PassiveInstanceDelegate>  PassiveRemovedCallbacks { get; } = new();
+        //private List<IPassivesContainer<Unit>.PassiveInstanceDelegate> PassiveAddedCallbacks { get; } = new();
+        //private List<IPassivesContainer<Unit>.PassiveInstanceDelegate>  PassiveRemovedCallbacks { get; } = new();
         public delegate IEnumerator TileDelegate(Unit unit,Tile tile);
         public event TileDelegate OnTileEnter;
         public event TileDelegate OnTileExit;
         public static event Action<Unit> OnUnitInit;
 
-        public IEnumerator InitUnit(Tile tile, int team, UnitSO so,Tile.Direction orientation)
+        public IEnumerator InitUnit(Tile tile, int team, UnitSO so,NewTile.Direction orientation)
         {
             // TODO - Instantiate model
             if (so == null) so = defaultUnitSo;
@@ -111,8 +111,8 @@ namespace Battle
             Team = team;
             Stats = so.CreateInstance(this);
             
-            PassiveAddedCallbacks.Clear();
-            PassiveRemovedCallbacks.Clear();
+            //PassiveAddedCallbacks.Clear();
+            //PassiveRemovedCallbacks.Clear();
             
             if(Tile != null) yield return StartCoroutine( tile.SetUnit(this));
             
@@ -142,8 +142,9 @@ namespace Battle
         {
             foreach (var passiveToAdd in Stats.So.StartingPassives)
             {
-                yield return StartCoroutine(AddPassiveEffect(passiveToAdd.UnitPassive, passiveToAdd.UnitStacks));
+                //yield return StartCoroutine(AddPassiveEffect(passiveToAdd.SO, passiveToAdd.Stacks));
             }
+            yield break;
         }
 
         public void PreStartRound()
@@ -451,7 +452,8 @@ namespace Battle
 
             OnUltimatePointsAmountChanged?.Invoke(previous, CurrentUltimatePoints);
         }
-
+        
+        /*
         public void AddOnPassiveAddedCallback(IPassivesContainer<Unit>.PassiveInstanceDelegate callback)
         {
             PassiveAddedCallbacks.Add(callback);
@@ -471,16 +473,29 @@ namespace Battle
             Debug.Log($"Removed callback, now {PassiveAddedCallbacks.Count} callbacks");
         }
 
-        public void RemoveOnPassiveRemovedCallback(IPassivesContainer<Unit>.PassiveInstanceDelegate callback)
+        public void RemoveOnPassiveRemovedCallback(IPassivesContainer.PassiveInstanceDelegate callback)
         {
             if(PassiveRemovedCallbacks.Contains(callback)) PassiveRemovedCallbacks.Remove(callback);
+        }*/
+        
+        public PassiveInstance GetPassiveInstance(PassiveSO passiveSo)
+        {
+            return PassiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
         }
 
-        public TPassiveInstance GetPassiveInstance<TPassiveInstance>(PassiveSO<Unit> passiveSo) where TPassiveInstance : PassiveInstance<Unit>
+        void IPassivesContainer.AddPassiveEffect(PassiveSO passiveSo, int amount)
         {
-            var instance = PassiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
             
-            return instance as TPassiveInstance;
+        }
+
+        public void RemovePassive(PassiveSO passiveSo)
+        {
+            
+        }
+
+        public void RemovePassiveInstance(PassiveInstance passiveInstance)
+        {
+            
         }
 
         /// <summary>
@@ -489,25 +504,26 @@ namespace Battle
         /// <param name="passiveSo"></param>
         /// <param name="amount"></param>
         /// <returns></returns>
-        public IEnumerator AddPassiveEffect(PassiveSO<Unit> passiveSo, int amount = 1)
+        public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1)
         {
             //add passive instance to list
             if (!passiveSo.IsStackable || (passiveSo.IsStackable && amount <= 0)) amount = 1;
             
-            var passiveInstance = GetPassiveInstance<PassiveInstance<Unit>>(passiveSo);
+            var passiveInstance = GetPassiveInstance(passiveSo);
 
-            return AddToPassives(passiveInstance);
+            //AddToPassives(passiveInstance);
             
-            IEnumerator AddToPassives(PassiveInstance<Unit> instance)
+            IEnumerator AddToPassives(PassiveInstance instance)
             {
                 //if current instance == null, no passive yet, creating new and adding to list
                 //if passive isn't stackable, creating new and adding to list
                 if (instance == null || !passiveSo.IsStackable)
                 {
-                    instance = passiveSo.CreateInstance<PassiveInstance<Unit>>(amount);
+                    instance = passiveSo.CreateInstance(amount);
                     PassiveInstances.Add(instance);
                 }
 
+                /*
                 var callbacks = PassiveAddedCallbacks.ToList();
                 Debug.Log($"Found {callbacks.Count} callbacks");
                 foreach (var callback in callbacks)
@@ -516,6 +532,8 @@ namespace Battle
                 }
                 
                 yield return StartCoroutine(instance.AddPassive(this));
+                */
+                yield break;
             }
         }
 
@@ -524,10 +542,10 @@ namespace Battle
         /// </summary>
         /// <param name="passiveSo"></param>
         /// <returns></returns>
-        public IEnumerator RemovePassiveEffect(PassiveSO<Unit> passiveSo)
+        public void RemovePassiveEffect(PassiveSO passiveSo)
         {
-            var currentInstance = GetPassiveInstance<PassiveInstance<Unit>>(passiveSo);
-            return currentInstance == null ? null : RemovePassiveEffect(currentInstance);
+            var currentInstance = GetPassiveInstance(passiveSo);
+            RemovePassiveEffect(currentInstance);
         }
 
         /// <summary>
@@ -535,11 +553,14 @@ namespace Battle
         /// </summary>
         /// <param name="passiveInstance"></param>
         /// <returns></returns>
-        public IEnumerator RemovePassiveEffect(PassiveInstance<Unit> passiveInstance)
+        public void RemovePassiveEffect(PassiveInstance passiveInstance)
         {
-            if (!PassiveInstances.Contains(passiveInstance)) yield break;
+            if (!PassiveInstances.Contains(passiveInstance)) return;
             PassiveInstances.Remove(passiveInstance);
 
+            passiveInstance.OnPassiveRemoved(this);
+            
+            /*
             var callbacks = PassiveRemovedCallbacks.ToList();
             foreach (var callback in callbacks)
             {
@@ -547,9 +568,10 @@ namespace Battle
             }
             
             yield return StartCoroutine(passiveInstance.RemovePassive(this));
+            */
         }
         
-        public int GetPassiveEffectCount(Func<PassiveInstance<Unit>,bool> condition,out PassiveInstance<Unit> firstPassiveInstance)
+        public int GetPassiveEffectCount(Func<PassiveInstance,bool> condition,out PassiveInstance firstPassiveInstance)
         {
             condition ??= _ => true;
             

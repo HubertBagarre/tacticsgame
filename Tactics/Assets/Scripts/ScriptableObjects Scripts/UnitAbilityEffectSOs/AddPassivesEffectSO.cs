@@ -15,9 +15,9 @@ namespace Battle.ScriptableObjects.Ability.Effect
             new(){PassiveType.Neutral,PassiveType.Positive,PassiveType.Negative};
         private Dictionary<PassiveType,IEnumerable<PassiveToAdd>> passivesByType = new(){ { PassiveType.Neutral,Enumerable.Empty<PassiveToAdd>()},{ PassiveType.Positive,Enumerable.Empty<PassiveToAdd>()},{ PassiveType.Negative,Enumerable.Empty<PassiveToAdd>()}};
         
-        private IEnumerable<PassiveToAdd> NeutralPassives => passivesToAdd.Where(passiveToAdd => !passiveToAdd.IsType(PassiveType.Positive) && !passiveToAdd.IsType(PassiveType.Positive));
-        private IEnumerable<PassiveToAdd> PositivePassives => passivesToAdd.Where(passiveToAdd => passiveToAdd.IsType(PassiveType.Positive));
-        private IEnumerable<PassiveToAdd> NegativePassives => passivesToAdd.Where(passiveToAdd => passiveToAdd.IsType(PassiveType.Negative));
+        private IEnumerable<PassiveToAdd> NeutralPassives => passivesToAdd.Where(passiveToAdd => passiveToAdd.SO.Type != (PassiveType.Positive) && passiveToAdd.SO.Type != (PassiveType.Negative));
+        private IEnumerable<PassiveToAdd> PositivePassives => passivesToAdd.Where(passiveToAdd => passiveToAdd.SO.Type == (PassiveType.Positive));
+        private IEnumerable<PassiveToAdd> NegativePassives => passivesToAdd.Where(passiveToAdd => passiveToAdd.SO.Type == (PassiveType.Negative));
 
         public override bool ConvertDescriptionLinks(Unit caster, string linkKey, out string text)
         {
@@ -28,16 +28,10 @@ namespace Battle.ScriptableObjects.Ability.Effect
             
             if(!int.TryParse(split[1],out var passiveIndex)) return false;
             
-            var unitPassive = passivesToAdd[passiveIndex].UnitPassive;
-            if (unitPassive != null)
-            {
-                text = unitPassive.Description;
-                return true;
-            }
+            var passive = passivesToAdd[passiveIndex].SO;
+            if (passive == null) return false;
             
-            var tilePassive = passivesToAdd[passiveIndex].TilePassive;
-            if (tilePassive == null) return false;
-            text = tilePassive.Description;
+            text = passive.Description;
             return true;
 
         }
@@ -110,7 +104,9 @@ namespace Battle.ScriptableObjects.Ability.Effect
                 {
                     foreach (var passiveToAdd in passivesByType[passiveType])
                     {
-                        yield return caster.StartCoroutine(passiveToAdd.AddPassive(tile));
+                        var container = passiveToAdd.SO.GetContainer(tile.NewTile);
+                        
+                        passiveToAdd.AddPassiveToContainer(passiveToAdd.SO.GetContainer(tile.NewTile));
                     }
                 }
             }

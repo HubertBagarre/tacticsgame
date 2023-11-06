@@ -21,7 +21,7 @@ namespace Battle.UIComponent
         [Header("Passives")]
         [SerializeField] private UIUnitPassiveIcon unitPassiveIconPrefab;
         [SerializeField] private Transform passiveIconParent;
-        private Dictionary<PassiveInstance<Unit> ,GameObject> passiveIconDict = new();
+        private Dictionary<PassiveInstance,GameObject> passiveIconDict = new();
         
         [Header("Stats")]
         [SerializeField] private UIStatElement UIStatElementPrefab;
@@ -130,8 +130,11 @@ namespace Battle.UIComponent
             }
         }
 
-        private IEnumerator AddPassive(PassiveInstance<Unit>  passiveInstance)
+        private void AddPassive(AddPassiveBattleAction ctx)
         {
+            if((Unit) ctx.Container !=  currentDisplayingUnit) return;
+            var passiveInstance = ctx.PassiveInstance;
+            
             if (!passiveIconDict.ContainsKey(passiveInstance))
             {
                 var icon = Instantiate(unitPassiveIconPrefab, passiveIconParent);
@@ -141,11 +144,13 @@ namespace Battle.UIComponent
             }
             
             UpdateCurrentPassives();
-            yield break;
         }
 
-        private IEnumerator RemovePassive(PassiveInstance<Unit>  passiveInstance)
+        private void RemovePassive(RemovePassiveBattleAction ctx)
         {
+            if((Unit) ctx.Container !=  currentDisplayingUnit) return;
+            var passiveInstance = ctx.PassiveInstance;
+            
             if (passiveIconDict.ContainsKey(passiveInstance))
             {
                 var icon = passiveIconDict[passiveInstance];
@@ -154,7 +159,6 @@ namespace Battle.UIComponent
             }
             
             UpdateCurrentPassives();
-            yield break;
         }
 
         private void UpdateCurrentPassives()
@@ -217,8 +221,8 @@ namespace Battle.UIComponent
             
             unit.OnMovementLeftChanged += UpdateUnitStatElementsForMovement;
             
-            unit.AddOnPassiveAddedCallback(AddPassive);
-            unit.AddOnPassiveRemovedCallback(RemovePassive);
+            EventManager.AddListener<AddPassiveBattleAction>(AddPassive);
+            EventManager.AddListener<RemovePassiveBattleAction>(RemovePassive);
         }
 
         private void RemoveCallbacks(Unit unit)
@@ -234,8 +238,8 @@ namespace Battle.UIComponent
             
             unit.OnMovementLeftChanged -= UpdateUnitStatElementsForMovement;
             
-            unit.RemoveOnPassiveAddedCallback(AddPassive);
-            unit.RemoveOnPassiveRemovedCallback(RemovePassive);
+            EventManager.RemoveListener<AddPassiveBattleAction>(AddPassive);
+            EventManager.RemoveListener<RemovePassiveBattleAction>(RemovePassive);
         }
 
         private void UpdateHpStatElement(UnitStatsInstance statsInstance)
