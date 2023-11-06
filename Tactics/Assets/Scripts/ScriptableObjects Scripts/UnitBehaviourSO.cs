@@ -75,7 +75,7 @@ namespace Battle.ScriptableObjects
             
             Debug.Log("Ending Behaviour");
         }
-    
+        
         protected abstract IEnumerator RunBehaviourEffect();
 
         public void OnBehaviourInterrupted()

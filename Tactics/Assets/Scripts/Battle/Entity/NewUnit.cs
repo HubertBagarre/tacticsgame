@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Battle.ActionSystem;
+using UnityEngine;
 
 namespace Battle
 {
@@ -54,6 +55,15 @@ namespace Battle
             
             // this should go in battle manager, end current entity turn
             UIBattleManager.OnEndTurnButtonClicked += EndTurn;
+            
+            
+            //TODO - Create new Unit Turn Battle Action;
+            // enqueue all actions in the battle action (based on behaviour) 
+            // enqueue end turn action
+            // PLAYER HAS NO ACTIONS, SO NO ENQUEUE OF END TURN ACTION
+            // run battle action
+            
+            Debug.Log($"Behaviour is {Stats.Behaviour}, running behaviour");
         }
 
         protected override void TurnEnd()
@@ -92,6 +102,37 @@ namespace Battle
             
             return passiveInstances.Count(condition);
         }
+    }
+    
+    public class UnitTurnBattleAction : BattleAction
+    {
+        protected override YieldInstruction YieldInstruction { get; }
+        protected override CustomYieldInstruction CustomYieldInstruction { get; }
+        public NewUnit Unit { get; }
+        
+        public UnitTurnBattleAction(NewUnit unit)
+        {
+            Unit = unit;
+        }
+        
+        protected override void StartActionEvent()
+        {
+            EventManager.Trigger(new StartBattleAction<UnitTurnBattleAction>(this));
+        }
+
+        protected override void EndActionEvent()
+        {
+            EventManager.Trigger(new EndBattleAction<UnitTurnBattleAction>(this));
+        }
+
+        protected override void AssignedActionPreWait()
+        {
+        }
+
+        protected override void AssignedActionPostWait()
+        {
+        }
+        
     }
 }
 
