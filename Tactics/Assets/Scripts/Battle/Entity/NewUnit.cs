@@ -62,6 +62,7 @@ namespace Battle
             // enqueue end turn action
             // PLAYER HAS NO ACTIONS, SO NO ENQUEUE OF END TURN ACTION
             // run battle action
+		//bosses/ units with conditional behaviour should have a special unitturn that behaves like the roundaction and dynamicaly adds battleactions then repeats itself
             
             Debug.Log($"Behaviour is {Stats.Behaviour}, running behaviour");
         }
