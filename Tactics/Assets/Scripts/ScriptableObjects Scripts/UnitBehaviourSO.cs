@@ -1,5 +1,8 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Battle.ActionSystem;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects
@@ -75,6 +78,19 @@ namespace Battle.ScriptableObjects
             
             Debug.Log("Ending Behaviour");
         }
+
+        public CustomBattleAction UnitTurnBehaviourAction(NewUnit unit)
+        {
+            return new CustomBattleAction(Action,1f);
+            
+            void Action()
+            {
+                UnitTurnBattleAction(unit);
+            }
+        }
+
+        protected abstract void UnitTurnBattleAction(NewUnit unit);
+
         
         protected abstract IEnumerator RunBehaviourEffect();
 

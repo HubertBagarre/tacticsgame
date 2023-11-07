@@ -186,7 +186,7 @@ namespace Battle.ActionSystem
         // send Start Action Event
         private void Step0()
         {
-            Log($"Started {this}");
+            Log($"Started {this} (Parent : {Parent})");
             
             StartActionEvent();
 
@@ -302,11 +302,19 @@ namespace Battle.ActionSystem
         protected override CustomYieldInstruction CustomYieldInstruction { get; }
         public Action ActionPreWait { get; }
         public Action ActionPostWait { get; }
-        
+        protected override MonoBehaviour CoroutineInvoker { get; }
+
         public CustomBattleAction(Action actionPreWait,Action actionPostWait = null)
         {
             ActionPreWait = actionPreWait;
             ActionPostWait = actionPostWait;
+        }
+        
+        public CustomBattleAction(Action actionPreWait,float wait,Action actionPostWait = null)
+        {
+            ActionPreWait = actionPreWait;
+            ActionPostWait = actionPostWait;
+            YieldInstruction = new WaitForSeconds(wait);
         }
         
         public CustomBattleAction(Action actionPreWait,YieldInstruction yieldInstruction, Action actionPostWait = null)

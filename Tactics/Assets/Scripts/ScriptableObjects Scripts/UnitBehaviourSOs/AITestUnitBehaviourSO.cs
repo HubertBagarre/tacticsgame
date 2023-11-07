@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using Battle.ActionSystem;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects
@@ -10,12 +12,17 @@ namespace Battle.ScriptableObjects
     {
         protected override void InitBehaviourEffect(Unit unit)
         {
-
+            
         }
 
         public override void ShowBehaviourPreview()
         {
+            
+        }
 
+        protected override void UnitTurnBattleAction(NewUnit unit)
+        {
+            Debug.Log($"{unit}'s behaviour running");
         }
 
         protected override IEnumerator RunBehaviourEffect()

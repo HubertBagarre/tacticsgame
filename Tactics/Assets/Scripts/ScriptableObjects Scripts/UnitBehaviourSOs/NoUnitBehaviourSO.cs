@@ -18,6 +18,11 @@ namespace Battle.ScriptableObjects.UnitBehaviour
             
         }
 
+        protected override void UnitTurnBattleAction(NewUnit unit)
+        {
+            
+        }
+
         protected override IEnumerator RunBehaviourEffect()
         {
             yield return null;

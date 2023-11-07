@@ -299,7 +299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c51a0a2b13bbb64f889734e3b9d5ef0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showLog: 0
+  showLog: 1
   tileManager: {fileID: 304268316}
   unitManager: {fileID: 304268315}
   abilityManager: {fileID: 304268314}

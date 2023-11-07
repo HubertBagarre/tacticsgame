@@ -56,6 +56,20 @@ namespace Battle
             // this should go in battle manager, end current entity turn
             UIBattleManager.OnEndTurnButtonClicked += EndTurn;
             
+            if (Stats.Behaviour != null)
+            {
+                var behaviourAction = Stats.Behaviour.UnitTurnBehaviourAction(this);
+                
+                behaviourAction.EnqueueInActionEnd(new CustomBattleAction(EndTurn));
+                
+                Debug.Log($"Behaviour is {Stats.Behaviour}, starting behaviour battle action");
+                
+                BattleAction.StartNewBattleAction(behaviourAction);
+            }
+            else
+            {
+                Debug.Log("No Behaviour, player turn");
+            }
             
             //TODO - Create new Unit Turn Battle Action;
             // enqueue all actions in the battle action (based on behaviour) 
@@ -63,8 +77,6 @@ namespace Battle
             // PLAYER HAS NO ACTIONS, SO NO ENQUEUE OF END TURN ACTION
             // run battle action
 		//bosses/ units with conditional behaviour should have a special unitturn that behaves like the roundaction and dynamicaly adds battleactions then repeats itself
-            
-            Debug.Log($"Behaviour is {Stats.Behaviour}, running behaviour");
         }
 
         protected override void TurnEnd()

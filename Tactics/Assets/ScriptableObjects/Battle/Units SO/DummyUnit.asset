@@ -22,7 +22,7 @@ MonoBehaviour:
   <Attack>k__BackingField: 0
   <AttackRange>k__BackingField: 0
   <BaseMovement>k__BackingField: 0
-  <BaseSpeed>k__BackingField: 0
+  <BaseSpeed>k__BackingField: 12
   <Initiative>k__BackingField: 1
   <Behaviour>k__BackingField: {fileID: 11400000, guid: 873a2e2cbfaab8b4e9add8d58846d456,
     type: 2}
