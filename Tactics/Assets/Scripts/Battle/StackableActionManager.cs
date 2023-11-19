@@ -63,7 +63,7 @@ public class StackableActionManager : MonoBehaviour
         }
     }
     
-    private class RoundAction : StackableAction
+    private class RoundAction : SimpleStackableAction
     {
         public int CurrentRound { get; }
         
@@ -71,12 +71,34 @@ public class StackableActionManager : MonoBehaviour
         {
             CurrentRound = round;
         }
-        
-        protected override YieldedAction MainYieldedAction()
+
+        protected override YieldInstruction YieldInstruction { get; }
+        protected override CustomYieldInstruction CustomYieldInstruction { get; }
+        protected override void Main()
         {
-            return new YieldedAction(() => Debug.Log($"Starting Round action (round {CurrentRound})"));
+            Debug.Log($"Starting round {CurrentRound}");
+        }
+
+        protected override void PostWaitAction()
+        {
+            
         }
     }
+}
+
+public abstract class SimpleStackableAction : StackableAction
+{
+    protected abstract YieldInstruction YieldInstruction { get; }                     
+    protected abstract CustomYieldInstruction CustomYieldInstruction { get; }
+    
+    protected override YieldedAction MainYieldedAction()
+    {
+        if(CustomYieldInstruction != null) return new YieldedAction(Main,CustomYieldInstruction,PostWaitAction);
+        return new YieldedAction(Main,YieldInstruction,PostWaitAction);
+    }
+    
+    protected abstract void Main();
+    protected abstract void PostWaitAction();
 }
 
 public abstract class StackableAction
@@ -196,7 +218,7 @@ public abstract class StackableAction
         //do stuff
         if (!hasInstruction && !hasCustomInstruction)
         {
-            Log("No instructions to wait for");
+            //Log("No instructions to wait for");
             
             yieldedAction.PreWaitAction?.Invoke();
             yieldedAction.PostWaitAction?.Invoke();
@@ -236,7 +258,7 @@ public abstract class StackableAction
         
         var subAction = CurrentAction.subActions.Dequeue();
                 
-        Log($"Found subaction {subAction}");
+        //Log($"Found subaction {subAction}");
                 
         subAction.Stack();
         return true;
@@ -260,7 +282,7 @@ public abstract class StackableAction
             
             var state = CurrentAction.CurrentState;
 
-            Log($"Current state of action : {state}");
+            //Log($"Current state of action : {state}");
 
             switch (state)
             {
@@ -276,9 +298,17 @@ public abstract class StackableAction
                 case State.Started:
                     if (!CurrentAction.CanInvokeSubActions()) CurrentAction.SetupActions();
                     break;
-                case State.Invoking: 
-                    if (!CurrentAction.CanInvokeSubActions()) CurrentAction.InvokeActions();
-                    return;
+                case State.Invoking:
+                    if (!CurrentAction.CanInvokeSubActions())
+                    {
+                        CurrentAction.InvokeActions();
+                        if (!CurrentAction.AutoAdvance)
+                        {
+                            Log("Auto Advancing disabled");
+                            return;
+                        }
+                    }
+                    break;
                 case State.Invoked:
                     if(!CurrentAction.CanInvokeSubActions()) CurrentAction.End();
                     break;
