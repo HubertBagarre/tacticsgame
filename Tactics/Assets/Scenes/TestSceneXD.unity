@@ -240,6 +240,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Timeline Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 9096039124257508801, guid: 1692648994a006141a08dfc064657e9d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1692648994a006141a08dfc064657e9d, type: 3}
 --- !u!1 &107337554
@@ -259,7 +264,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &107337556
 Transform:
   m_ObjectHideFlags: 0
@@ -375,6 +380,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Battle Managers
+      objectReference: {fileID: 0}
+    - target: {fileID: 8949087217103233743, guid: d199fcebe4717a144b5aa807d02228a4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d199fcebe4717a144b5aa807d02228a4, type: 3}
@@ -798,3 +808,48 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 103671446}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2087929723
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2087929724}
+  - component: {fileID: 2087929725}
+  m_Layer: 0
+  m_Name: StackableActionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2087929724
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2087929723}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2087929725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2087929723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4d5a57e12563ce419712a31642779af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showLog: 1
