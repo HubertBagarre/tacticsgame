@@ -18,7 +18,7 @@ namespace Battle
         public event Action<int> OnSpeedChanged;
         public float DistanceFromTurnStart { get; private set; }
         public event Action<float> OnDistanceFromTurnStartChanged;
-        public float TurnOrder => DistanceFromTurnStart / (Speed / 100f);
+        public float TurnOrder => DistanceFromTurnStart / DecayRate;
         public int JoinedIndex { get; private set; }
         public float DecayRate => Speed / 100f;
 

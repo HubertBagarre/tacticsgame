@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class SimpleStackableAction : StackableAction
+namespace Battle
+{
+    public abstract class SimpleStackableAction : StackableAction
 {
     protected abstract YieldInstruction YieldInstruction { get; }                     
     protected abstract CustomYieldInstruction CustomYieldInstruction { get; }
@@ -331,3 +333,6 @@ public class ActionEndInvoker<T> where T : StackableAction
         OnInvoked?.Invoke(stackableAction);
     }
 }
+}
+
+

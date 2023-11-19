@@ -253,6 +253,7 @@ GameObject:
   - component: {fileID: 107337556}
   - component: {fileID: 107337557}
   - component: {fileID: 107337558}
+  - component: {fileID: 107337559}
   m_Layer: 0
   m_Name: BattleActionManager
   m_TagString: Untagged
@@ -301,10 +302,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   showLog: 0
   maxIterations: 1000
+  maxRounds: 10
   tileManager: {fileID: 304268316}
   unitManager: {fileID: 304268315}
   abilityManager: {fileID: 304268314}
+  timelineManager: {fileID: 107337559}
+--- !u!114 &107337559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 107337554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adf83db4279a8f540893df27ce9ab7c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   <ResetTurnValue>k__BackingField: 100
+  timelineEntityShowers: []
 --- !u!1001 &304268313
 PrefabInstance:
   m_ObjectHideFlags: 0

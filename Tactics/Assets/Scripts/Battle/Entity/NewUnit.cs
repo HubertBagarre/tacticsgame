@@ -8,6 +8,7 @@ namespace Battle
 {
     using ScriptableObjects;
     
+    [Serializable]
     public class NewUnit : TimelineEntity, IPassivesContainer
     {
         public UnitStatsInstance Stats { get; private set; }
