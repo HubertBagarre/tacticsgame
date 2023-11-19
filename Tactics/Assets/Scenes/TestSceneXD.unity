@@ -264,7 +264,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &107337556
 Transform:
   m_ObjectHideFlags: 0
@@ -305,6 +305,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showLog: 1
+  maxIterations: 100
   tileManager: {fileID: 304268316}
   unitManager: {fileID: 304268315}
   abilityManager: {fileID: 304268314}
@@ -824,7 +825,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2087929724
 Transform:
   m_ObjectHideFlags: 0
@@ -853,3 +854,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showLog: 1
+  maxIterations: 1000

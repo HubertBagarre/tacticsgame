@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects.UnitBehaviour
@@ -24,10 +25,10 @@ namespace Battle.ScriptableObjects.UnitBehaviour
         {
             
         }
-
-        protected override void UnitTurnBattleAction(NewUnit unit)
+        
+        public override IEnumerable<StackableAction.YieldedAction> UnitTurnBehaviourActions(NewUnit unit)
         {
-            
+            return null;
         }
 
         protected override IEnumerator RunBehaviourEffect()

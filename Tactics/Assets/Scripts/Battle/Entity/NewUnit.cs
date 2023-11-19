@@ -50,16 +50,24 @@ namespace Battle
             
             foreach (var abilityInstance in abilityInstances)
             {
-                abilityInstance.DecreaseCurrentCooldown(1);
+                abilityInstance.DecreaseCurrentCooldown(1);  //should be battle action/callbackable
             }
             
             // this should go in battle manager, end current entity turn
             UIBattleManager.OnEndTurnButtonClicked += EndTurn;
+
+            var unitTurnAction = new UnitTurnBattleAction(this);
+            
+            Debug.Log($"Stacking unit turn action of {unitTurnAction.Unit}");
+            
+            unitTurnAction.TryStack();
+            
+            /*
             
             if (Stats.Behaviour != null)
             {
                 var behaviourAction = Stats.Behaviour.UnitTurnBehaviourAction(this);
-                
+            
                 behaviourAction.EnqueueInActionEnd(new CustomBattleAction(EndTurn));
                 
                 Debug.Log($"Behaviour is {Stats.Behaviour}, starting behaviour battle action");
@@ -70,20 +78,21 @@ namespace Battle
             {
                 Debug.Log("No Behaviour, player turn");
             }
+            */
             
             //TODO - Create new Unit Turn Battle Action;
             // enqueue all actions in the battle action (based on behaviour) 
             // enqueue end turn action
             // PLAYER HAS NO ACTIONS, SO NO ENQUEUE OF END TURN ACTION
             // run battle action
-		//bosses/ units with conditional behaviour should have a special unitturn that behaves like the roundaction and dynamicaly adds battleactions then repeats itself
+		    //bosses/ units with conditional behaviour should have a special unitturn that behaves like the roundaction and dynamicaly adds battleactions then repeats itself
         }
 
         protected override void TurnEnd()
         {
             UIBattleManager.OnEndTurnButtonClicked -= EndTurn;
         }
-
+        
         public PassiveInstance GetPassiveInstance(PassiveSO passiveSo)
         {
             return passiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
@@ -115,37 +124,52 @@ namespace Battle
             
             return passiveInstances.Count(condition);
         }
+
+        public override IEnumerable<StackableAction.YieldedAction> EntityTurnYieldedActions => new[] { new StackableAction.YieldedAction(new UnitTurnBattleAction(this).TryStack)};
     }
     
-    public class UnitTurnBattleAction : BattleAction
+    public class UnitTurnBattleAction : SimpleStackableAction
     {
         protected override YieldInstruction YieldInstruction { get; }
         protected override CustomYieldInstruction CustomYieldInstruction { get; }
+        protected override bool AutoAdvance => !isPlayerTurn;
+        
         public NewUnit Unit { get; }
+        public UnitStatsInstance Stats => Unit.Stats;
+        
+        private bool isPlayerTurn;
         
         public UnitTurnBattleAction(NewUnit unit)
         {
             Unit = unit;
         }
         
-        protected override void StartActionEvent()
+        protected override void Main()
         {
-            EventManager.Trigger(new StartBattleAction<UnitTurnBattleAction>(this));
-        }
+            Debug.Log($"Starting {Unit.Name} UnitTurn Battle Action");
 
-        protected override void EndActionEvent()
-        {
-            EventManager.Trigger(new EndBattleAction<UnitTurnBattleAction>(this));
-        }
+            isPlayerTurn = Stats.Behaviour == null;
 
-        protected override void AssignedActionPreWait()
-        {
+            if (isPlayerTurn)
+            {
+                Debug.Log($"No behaviour for {Unit.Name}, player turn");
+                
+                // probably send callback to enable ui;
+                
+                return;
+            }
+            
+            Debug.Log($"Behaviour : {Stats.Behaviour}");
+            
+            var enumerable = Stats.Behaviour.UnitTurnBehaviourActions(Unit);
+            
+            if (enumerable == null)  return;
+            
+            foreach (var behaviourAction in enumerable)
+            {
+                EnqueueYieldedActions(behaviourAction);
+            }
         }
-
-        protected override void AssignedActionPostWait()
-        {
-        }
-        
     }
 }
 

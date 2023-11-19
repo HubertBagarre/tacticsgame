@@ -17,10 +17,15 @@ namespace Battle.ScriptableObjects.UnitBehaviour
         {
             
         }
-
-        protected override void UnitTurnBattleAction(NewUnit unit)
+        
+        public override IEnumerable<StackableAction.YieldedAction> UnitTurnBehaviourActions(NewUnit unit)
         {
-            
+            return new[] { new StackableAction.YieldedAction(Log,new WaitForSeconds(3f)) };
+                
+            void Log()
+            {
+                Debug.Log($"{unit}'s behaviour running");
+            }
         }
 
         protected override IEnumerator RunBehaviourEffect()

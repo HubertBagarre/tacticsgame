@@ -3,6 +3,7 @@
 // it also has a method to reset the turn value and a method to decay the turn value
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Battle
@@ -90,42 +91,39 @@ namespace Battle
             
             return JoinedIndex.CompareTo(other.JoinedIndex);
         }
+        
+        public abstract IEnumerable<StackableAction.YieldedAction> EntityTurnYieldedActions { get; }
     }
 }
 
 namespace Battle.ActionSystem.TimelineActions
 {
-    public class TimelineEntityTurnAction : BattleAction
+    public class TimelineEntityTurnAction : SimpleStackableAction
     {
         public TimelineEntity Entity { get; }
-
+        protected override YieldInstruction YieldInstruction { get; }
+        protected override CustomYieldInstruction CustomYieldInstruction { get; }
+        
         public TimelineEntityTurnAction(TimelineEntity entity)
         {
             Entity = entity;
-            CustomYieldInstruction = new WaitUntil(() => !Entity.InTurn);
         }
-
-        protected override YieldInstruction YieldInstruction { get; }
-        protected override CustomYieldInstruction CustomYieldInstruction { get; }
-
-        protected override void StartActionEvent()
+        
+        protected override void Main()
         {
-            EventManager.Trigger(new StartBattleAction<TimelineEntityTurnAction>(this));
-        }
-
-        protected override void EndActionEvent()
-        {
-            EventManager.Trigger(new EndBattleAction<TimelineEntityTurnAction>(this));
-        }
-
-        protected override void AssignedActionPreWait()
-        {
-            Entity.OnTurnStart();
-        }
-
-        protected override void AssignedActionPostWait()
-        {
-            Entity.OnTurnEnd();
+            Debug.Log($"Starting {Entity.Name} TimelineEntityTurn Battle Action");
+            
+            var enumerable = Entity.EntityTurnYieldedActions;
+            if (enumerable == null)
+            {
+                Debug.LogWarning($"No yielded actions for {Entity.Name}");
+                return;
+            }
+                
+            foreach (var behaviourAction in enumerable)
+            {
+                EnqueueYieldedActions(behaviourAction);
+            }
         }
     }
 }

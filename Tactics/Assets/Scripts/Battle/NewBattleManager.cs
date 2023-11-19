@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace Battle
 {
-    using ActionSystem;
     using ActionSystem.TimelineActions;
 
     /// <summary>
@@ -23,6 +22,7 @@ namespace Battle
     public class NewBattleManager : MonoBehaviour
     {
         [SerializeField] private bool showLog;
+        [SerializeField] private int maxIterations = 99999;
 
         [Header("Managers")]
         [SerializeField] private TileManager tileManager;
@@ -41,14 +41,9 @@ namespace Battle
         //Level
         private BattleLevel CurrentLevel { get; set; }
         
-        //Round
-        private int CurrentRound { get; set; }
-        
         //Battle
         private bool IsBattleStarted { get; set; }
-
-        private MainBattleAction mainBattleAction;
-        private RoundAction CurrentRoundAction;
+        
         private TestEntity RoundEndEntity;
 
         [ContextMenu("End Unit Turn")]
@@ -56,14 +51,7 @@ namespace Battle
         {
             CurrentTimelineEntity.EndTurn();
         }
-
-        private void Awake()
-        {
-            BattleAction.showLog = showLog;
-
-            mainBattleAction = new MainBattleAction(this);
-        }
-
+        
         public void SetLevel(BattleLevel level)
         {
             CurrentLevel = level;
@@ -93,16 +81,27 @@ namespace Battle
             
 
             // 5 - Start Round Entity's turn (a round starts at the end of Round entity's turn and end at the end of Round entity's turn)
-            CurrentRound = 0;
+            
+            ActionStartInvoker<RoundAction>.OnInvoked += action => Debug.Log($"Starting round {action.CurrentRound}");
+            
             CurrentTimelineEntity = RoundEndEntity;
-
-            CurrentRoundAction = new RoundAction(this);
-
+            
+            StackableAction.Manager.ShowLog(showLog);
+            StackableAction.Manager.Init(this,maxIterations);
+            
+            var mainBattleAction = new MainBattleAction(this);
 
             IsBattleStarted = true;
 
-            mainBattleAction.EnqueueInActionStart(CurrentRoundAction);
-            mainBattleAction.Start();
+            mainBattleAction.TryStack();
+            
+            Advance();
+        }
+        
+        [ContextMenu("Advance")]
+        private void Advance()
+        {
+            StackableAction.Manager.AdvanceAction();
         }
 
         public void AddEntitiesToTimeline(bool useInitiative,List<TimelineEntity> entities)
@@ -223,97 +222,70 @@ namespace Battle
             }
         }
 
-        private class MainBattleAction : BattleAction
+        private class MainBattleAction : SimpleStackableAction
         {
+            private RoundAction currentRoundAction;
+            private NewBattleManager BattleManager { get; }
+
             protected override YieldInstruction YieldInstruction { get; }
             protected override CustomYieldInstruction CustomYieldInstruction { get; }
-            protected override MonoBehaviour CoroutineInvoker { get; }
-
+            
             public MainBattleAction(NewBattleManager battleManager)
             {
-                CoroutineInvoker = battleManager;
-                CustomYieldInstruction = new WaitUntil(() => battleManager.IsBattleStarted);
-                SetAsCurrentRunningAction();
+                currentRoundAction = new RoundAction(battleManager,1);
+                BattleManager = battleManager;
             }
-
-            protected override void AssignedActionPreWait()
+            
+            protected override void Main()
             {
-                
-            }
+                currentRoundAction.TryStack();
 
-            protected override void AssignedActionPostWait()
-            {
-            }
-
-            // Copy this in every BattleAction (replace MainBattleAction with the name of the class)
-            protected override void StartActionEvent()
-            {
-                EventManager.Trigger(new StartBattleAction<MainBattleAction>(this));
-            }
-
-            protected override void EndActionEvent()
-            {
-                EventManager.Trigger(new EndBattleAction<MainBattleAction>(this));
+                currentRoundAction = new RoundAction(BattleManager,currentRoundAction.CurrentRound + 1);
+            
+                EnqueueYieldedActions(new YieldedAction(Main));
             }
         }
         
-        public class RoundAction : BattleAction
+        public class RoundAction : SimpleStackableAction
         {
-            protected override YieldInstruction YieldInstruction { get; }
-            protected override CustomYieldInstruction CustomYieldInstruction { get; }
-            protected override MonoBehaviour CoroutineInvoker => BattleManager;
-            protected NewBattleManager BattleManager { get; }
-
-            public int Round => BattleManager.CurrentRound;
-
-            public RoundAction(NewBattleManager battleManager)
+            public int CurrentRound { get; }
+            public TimelineEntityTurnAction CurrentEntityTurnAction { get; private set; }
+            private NewBattleManager BattleManager { get; }
+        
+            public RoundAction(NewBattleManager battleManager,int round) : base()
             {
+                CurrentRound = round;
                 BattleManager = battleManager;
             }
 
-            protected override void StartActionEvent()
+            protected override YieldInstruction YieldInstruction { get; }
+            protected override CustomYieldInstruction CustomYieldInstruction { get; }
+            protected override void Main()
             {
-                EventManager.Trigger(new StartBattleAction<RoundAction>(this));
-            }
+                var currentEntity = BattleManager.FirstTimelineEntity;
 
-            protected override void EndActionEvent()
-            {
-                EventManager.Trigger(new EndBattleAction<RoundAction>(this));
-            }
+                var isEndRound = currentEntity == BattleManager.RoundEndEntity;
+                
+                //Debug.Log($"Should end round : {isEndRound}");
 
-            protected override void AssignedActionPreWait()
-            {
-                BattleManager.CurrentRoundAction = this;
-
-                BattleManager.AdvanceTimeline();
-            }
-
-            protected override void AssignedActionPostWait()
-            {
-                //Debug.Log($"CurrentTimelineEntity != Round End ? {(BattleManager.CurrentTimelineEntity != BattleManager.RoundEndEntity)}");
-                if (BattleManager.CurrentTimelineEntity != BattleManager.RoundEndEntity)
+                if (!isEndRound)
                 {
-                    // enqueue Current Entity Turn action
-                    EnqueueInActionStart(new TimelineEntityTurnAction(BattleManager.CurrentTimelineEntity));
-
-                    //Debug.Log($"Queued {BattleManager.CurrentTimelineEntity.Name}'s turn");
-
-                    // rollback to step 1 so we can start the unit action
-                    SetStep(0);
-
-                    return;
+                    EnqueueYieldedActions(new YieldedAction(Main));
+                    
+                    var entityTimelineAction = new TimelineEntityTurnAction(currentEntity);
+                    
+                    entityTimelineAction.TryStack();
                 }
 
-                //if Current Entity is Round End Entity, queue next round
-                BattleManager.CurrentRound++;
-
-                Parent.EnqueueInActionStart(new RoundAction(BattleManager));
+                BattleManager.AdvanceTimeline();
+                
             }
         }
 
         [Serializable]
         private class TestEntity : TimelineEntity
         {
+            public override IEnumerable<StackableAction.YieldedAction> EntityTurnYieldedActions => null;
             public TestEntity(int speed, int initiative, string name = "Test Entity") : base(speed, initiative, name)
             {
             }
@@ -331,6 +303,7 @@ namespace Battle
             protected override void TurnEnd()
             {
             }
+
         }
     }
 }

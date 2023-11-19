@@ -6,19 +6,23 @@ using UnityEngine;
 public class StackableActionManager : MonoBehaviour
 {
     [SerializeField] private bool showLog = false;
+    [SerializeField] private int maxIterations = 99999;
 
     private void Start()
     {
-        StackableAction.showLog = showLog;
-        StackableAction.Manager.Init(this);
-
-
-        StackableAction.ActionStartInvoker<MainAction>.OnInvoked += action => Debug.Log("Action started (invoked)");
-        StackableAction.ActionEndInvoker<MainAction>.OnInvoked += action => Debug.Log("Action ended (invoked)");
-
-        var test = new MainAction(3);
+        StackableAction.Manager.ShowLog(showLog);
+        StackableAction.Manager.Init(this,maxIterations);
         
-        test.Run();
+        ActionStartInvoker<RoundAction>.OnInvoked += action => Debug.Log($"Starting round {action.CurrentRound}");
+
+        
+        
+        
+        var mainAction = new MainAction(3);
+        
+        mainAction.TryStack();
+        
+        Advance();
     }
     
     [ContextMenu("Advance")]
@@ -26,13 +30,14 @@ public class StackableActionManager : MonoBehaviour
     {
         StackableAction.Manager.AdvanceAction();
     }
-
+    
+    
     private class MainAction : StackableAction
     {
         private RoundAction currentRoundAction;
         private int maxRounds;
         
-        public MainAction(int maxRounds) : base()
+        public MainAction(int maxRounds)
         {
             this.maxRounds = maxRounds;
         }
@@ -46,7 +51,7 @@ public class StackableActionManager : MonoBehaviour
 
         private void RunCurrentRound()
         {
-            currentRoundAction.Run();
+            currentRoundAction.TryStack();
 
             EnqueueNextRound();
         }
@@ -76,7 +81,7 @@ public class StackableActionManager : MonoBehaviour
         protected override CustomYieldInstruction CustomYieldInstruction { get; }
         protected override void Main()
         {
-            Debug.Log($"Starting round {CurrentRound}");
+            
         }
 
         protected override void PostWaitAction()
@@ -98,7 +103,8 @@ public abstract class SimpleStackableAction : StackableAction
     }
     
     protected abstract void Main();
-    protected abstract void PostWaitAction();
+
+    protected virtual void PostWaitAction() { }
 }
 
 public abstract class StackableAction
@@ -116,9 +122,9 @@ public abstract class StackableAction
         Ended,
     }
     
-    public static bool showLog = false;
+    private static bool showLog = false;
     private static Stack<StackableAction> stack;
-    private static int maxIterationsSafety = 100;
+    private static int maxIterationsSafety;
     private static StackableAction CurrentAction => stack.TryPeek(out var action) ? action : null;
     private static MonoBehaviour coroutineInvoker;
     
@@ -128,9 +134,7 @@ public abstract class StackableAction
     
     private State currentState;
     protected State CurrentState => currentState;
-
-    
-    public virtual bool AutoAdvance => true;
+    protected virtual bool AutoAdvance => true;
     
     protected StackableAction()
     {
@@ -139,7 +143,7 @@ public abstract class StackableAction
         yieldedActions = new Queue<YieldedAction>();
     }
 
-    public void Run()
+    public void TryStack()
     {
         if (CurrentAction == null)
         {
@@ -187,6 +191,8 @@ public abstract class StackableAction
         
         InvokeStart();
         
+        Log($"Started {this}");
+        
         currentState = State.Started;
     }
     
@@ -195,7 +201,7 @@ public abstract class StackableAction
         yieldedActions.Enqueue(yieldedAction);
     }
 
-    private void SetupActions()
+    private void SetupYieldedActions()
     {
         EnqueueYieldedActions(MainYieldedAction());
         
@@ -209,8 +215,11 @@ public abstract class StackableAction
         if (!yieldedActions.TryDequeue(out var yieldedAction))
         {
             currentState = State.Invoked;
+            Advance();
             return;
         }
+        
+        Log("Invoking actions, auto advance is " + AutoAdvance);
         
         var hasInstruction = yieldedAction.YieldInstruction != null;
         var hasCustomInstruction = yieldedAction.CustomYieldInstruction != null;   
@@ -218,13 +227,16 @@ public abstract class StackableAction
         //do stuff
         if (!hasInstruction && !hasCustomInstruction)
         {
-            //Log("No instructions to wait for");
+            Log("No instructions to wait for");
             
-            yieldedAction.PreWaitAction?.Invoke();
+            yieldedAction.PreWaitAction?.Invoke(); 
             yieldedAction.PostWaitAction?.Invoke();
             
+            EndInvoking();
             return;
         }
+        
+        Log($"Waiting for {(hasCustomInstruction ? "custom " : "")}instruction ");
         
         coroutineInvoker.StartCoroutine(RunCoroutine());
         
@@ -237,6 +249,15 @@ public abstract class StackableAction
             yield return hasCustomInstruction ? yieldedAction.CustomYieldInstruction : yieldedAction.YieldInstruction;
             
             yieldedAction.PostWaitAction?.Invoke();
+            
+            EndInvoking();
+        }
+        
+        void EndInvoking()
+        {
+            Log("Ended invoke actions");
+            
+            if(AutoAdvance) Advance();
         }
         
     }
@@ -248,6 +269,8 @@ public abstract class StackableAction
         Log($"Ending {this}");
         
         InvokeEnd();
+        
+        Log($"Ended {this}");
         
         currentState = State.Ended;
     }
@@ -271,18 +294,15 @@ public abstract class StackableAction
         {
             iterations++;
             
-            Log($"Advancing ({iterations})");
-            if(iterations == maxIterationsSafety-1) Debug.LogWarning("Max iterations reached");
-
             if (CurrentAction == null)
             {
-                Debug.LogWarning("Stack is empty");
+                Debug.LogWarning("Stack is empty, ending ");
                 return;
             }
             
             var state = CurrentAction.CurrentState;
 
-            //Log($"Current state of action : {state}");
+            Log($"Current state of {CurrentAction} : {state}");
 
             switch (state)
             {
@@ -296,17 +316,13 @@ public abstract class StackableAction
                     CurrentAction.currentState = State.Started;
                     break;
                 case State.Started:
-                    if (!CurrentAction.CanInvokeSubActions()) CurrentAction.SetupActions();
+                    if (!CurrentAction.CanInvokeSubActions()) CurrentAction.SetupYieldedActions();
                     break;
                 case State.Invoking:
                     if (!CurrentAction.CanInvokeSubActions())
                     {
                         CurrentAction.InvokeActions();
-                        if (!CurrentAction.AutoAdvance)
-                        {
-                            Log("Auto Advancing disabled");
-                            return;
-                        }
+                        return;
                     }
                     break;
                 case State.Invoked:
@@ -322,6 +338,10 @@ public abstract class StackableAction
                     throw new ArgumentOutOfRangeException();
             }
         }
+        
+        Debug.LogWarning($"Max iterations reached ({maxIterationsSafety}), popping stack)");
+        stack.Pop();
+        Advance();
     }
 
     public class YieldedAction
@@ -358,6 +378,13 @@ public abstract class StackableAction
             if(maxIterations > 0) maxIterationsSafety = maxIterations;
             coroutineInvoker = monoBehaviour;
             stack = new Stack<StackableAction>();
+            
+            Debug.Log($"Stackable Action Manager initialized, showlog is set to : {showLog}");
+        }
+
+        public static void ShowLog(bool value)
+        {
+            showLog = value;
         }
         
         public static void AdvanceAction()
@@ -366,29 +393,29 @@ public abstract class StackableAction
         }
     }
     
-    public class ActionStartInvoker<T> where T : StackableAction
-    {
-        public static event Action<T> OnInvoked;
-        
-        public ActionStartInvoker(T stackableAction)
-        {
-            OnInvoked?.Invoke(stackableAction);
-        }
-    }
-    
-    public class ActionEndInvoker<T> where T : StackableAction
-    {
-        public static event Action<T> OnInvoked;
-        
-        public ActionEndInvoker(T stackableAction)
-        {
-            OnInvoked?.Invoke(stackableAction);
-        }
-    }
-    
     private static void Log(string text)
     {
         if(!showLog) return;
         Debug.Log(text);
+    }
+}
+
+public class ActionStartInvoker<T> where T : StackableAction
+{
+    public static event Action<T> OnInvoked;
+        
+    public ActionStartInvoker(T stackableAction)
+    {
+        OnInvoked?.Invoke(stackableAction);
+    }
+}
+    
+public class ActionEndInvoker<T> where T : StackableAction
+{
+    public static event Action<T> OnInvoked;
+        
+    public ActionEndInvoker(T stackableAction)
+    {
+        OnInvoked?.Invoke(stackableAction);
     }
 }

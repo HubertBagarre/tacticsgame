@@ -19,11 +19,18 @@ namespace Battle.ScriptableObjects
         {
             
         }
-
-        protected override void UnitTurnBattleAction(NewUnit unit)
+        
+        public override IEnumerable<StackableAction.YieldedAction> UnitTurnBehaviourActions(NewUnit unit)
         {
-            Debug.Log($"{unit}'s behaviour running");
+            return new[] { new StackableAction.YieldedAction(Log) };
+                
+            void Log()
+            {
+                Debug.Log($"{unit}'s behaviour running");
+            }
         }
+
+        
 
         protected override IEnumerator RunBehaviourEffect()
         {
