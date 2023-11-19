@@ -24,6 +24,8 @@ namespace Battle.ScriptableObjects
         {
             return new[] { new StackableAction.YieldedAction(Log) };
                 
+            void Void(){}
+            
             void Log()
             {
                 Debug.Log($"{unit}'s behaviour running");

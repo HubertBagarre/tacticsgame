@@ -57,7 +57,7 @@ namespace Battle
 
         public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1)
         {
-            BattleAction.StartNewBattleAction(new AddPassiveBattleAction(this,passiveSo,amount));
+            new AddPassiveBattleAction(this, passiveSo, amount).TryStack();
         }
 
         public void RemovePassive(PassiveSO passiveSo)
@@ -72,7 +72,8 @@ namespace Battle
             if(!passiveInstances.Contains(passiveInstance)) return;
             
             passiveInstances.Remove(passiveInstance);
-            BattleAction.StartNewBattleAction(new RemovePassiveBattleAction(this,passiveInstance));
+            
+            new RemovePassiveBattleAction(this,passiveInstance).TryStack();
         }
 
         public int GetPassiveEffectCount(Func<PassiveInstance, bool> condition, out PassiveInstance firstPassiveInstance)

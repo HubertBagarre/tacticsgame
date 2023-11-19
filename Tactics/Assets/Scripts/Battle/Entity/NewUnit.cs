@@ -38,6 +38,8 @@ namespace Battle
         
         protected override void AddedToTimelineEffect()
         {
+            return; // TODO fix this
+            
             foreach (var passiveToAdd in UnitSo.StartingPassives)
             {
                 passiveToAdd.AddPassiveToContainer(this);
@@ -62,24 +64,6 @@ namespace Battle
             
             unitTurnAction.TryStack();
             
-            /*
-            
-            if (Stats.Behaviour != null)
-            {
-                var behaviourAction = Stats.Behaviour.UnitTurnBehaviourAction(this);
-            
-                behaviourAction.EnqueueInActionEnd(new CustomBattleAction(EndTurn));
-                
-                Debug.Log($"Behaviour is {Stats.Behaviour}, starting behaviour battle action");
-                
-                BattleAction.StartNewBattleAction(behaviourAction);
-            }
-            else
-            {
-                Debug.Log("No Behaviour, player turn");
-            }
-            */
-            
             //TODO - Create new Unit Turn Battle Action;
             // enqueue all actions in the battle action (based on behaviour) 
             // enqueue end turn action
@@ -100,7 +84,7 @@ namespace Battle
 
         public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1)
         {
-            BattleAction.StartNewBattleAction(new AddPassiveBattleAction(this,passiveSo,amount));
+            new AddPassiveBattleAction(this,passiveSo,amount).TryStack();
         }
 
         public void RemovePassive(PassiveSO passiveSo)
@@ -115,7 +99,7 @@ namespace Battle
             if(!passiveInstances.Contains(passiveInstance)) return;
             
             passiveInstances.Remove(passiveInstance);
-            BattleAction.StartNewBattleAction(new RemovePassiveBattleAction(this,passiveInstance));
+            new RemovePassiveBattleAction(this,passiveInstance).TryStack();
         }
 
         public int GetPassiveEffectCount(Func<PassiveInstance, bool> condition, out PassiveInstance firstPassiveInstance)

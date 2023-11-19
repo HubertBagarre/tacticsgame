@@ -235,7 +235,7 @@ namespace Battle
         }
     }
 
-    public class AddPassiveBattleAction : BattleAction
+    public class AddPassiveBattleAction : SimpleStackableAction
     {
         protected override YieldInstruction YieldInstruction { get; }
         protected override CustomYieldInstruction CustomYieldInstruction { get; }
@@ -254,17 +254,7 @@ namespace Battle
             Amount = amount;
         }
         
-        protected override void StartActionEvent()
-        {
-            EventManager.Trigger(new StartBattleAction<AddPassiveBattleAction>(this));
-        }
-
-        protected override void EndActionEvent()
-        {
-            EventManager.Trigger(new EndBattleAction<AddPassiveBattleAction>(this));
-        }
-
-        protected override void AssignedActionPreWait()
+        protected override void Main()
         {
             if (!PassiveSo.IsStackable || (PassiveSo.IsStackable && Amount <= 0)) Amount = 1;
             
@@ -280,14 +270,10 @@ namespace Battle
             
             PassiveInstance.OnPassiveAdded(Container,Amount);
         }
-
-        protected override void AssignedActionPostWait()
-        {
-            
-        }
+        
     }
     
-    public class RemovePassiveBattleAction : BattleAction
+    public class RemovePassiveBattleAction : SimpleStackableAction
     {
         protected override YieldInstruction YieldInstruction { get; }
         protected override CustomYieldInstruction CustomYieldInstruction { get; }
@@ -303,24 +289,9 @@ namespace Battle
             PassiveInstance = passiveInstance;
         }
         
-        protected override void StartActionEvent()
-        {
-            EventManager.Trigger(new StartBattleAction<RemovePassiveBattleAction>(this));
-        }
-
-        protected override void EndActionEvent()
-        {
-            EventManager.Trigger(new EndBattleAction<RemovePassiveBattleAction>(this));
-        }
-
-        protected override void AssignedActionPreWait()
+        protected override void Main()
         {
             PassiveInstance.OnPassiveRemoved(Container);
-        }
-
-        protected override void AssignedActionPostWait()
-        {
-            
         }
     }
 }

@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Battle.ScriptableObjects;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects.UnitBehaviour
