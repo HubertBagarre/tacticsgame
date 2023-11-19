@@ -18,7 +18,7 @@ namespace Battle
         public event Action<int> OnSpeedChanged;
         public float DistanceFromTurnStart { get; private set; }
         public event Action<float> OnDistanceFromTurnStartChanged;
-        public float TurnOrder => DistanceFromTurnStart / DecayRate;
+        public float TurnOrder => DistanceFromTurnStart * 100 / Speed;
         public int JoinedIndex { get; private set; }
         public float DecayRate => Speed / 100f;
 
@@ -33,7 +33,7 @@ namespace Battle
 
         public void SetJoinIndex(int value)
         {
-            JoinedIndex = value;
+            JoinedIndex = -value;
         }
 
         public void DecayTurnValue(float amount)
@@ -87,7 +87,7 @@ namespace Battle
             var turnOrder = TurnOrder.CompareTo(other.TurnOrder);
             if (turnOrder != 0) return turnOrder;
             
-            if (JoinedIndex < 0) return 1;
+            //if (JoinedIndex < 0) return 1;
             
             return JoinedIndex.CompareTo(other.JoinedIndex);
         }

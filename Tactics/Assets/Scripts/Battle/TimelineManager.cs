@@ -20,7 +20,7 @@ namespace Battle
             [field: SerializeField] public string Speed { get; private set; }
             [field: SerializeField] public string DistanceFromStart { get; private set; }
             [field: SerializeField] public string TurnOrder { get; private set; }
-            [field: SerializeField] public string JoinIndex { get; private set; }
+            [field: SerializeField] public string JoinedIndex { get; private set; }
             [field: SerializeField] public string DecayRate { get; private set; }
 
             public TimelineEntityShower(TimelineEntity entity)
@@ -32,7 +32,7 @@ namespace Battle
                 Speed = $"{linkedEntity.Speed}";
                 DistanceFromStart = $"{linkedEntity.DistanceFromTurnStart}";
                 TurnOrder = $"{linkedEntity.TurnOrder}";
-                JoinIndex = $"{linkedEntity.JoinedIndex}";
+                JoinedIndex = $"{linkedEntity.JoinedIndex}";
                 DecayRate = $"{linkedEntity.DecayRate}";
             }
 
@@ -44,7 +44,7 @@ namespace Battle
                 Speed = $"{linkedEntity.Speed}";
                 DistanceFromStart = $"{linkedEntity.DistanceFromTurnStart}";
                 TurnOrder = $"{linkedEntity.TurnOrder}";
-                JoinIndex = $"{linkedEntity.JoinedIndex}";
+                JoinedIndex = $"{linkedEntity.JoinedIndex}";
                 DecayRate = $"{linkedEntity.DecayRate}";
             }
         }
@@ -153,7 +153,7 @@ namespace Battle
                 
                 var furthestEntity = entitiesInTimeline.Where(entity => entity != roundEndEntity)
                     .OrderBy(entity => entity.TurnOrder).Last();
-                distance = furthestEntity.DistanceFromTurnStart + 0.01f; // TODO : find a better way to do this (+0.01f should not be necessary)
+                distance = furthestEntity.DistanceFromTurnStart; // + 0.01f; // TODO : find a better way to do this (+0.01f should not be necessary)
                 
             }
             

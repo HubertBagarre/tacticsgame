@@ -42,7 +42,9 @@ public class TimelineManagerEditor : Editor
         var element = list.serializedProperty.GetArrayElementAtIndex(index); // The element in the list
         
         var entityName = element.FindPropertyRelative("<Name>k__BackingField").stringValue;
-        EditorGUI.LabelField(new Rect(rectX, rect.y, 100, EditorGUIUtility.singleLineHeight), entityName);
+        var joinedIndex = element.FindPropertyRelative("<JoinedIndex>k__BackingField").stringValue;
+        
+        EditorGUI.LabelField(new Rect(rectX, rect.y, 100, EditorGUIUtility.singleLineHeight), $"({joinedIndex}){entityName}");
 
         DrawLabel("Speed","Speed",90,40,100,29);
         DrawLabel("Distance","DistanceFromStart",35,55,100,29);
