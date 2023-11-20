@@ -20,6 +20,8 @@ public class UIBattleEntityTimeline : MonoBehaviour
 
     public void ConnectToEntity(TimelineEntity entity)
     {
+        if(TimelineEntity != null) DisconnectFromEntity();
+        
         if(entity == null) return;
         TimelineEntity = entity;
         debugText.text = TimelineEntity.Name;
@@ -31,6 +33,12 @@ public class UIBattleEntityTimeline : MonoBehaviour
 
         TimelineEntity.OnDistanceFromTurnStartChanged += ChangeValue;
         TimelineEntity.OnSpeedChanged += ChangeSpeed;
+    }
+    
+    private void DisconnectFromEntity()
+    {
+        TimelineEntity.OnDistanceFromTurnStartChanged -= ChangeValue;
+        TimelineEntity.OnSpeedChanged -= ChangeSpeed;
     }
 
     public void ConnectToEntity(IBattleEntity entity)

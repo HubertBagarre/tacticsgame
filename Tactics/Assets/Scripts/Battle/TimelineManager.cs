@@ -59,9 +59,8 @@ namespace Battle
         [SerializeField]
         private List<TimelineEntityShower> timelineEntityShowers = new();
         
-        public TimelineEntity CurrentTimelineEntity { get; private set; }
-        public bool IsCurrentEntityEndRoundEntity => CurrentTimelineEntity == roundEndEntity;
         public TimelineEntity FirstTimelineEntity => EntitiesInTimeline.FirstOrDefault();
+        public bool IsFirstEntityRoundEnd => FirstTimelineEntity == roundEndEntity;
         private int totalEntityAddedToTimeline = 0;
 
         private RoundEndEntity roundEndEntity;
@@ -174,13 +173,13 @@ namespace Battle
         [ContextMenu("Advance Timeline")]
         public void AdvanceTimeline()
         {
-            ResetTimelineEntityDistanceFromTurnStart(CurrentTimelineEntity);
+            var first = FirstTimelineEntity;
+            
+            ResetTimelineEntityDistanceFromTurnStart(first);
             
             ReorderTimeline();
-
-            CurrentTimelineEntity = FirstTimelineEntity;
-
-            var amountToDecay = CurrentTimelineEntity.TurnOrder;
+            
+            var amountToDecay = FirstTimelineEntity.TurnOrder;
             
             foreach (var entity in entitiesInTimeline)
             {

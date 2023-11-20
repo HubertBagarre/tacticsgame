@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEditor;
 using UnityEditorInternal;
 using Battle;
@@ -15,7 +14,7 @@ public class TimelineManagerEditor : Editor
     {
         entitiesInTimeline = serializedObject.FindProperty("timelineEntityShowers");
         
-        list = new ReorderableList(serializedObject, entitiesInTimeline, true, true, false, false)
+        list = new ReorderableList(serializedObject, entitiesInTimeline, false, true, false, false)
             {
                 drawElementCallback = DrawListItems, // Delegate to draw the elements on the list
                 drawHeaderCallback = DrawHeader // Skip this line if you set displayHeader to 'false' in your ReorderableList constructor.
@@ -46,7 +45,7 @@ public class TimelineManagerEditor : Editor
         
         EditorGUI.LabelField(new Rect(rectX, rect.y, 100, EditorGUIUtility.singleLineHeight), $"({joinedIndex}){entityName}");
 
-        DrawLabel("Speed","Speed",90,40,100,29);
+        DrawLabel("Speed","Speed",110,40,100,29);
         DrawLabel("Distance","DistanceFromStart",35,55,100,29);
         
         DrawLabel("Rate","DecayRate",35,30,100,31);

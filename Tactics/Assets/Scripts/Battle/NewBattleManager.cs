@@ -37,11 +37,6 @@ namespace Battle
         //Battle
         private bool IsBattleStarted { get; set; }
         
-        [ContextMenu("End Unit Turn")]
-        private void EndCurrentTimelineEntityTurn()
-        {
-            timelineManager.CurrentTimelineEntity.EndTurn();
-        }
         
         public void SetLevel(BattleLevel level)
         {
@@ -133,7 +128,6 @@ namespace Battle
         public class RoundAction : SimpleStackableAction
         {
             public int CurrentRound { get; }
-            public TimelineEntityTurnAction CurrentEntityTurnAction { get; private set; }
             private NewBattleManager BattleManager { get; }
         
             public RoundAction(NewBattleManager battleManager,int round) : base()
@@ -147,24 +141,23 @@ namespace Battle
             protected override void Main()
             {
                 var currentEntity = BattleManager.timelineManager.FirstTimelineEntity;
+                var isEndTurn = BattleManager.timelineManager.IsFirstEntityRoundEnd;
                 
                 if(currentEntity == null) return;
-
-                var isEndRound = BattleManager.timelineManager.IsCurrentEntityEndRoundEntity;
                 
-                //Debug.Log($"Should end round : {isEndRound}");
-
-                if (!isEndRound)
-                {
-                    EnqueueYieldedActions(new YieldedAction(Main));
-                    
-                    var entityTimelineAction = new TimelineEntityTurnAction(currentEntity);
-                    
-                    entityTimelineAction.TryStack();
-                }
-
+                //Debug.Log($"Starting entity Round : {currentEntity.Name}");
+                
                 BattleManager.timelineManager.AdvanceTimeline();
                 
+                //Debug.Log($"Next entity Round should be : {BattleManager.timelineManager.FirstTimelineEntity.Name}");
+                
+                if(isEndTurn) return;
+                
+                EnqueueYieldedActions(new YieldedAction(Main));
+                
+                var entityTurnAction = new TimelineEntityTurnAction(currentEntity);
+                    
+                entityTurnAction.TryStack();
             }
         }
 
