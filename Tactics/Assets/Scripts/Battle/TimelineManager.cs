@@ -97,6 +97,8 @@ namespace Battle
 
         public void InsertEntityInTimeline(TimelineEntity entityToInsert,float distanceFromTurnStart)
         {
+            Debug.Log($"Inserting {entityToInsert.Name} at {distanceFromTurnStart}");
+            
             entityToInsert.SetJoinIndex(totalEntityAddedToTimeline);
             totalEntityAddedToTimeline++;
             if (entityToInsert == roundEndEntity)

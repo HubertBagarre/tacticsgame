@@ -15,12 +15,21 @@ MonoBehaviour:
   <PlacedUnits>k__BackingField:
   - prefab: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
       type: 3}
+    rendererPrefab: {fileID: 0}
     so: {fileID: 11400000, guid: 61a3f0fc4fd04034798ec0fc6883ad4e, type: 2}
     team: 1
     position: {x: 1, y: 1}
     orientation: 6
   - prefab: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
       type: 3}
+    rendererPrefab: {fileID: 0}
+    so: {fileID: 11400000, guid: 9678e3581c87714498371f90fc482a9c, type: 2}
+    team: 0
+    position: {x: 2, y: 2}
+    orientation: 4
+  - prefab: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
+      type: 3}
+    rendererPrefab: {fileID: 0}
     so: {fileID: 11400000, guid: ce006ab0bef781c41bcdfbffb35f3e6b, type: 2}
     team: 0
     position: {x: 3, y: 3}
