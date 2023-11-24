@@ -117,36 +117,37 @@ namespace Battle
     {
         protected override YieldInstruction YieldInstruction { get; }
         protected override CustomYieldInstruction CustomYieldInstruction { get; }
-        protected override bool AutoAdvance => !isPlayerTurn;
+        protected override bool AutoAdvance => !IsPlayerTurn && advance;
+        private bool advance = true;
         
         public NewUnit Unit { get; }
         public UnitStatsInstance Stats => Unit.Stats;
+        public bool IsPlayerTurn => Stats.Behaviour == null;
         
-        private bool isPlayerTurn;
+        public event Action OnRequestEndTurn;
         
         public UnitTurnBattleAction(NewUnit unit)
         {
             Unit = unit;
+            advance = true;
         }
         
         protected override void Main()
         {
+            advance = true;
+            
             Debug.Log($"Starting {Unit.Name} UnitTurn Battle Action");
-
-            isPlayerTurn = Stats.Behaviour == null;
-
-            if (isPlayerTurn)
+            
+            if (IsPlayerTurn)
             {
                 Debug.Log($"No behaviour for {Unit.Name}, player turn");
-                
-                // probably send callback to enable ui;
                 
                 return;
             }
             
             Debug.Log($"Behaviour : {Stats.Behaviour}");
             
-            var enumerable = Stats.Behaviour.UnitTurnBehaviourActions(Unit);
+            var enumerable = Stats.Behaviour.UnitTurnBehaviourActions(Unit,EnqueueYieldedActions);
             
             if (enumerable == null)  return;
             
@@ -154,6 +155,40 @@ namespace Battle
             {
                 EnqueueYieldedActions(behaviourAction);
             }
+            
+            if(!IsPlayerTurn) EnqueueYieldedActions(TryEndTurnYieldedAction());
+        }
+        
+        private YieldedAction TryEndTurnYieldedAction()
+        {
+            return new YieldedAction(RequestEndTurnIfNoMoreYieldedActions);
+
+            void RequestEndTurnIfNoMoreYieldedActions()
+            {
+                Debug.Log($"Trying to end {Unit}'s turn");
+
+                var actionsLeft = GetYieldedActionsCount();
+                
+                Debug.Log($"Actions left: {actionsLeft}");
+
+                advance = actionsLeft > 0;
+
+                if (actionsLeft > 0)
+                {
+                    Debug.Log("Unit has more actions, queueing and go next");
+                    EnqueueYieldedActions(TryEndTurnYieldedAction());
+                    return;
+                }
+                
+                Debug.Log("No more actions, asking requesting end turn");
+
+                RequestEndTurn();
+            }
+        }
+
+        public void RequestEndTurn()
+        {
+            OnRequestEndTurn?.Invoke();
         }
     }
 }

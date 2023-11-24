@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6843871331217970624}
   - component: {fileID: 7443386184952824264}
   m_Layer: 5
-  m_Name: Ability Point Charge
+  m_Name: UI Ability Point Charge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

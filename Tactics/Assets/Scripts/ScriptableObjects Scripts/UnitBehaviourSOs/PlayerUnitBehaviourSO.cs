@@ -26,7 +26,7 @@ namespace Battle.ScriptableObjects.UnitBehaviour
             
         }
         
-        public override IEnumerable<StackableAction.YieldedAction> UnitTurnBehaviourActions(NewUnit unit)
+        public override IEnumerable<StackableAction.YieldedAction> UnitTurnBehaviourActions(NewUnit unit,Action<StackableAction.YieldedAction> enqueueActionMethod)
         {
             return null;
         }

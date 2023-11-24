@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +21,9 @@ namespace Battle.ScriptableObjects
             
         }
         
-        public override IEnumerable<StackableAction.YieldedAction> UnitTurnBehaviourActions(NewUnit unit)
+        public override IEnumerable<StackableAction.YieldedAction> UnitTurnBehaviourActions(NewUnit unit,Action<StackableAction.YieldedAction> enqueueActionMethod)
         {
-            return new[] { new StackableAction.YieldedAction(Log) };
+            return new[] { new StackableAction.YieldedAction(Log,new WaitForSeconds(1f)) };
                 
             void Void(){}
             

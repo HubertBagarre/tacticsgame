@@ -37,6 +37,8 @@ namespace Battle
         //Battle
         private bool IsBattleStarted { get; set; }
         
+        //Current Unit
+        private UnitTurnBattleAction CurrentTurnUnitAction { get; set; }
         
         public void SetLevel(BattleLevel level)
         {
@@ -78,8 +80,8 @@ namespace Battle
             
 
             // 5 - Start Round Entity's turn (a round starts at the end of Round entity's turn and end at the end of Round entity's turn)
-            
-            ActionStartInvoker<RoundAction>.OnInvoked += action => Debug.Log($"Starting round {action.CurrentRound}");
+
+            AddCallbacks();
             
             StackableAction.Manager.ShowLog(showLog);
             StackableAction.Manager.Init(this,maxIterations);
@@ -92,10 +94,40 @@ namespace Battle
             
             Advance();
         }
+
+        private void AddCallbacks()
+        {
+            ActionStartInvoker<RoundAction>.OnInvoked += action => Debug.Log($"Starting round {action.CurrentRound}");
+            
+            ActionStartInvoker<UnitTurnBattleAction>.OnInvoked += SetCurrentUnitTurnBattleAction;
+            ActionEndInvoker<UnitTurnBattleAction>.OnInvoked += ClearCurrentUnitTurnBattleAction;
+        }
+        
+        private void RemoveCallbacks()
+        {
+            ActionStartInvoker<UnitTurnBattleAction>.OnInvoked -= SetCurrentUnitTurnBattleAction;
+            ActionEndInvoker<UnitTurnBattleAction>.OnInvoked -= ClearCurrentUnitTurnBattleAction;
+        }
+        
+        private void SetCurrentUnitTurnBattleAction(UnitTurnBattleAction action)
+        {
+            CurrentTurnUnitAction = action;
+            
+            CurrentTurnUnitAction.OnRequestEndTurn += Advance;
+        }
+
+        private void ClearCurrentUnitTurnBattleAction(UnitTurnBattleAction _)
+        {
+            if(CurrentTurnUnitAction != null) CurrentTurnUnitAction.OnRequestEndTurn -= Advance;
+            
+            CurrentTurnUnitAction = null;
+        }
         
         [ContextMenu("Advance")]
         private void Advance()
         {
+            Debug.Log("Advancing from battleManager");
+            
             StackableAction.Manager.AdvanceAction();
         }
 

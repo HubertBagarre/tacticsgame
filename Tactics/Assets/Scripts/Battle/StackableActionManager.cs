@@ -114,6 +114,11 @@ public abstract class StackableAction
     {
         yieldedActions.Enqueue(yieldedAction);
     }
+    
+    protected int GetYieldedActionsCount()
+    {
+        return yieldedActions.Count;
+    }
 
     private void SetupYieldedActions()
     {

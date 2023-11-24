@@ -77,7 +77,7 @@ namespace Battle.ScriptableObjects
             Debug.Log("Ending Behaviour");
         }
 
-        public abstract IEnumerable<StackableAction.YieldedAction> UnitTurnBehaviourActions(NewUnit unit);
+        public abstract IEnumerable<StackableAction.YieldedAction> UnitTurnBehaviourActions(NewUnit unit, Action<StackableAction.YieldedAction> enqueueActionMethod);
         
         protected abstract IEnumerator RunBehaviourEffect();
 
