@@ -265,7 +265,7 @@ namespace Battle
                 PassiveInstance = PassiveSo.CreateInstance(Amount);
             }
             
-            // should get added right after
+            //should get added right after
             //passiveInstances.Add(passiveInstance);
             
             PassiveInstance.OnPassiveAdded(Container,Amount);
@@ -278,7 +278,7 @@ namespace Battle
         protected override YieldInstruction YieldInstruction { get; }
         protected override CustomYieldInstruction CustomYieldInstruction { get; }
         public IPassivesContainer Container { get;}
-        public PassiveInstance PassiveInstance { get; private set; }
+        public PassiveInstance PassiveInstance { get; }
         
         public RemovePassiveBattleAction(IPassivesContainer container, PassiveInstance passiveInstance)
         {

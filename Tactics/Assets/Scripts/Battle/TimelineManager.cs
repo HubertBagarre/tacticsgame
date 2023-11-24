@@ -95,27 +95,9 @@ namespace Battle
 
         public void InsertEntityInTimeline(TimelineEntity entityToInsert,float distanceFromTurnStart)
         {
-            Debug.Log($"Inserting {entityToInsert.Name} at {distanceFromTurnStart}");
+            var insertEntityInTimelineAction = new InsertEntityInTimelineAction(this,entityToInsert,distanceFromTurnStart);
             
-            entityToInsert.SetJoinIndex(totalEntityAddedToTimeline);
-            totalEntityAddedToTimeline++;
-            if (entityToInsert == roundEndEntity)
-            {
-                entityToInsert.SetJoinIndex(-1);
-                totalEntityAddedToTimeline--;
-            }
-            
-            entityToInsert.SetDistanceFromTurnStart(distanceFromTurnStart);
-            
-            entitiesInTimeline.Add(entityToInsert);
-            
-            timelineEntityShowers.Add(new TimelineEntityShower(entityToInsert));
-            
-            ReorderTimeline();
-            
-            entityToInsert.OnAddedToTimeline();
-
-            UpdateShowers();
+            insertEntityInTimelineAction.TryStack();
         }
 
         [ContextMenu("Reorder Timeline")]
@@ -219,6 +201,48 @@ namespace Battle
             {
             }
 
+        }
+        
+        public class InsertEntityInTimelineAction : SimpleStackableAction
+        {
+            protected override YieldInstruction YieldInstruction { get; }
+            protected override CustomYieldInstruction CustomYieldInstruction { get; }
+
+            private TimelineManager manager;
+            public TimelineEntity Entity { get; }
+            public float DistanceFromTurnStart { get; }
+            
+            public InsertEntityInTimelineAction(TimelineManager timelineManager,TimelineEntity entityToInsert,float distanceFromTurnStart)
+            {
+                manager = timelineManager;
+                Entity = entityToInsert;
+                DistanceFromTurnStart = distanceFromTurnStart;
+            }
+            
+            protected override void Main()
+            {
+                Debug.Log($"Inserting {Entity.Name} at {DistanceFromTurnStart}");
+            
+                Entity.SetJoinIndex(manager.totalEntityAddedToTimeline);
+                manager.totalEntityAddedToTimeline++;
+                if (Entity == manager.roundEndEntity)
+                {
+                    Entity.SetJoinIndex(-1);
+                    manager.totalEntityAddedToTimeline--;
+                }
+            
+                Entity.SetDistanceFromTurnStart(DistanceFromTurnStart);
+            
+                manager.entitiesInTimeline.Add(Entity);
+            
+                manager.timelineEntityShowers.Add(new TimelineEntityShower(Entity));
+            
+                manager.ReorderTimeline();
+            
+                Entity.OnAddedToTimeline();
+
+                manager.UpdateShowers();
+            }
         }
     }
 }

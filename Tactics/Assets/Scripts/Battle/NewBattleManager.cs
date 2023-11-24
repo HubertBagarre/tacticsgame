@@ -34,9 +34,6 @@ namespace Battle
         //Level
         private BattleLevel CurrentLevel { get; set; }
         
-        //Battle
-        private bool IsBattleStarted { get; set; }
-        
         //Current Unit
         private UnitTurnBattleAction CurrentTurnUnitAction { get; set; }
         
@@ -48,9 +45,7 @@ namespace Battle
         public void StartBattle()
         {
             // 0 - Setup default values (lists, dictionaries, etc)
-            
-            timelineManager.CreateNewTimeline();
-            
+            AddCallbacks();
             
             // 1 - Spawn Tiles
             // Already there cuz of BattleLevel
@@ -58,6 +53,29 @@ namespace Battle
             tileManager.SetTiles(CurrentLevel.Tiles);
             
             // 3 - Spawn Units (timeline should be set up and they should spawn with their passives)
+            
+            
+            
+            // 4 - Setup Win/Lose Conditions
+            
+
+            // 5 - Start Round Entity's turn (a round starts at the end of Round entity's turn and end at the end of Round entity's turn)
+            
+            StackableAction.Manager.ShowLog(showLog);
+            StackableAction.Manager.Init(this,maxIterations);
+            
+            var mainBattleAction = new MainBattleAction(this);
+            
+            mainBattleAction.TryStack();
+            
+            Advance();
+        }
+
+        private void SpawnStartingUnits(MainBattleAction action)
+        {
+            ActionStartInvoker<MainBattleAction>.OnInvoked -= SpawnStartingUnits;
+            
+            timelineManager.CreateNewTimeline();
             
             foreach (var placedUnit in CurrentLevel.PlacedUnits)
             {
@@ -75,32 +93,17 @@ namespace Battle
             }
             
             timelineManager.ResetRoundEntityDistanceFromTurnStart();
-            
-            // 4 - Setup Win/Lose Conditions
-            
-
-            // 5 - Start Round Entity's turn (a round starts at the end of Round entity's turn and end at the end of Round entity's turn)
-
-            AddCallbacks();
-            
-            StackableAction.Manager.ShowLog(showLog);
-            StackableAction.Manager.Init(this,maxIterations);
-            
-            var mainBattleAction = new MainBattleAction(this);
-
-            IsBattleStarted = true;
-
-            mainBattleAction.TryStack();
-            
-            Advance();
         }
 
         private void AddCallbacks()
         {
             ActionStartInvoker<RoundAction>.OnInvoked += action => Debug.Log($"Starting round {action.CurrentRound}");
+            ActionStartInvoker<MainBattleAction>.OnInvoked += SpawnStartingUnits;
             
             ActionStartInvoker<UnitTurnBattleAction>.OnInvoked += SetCurrentUnitTurnBattleAction;
             ActionEndInvoker<UnitTurnBattleAction>.OnInvoked += ClearCurrentUnitTurnBattleAction;
+            
+            unitManager.AddCallbacks();
         }
         
         private void RemoveCallbacks()

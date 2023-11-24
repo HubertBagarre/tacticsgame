@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Battle.ActionSystem;
 using UnityEngine;
 
 namespace Battle
@@ -26,20 +25,20 @@ namespace Battle
             
             passiveInstances = new List<PassiveInstance>();
             abilityInstances = new List<UnitAbilityInstance>();
-            
-            EventManager.AddListener<AddPassiveBattleAction>(AddPassiveInstanceToList);
         }
 
-        private void AddPassiveInstanceToList(AddPassiveBattleAction ctx)
+        public void AddPassiveInstanceToList(PassiveInstance passiveInstance)
         {
-            if(ctx.Container != this || ctx.PassiveInstance != null) return;
+            if(passiveInstance == null || passiveInstances.Contains(passiveInstance)) return;
             
-            passiveInstances.Add(ctx.PassiveInstance);
+            passiveInstances.Add(passiveInstance);
+            
+            Debug.Log($"Added passive instance to list, now has {passiveInstances.Count}");
         }
         
         protected override void AddedToTimelineEffect()
         {
-            return; // TODO fix this
+            Debug.Log($"Adding {UnitSo.StartingPassives.Count} starting passives to {Name}");
             
             foreach (var passiveToAdd in UnitSo.StartingPassives)
             {

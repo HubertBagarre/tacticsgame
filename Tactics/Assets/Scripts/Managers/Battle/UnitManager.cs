@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Battle.InputEvent;
-using Battle.ScriptableObjects;
 using UnityEngine;
 
 namespace Battle
@@ -23,10 +21,26 @@ namespace Battle
         [Header("Debug")] [SerializeField] private List<Unit> units = new List<Unit>();
         
         public List<Unit> AllUnits => units.ToList();
-
-        public void Start()
+        
+        public void AddCallbacks()
         {
             InputManager.RightClickEvent += ClickUnit;
+            
+            ActionEndInvoker<AddPassiveBattleAction>.OnInvoked += AddPassiveInstanceToUnitList;
+        }
+
+        public void RemoveCallbacks()
+        {
+            InputManager.RightClickEvent -= ClickUnit;
+        }
+
+        private void AddPassiveInstanceToUnitList(AddPassiveBattleAction action)
+        {
+            if(action.Container is not NewUnit unit) return;
+            
+            var instance = action.PassiveInstance;
+            
+            unit.AddPassiveInstanceToList(instance);
         }
 
         public UnitRenderer SpawnUnit(NewUnit unit)
