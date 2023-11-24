@@ -1,3 +1,4 @@
+using Battle.ActionSystem.TimelineActions;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,12 +9,46 @@ namespace Battle.UIComponent
         [SerializeField] private UIBattleEntityTimeline entityTimelinePrefab;
         [SerializeField] private Transform timelineContainer;
         private Dictionary<TimelineEntity, UIBattleEntityTimeline> uiEntityTimelines;
+        private UIBattleEntityTimeline currentBattleEntityTimeline;
         
         private void Start()
         {
             uiEntityTimelines = new Dictionary<TimelineEntity, UIBattleEntityTimeline>();
             
+            currentBattleEntityTimeline = Instantiate(entityTimelinePrefab, timelineContainer);
+            
+            AddCallbacks();
+        }
+
+        private void AddCallbacks()
+        {
             EventManager.AddListener<List<TimelineEntity>>(UpdateTimeline);
+            
+            ActionStartInvoker<TimelineEntityTurnAction>.OnInvoked += ShowCurrentBattleEntityTimeline;
+            ActionEndInvoker<TimelineEntityTurnAction>.OnInvoked += HideCurrentBattleEntityTimeline;
+        }
+
+        private void RemoveCallbacks()
+        {
+            EventManager.RemoveListener<List<TimelineEntity>>(UpdateTimeline);
+            
+            ActionStartInvoker<TimelineEntityTurnAction>.OnInvoked -= ShowCurrentBattleEntityTimeline;
+            ActionEndInvoker<TimelineEntityTurnAction>.OnInvoked -= HideCurrentBattleEntityTimeline;
+        }
+
+        private void ShowCurrentBattleEntityTimeline(TimelineEntityTurnAction action)
+        {
+            currentBattleEntityTimeline.ConnectToEntity(action.Entity);
+            currentBattleEntityTimeline.ChangeValue(-1);
+            
+            currentBattleEntityTimeline.Show(true);
+            currentBattleEntityTimeline.ShowArrow(true);
+        }
+        
+        private void HideCurrentBattleEntityTimeline(TimelineEntityTurnAction action)
+        {
+            currentBattleEntityTimeline.Show(false);
+            currentBattleEntityTimeline.ShowArrow(false);
         }
 
         private void UpdateTimeline(List<TimelineEntity> timelineEntities)
@@ -31,6 +66,7 @@ namespace Battle.UIComponent
             
             var uiEntity = Instantiate(entityTimelinePrefab, timelineContainer);
             uiEntity.ConnectToEntity(timelineEntity);
+            uiEntity.ShowArrow(false);
             
             uiEntityTimelines.Add(timelineEntity, uiEntity);
 

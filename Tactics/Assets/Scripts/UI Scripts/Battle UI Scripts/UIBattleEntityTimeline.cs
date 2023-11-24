@@ -11,6 +11,7 @@ public class UIBattleEntityTimeline : MonoBehaviour
     [SerializeField] private TextMeshProUGUI turnValueText;
     [SerializeField] private GameObject turnValueObj;
     [SerializeField] private GameObject obj;
+    [SerializeField] private GameObject arrowObj;
     [SerializeField] private TextMeshProUGUI debugText;
     [SerializeField] private TextMeshProUGUI debugText2;
     [SerializeField] private TextMeshProUGUI speedText;
@@ -34,6 +35,7 @@ public class UIBattleEntityTimeline : MonoBehaviour
         TimelineEntity.OnDistanceFromTurnStartChanged += ChangeValue;
         TimelineEntity.OnSpeedChanged += ChangeSpeed;
     }
+    
     
     private void DisconnectFromEntity()
     {
@@ -72,6 +74,11 @@ public class UIBattleEntityTimeline : MonoBehaviour
     public void ChangeBorderColor(int team)
     {
         borderImage.color = team == 0 ? Color.cyan : Color.red;
+    }
+    
+    public void ShowArrow(bool value)
+    {
+        arrowObj.SetActive(value);
     }
 
     public void ChangeValue(float value)
