@@ -27,6 +27,7 @@ public class NewUIBattleManager : MonoBehaviour
     public void AddCallbacks()
     {
         ActionEndInvoker<NewBattleManager.UnitCreatedAction>.OnInvoked += InstantiateUnitUi;
+        ActionStartInvoker<NewBattleManager.MainBattleAction>.OnInvoked += PlayBattleStartAnimation;
         ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked += PlayRoundStartAnimation;
         
         EventManager.AddListener<ClickUnitEvent>(ShowUnitTooltip);
@@ -35,6 +36,7 @@ public class NewUIBattleManager : MonoBehaviour
     public void RemoveCallbacks()
     {
         ActionEndInvoker<NewBattleManager.UnitCreatedAction>.OnInvoked -= InstantiateUnitUi;
+        ActionStartInvoker<NewBattleManager.MainBattleAction>.OnInvoked -= PlayBattleStartAnimation;
         ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked -= PlayRoundStartAnimation;
         
         EventManager.RemoveListener<ClickUnitEvent>(ShowUnitTooltip);
@@ -82,10 +84,21 @@ public class NewUIBattleManager : MonoBehaviour
         Tooltip.Hide();
     }
     
+    private void PlayBattleStartAnimation(NewBattleManager.MainBattleAction action)
+    {
+        var posY = battleStartIndicatorTr.anchoredPosition.y;
+            
+        var sequence = DOTween.Sequence();
+        sequence.Append(battleStartIndicatorTr.DOMoveX(0, action.BattleStartTransitionDuration.x));
+        sequence.AppendInterval(action.BattleStartTransitionDuration.y);
+        sequence.Append(battleStartIndicatorTr.DOMoveX(Screen.width, action.BattleStartTransitionDuration.z));
+        sequence.AppendCallback(()=>battleStartIndicatorTr.anchoredPosition = new Vector2(-Screen.width,posY));
+
+        sequence.Play();
+    }
+    
     private void PlayRoundStartAnimation(NewBattleManager.RoundAction action)
     {
-        //currentEntityBattleTimeline.gameObject.SetActive(false);
-            
         battleRoundIndicatorText.text = $"Round {action.CurrentRound}";
 
         var sequence = DOTween.Sequence();

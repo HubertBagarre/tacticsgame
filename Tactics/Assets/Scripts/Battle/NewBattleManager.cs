@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Battle.ScriptableObjects;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Battle
 {
@@ -32,7 +33,8 @@ namespace Battle
         [SerializeField] private int maxIterations = 99999;
         [SerializeField] private bool showLog;
         [SerializeField] private int maxRounds = 10;
-        [SerializeField] private Vector3 roundTransitionDuration = Vector3.one;
+        [SerializeField] private Vector3 battleStartTransitionDuration = Vector3.one;
+        [SerializeField] private Vector3 roundStartTransitionDuration = Vector3.one;
         
         //Level
         private BattleLevel CurrentLevel { get; set; }
@@ -64,7 +66,7 @@ namespace Battle
             StackableAction.Manager.ShowLog(showLog);
             StackableAction.Manager.Init(this,maxIterations);
             
-            var mainBattleAction = new MainBattleAction(this);
+            var mainBattleAction = new MainBattleAction(this,battleStartTransitionDuration);
             
             mainBattleAction.TryStack();
             
@@ -157,24 +159,34 @@ namespace Battle
             }
         }
 
-        private class MainBattleAction : BattleManagerAction
+        public class MainBattleAction : BattleManagerAction
         {
             private RoundAction currentRoundAction;
-            
-            public MainBattleAction(NewBattleManager battleManager) : base(battleManager)
+            public Vector3 BattleStartTransitionDuration { get; }
+            private float BattleStartTransitionDurationFloat => BattleStartTransitionDuration.x + BattleStartTransitionDuration.y + BattleStartTransitionDuration.z;
+
+            protected override YieldInstruction YieldInstruction => new WaitForSeconds(BattleStartTransitionDurationFloat);
+
+            public MainBattleAction(NewBattleManager battleManager,Vector3 battleStartTransitionDuration) : base(battleManager)
             {
-                currentRoundAction = new RoundAction(battleManager, 1,battleManager.roundTransitionDuration);
+                currentRoundAction = new RoundAction(battleManager, 1,battleManager.roundStartTransitionDuration);
+                BattleStartTransitionDuration = battleStartTransitionDuration;
             }
             
             protected override void Main()
             {
+                
+            }
+            
+            protected override void PostWaitAction()
+            {
                 currentRoundAction.TryStack();
 
-                currentRoundAction = new RoundAction(BattleManager,currentRoundAction.CurrentRound + 1,BattleManager.roundTransitionDuration);
+                currentRoundAction = new RoundAction(BattleManager,currentRoundAction.CurrentRound + 1,BattleManager.roundStartTransitionDuration);
             
                 if(BattleManager.maxRounds > 0 && currentRoundAction.CurrentRound > BattleManager.maxRounds) return;
                 
-                EnqueueYieldedActions(new YieldedAction(Main));
+                EnqueueYieldedActions(new YieldedAction(PostWaitAction));
             }
         }
         

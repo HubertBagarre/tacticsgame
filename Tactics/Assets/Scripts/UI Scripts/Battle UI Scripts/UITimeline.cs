@@ -7,8 +7,12 @@ namespace Battle.UIComponent
 {
     public class UITimeline : MonoBehaviour
     {
-        [SerializeField] private UIBattleEntityTimeline entityTimelinePrefab;
+        [Header("Components")]
         [SerializeField] private Transform timelineContainer;
+        [SerializeField] private GameObject timelineObj;
+        
+        [Header("Settings")]
+        [SerializeField] private UIBattleEntityTimeline entityTimelinePrefab;
         private Dictionary<TimelineEntity, UIBattleEntityTimeline> uiEntityTimelines;
         private UIBattleEntityTimeline currentBattleEntityTimeline;
         
@@ -17,6 +21,8 @@ namespace Battle.UIComponent
             uiEntityTimelines = new Dictionary<TimelineEntity, UIBattleEntityTimeline>();
             
             currentBattleEntityTimeline = Instantiate(entityTimelinePrefab, timelineContainer);
+            
+            ShowTimeline(false);
             
             AddCallbacks();
         }
@@ -43,7 +49,7 @@ namespace Battle.UIComponent
         
         private void HideTimelineDuringTransition(NewBattleManager.RoundAction action)
         {
-            timelineContainer.gameObject.SetActive(false);
+            ShowTimeline(false);
 
             StartCoroutine(DelayShowTimeline());
             
@@ -51,8 +57,15 @@ namespace Battle.UIComponent
             IEnumerator DelayShowTimeline()
             {
                 yield return new WaitForSeconds(action.TransitionDurationFloat);
-                timelineContainer.gameObject.SetActive(true);
+                ShowTimeline();
             }
+        }
+
+        public void ShowTimeline(bool value = true)
+        {
+            // TODO - probably animation or idk
+            
+            timelineObj.SetActive(value);
         }
 
         private void ShowCurrentBattleEntityTimeline(TimelineEntityTurnAction action)

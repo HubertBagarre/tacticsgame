@@ -448,7 +448,8 @@ MonoBehaviour:
   maxIterations: 1000
   showLog: 0
   maxRounds: 10
-  roundTransitionDuration: {x: 1, y: 1, z: 1}
+  battleStartTransitionDuration: {x: 1, y: 1, z: 1}
+  roundStartTransitionDuration: {x: 1, y: 1, z: 1}
 --- !u!114 &107337559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -687,9 +688,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2aa224b3adc394c4bb20479d5c1ca0be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timelineContainer: {fileID: 1938200514}
+  timelineObj: {fileID: 1445914794}
   entityTimelinePrefab: {fileID: 8208835791797979481, guid: a98e4692f99d9344bafa11b222490fef,
     type: 3}
-  timelineContainer: {fileID: 1938200514}
 --- !u!1 &496578134 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 338824192872231962, guid: ff46836e02f007843b920ec7d9bb90fe,
@@ -1688,6 +1690,12 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1445914794 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8045213374600291028, guid: 1692648994a006141a08dfc064657e9d,
+    type: 3}
+  m_PrefabInstance: {fileID: 103671446}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1541623361
 PrefabInstance:
   m_ObjectHideFlags: 0
