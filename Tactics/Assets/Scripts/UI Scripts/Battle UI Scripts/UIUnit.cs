@@ -111,39 +111,32 @@ namespace Battle.UIComponent
         
         private void AddPassiveIcon(PassiveInstance.AddPassiveBattleAction action)
         {
-            //TODO - rework here
+            if(action.PassiveInstance.Container != newAssociatedUnit) return;
             
-            /*
-            if((Unit) ctx.Container != associatedUnit) return;
-
-            var passiveInstance = ctx.PassiveInstance;
+            var passiveInstance = action.PassiveInstance;
             
-            var associatedPassive =
-                unitPassiveIcons.FirstOrDefault(passiveIcon => passiveIcon.PassiveInstance == passiveInstance);
+            var associatedPassive = unitPassiveIcons.FirstOrDefault(passiveIcon => passiveIcon.PassiveInstance == passiveInstance);
 
             if (associatedPassive != null) return;
             
             associatedPassive = Instantiate(passiveIconPrefab, passiveIconParent);
             unitPassiveIcons.Add(associatedPassive);
             
-            associatedPassive.LinkToPassive(passiveInstance);*/
+            associatedPassive.LinkToPassive(passiveInstance);
         }
 
         private void RemovePassiveIcon(PassiveInstance.RemovePassiveBattleAction action)
         {
-            //TODO - rework here
+            if(action.PassiveInstance.Container != newAssociatedUnit) return;
             
-            /*
-            if((Unit) ctx.Container != associatedUnit) return;
-
-            var passiveInstance = ctx.PassiveInstance;
+            var passiveInstance = action.PassiveInstance;
             
             var associatedPassive =
                 unitPassiveIcons.FirstOrDefault(passiveIcon => passiveIcon.PassiveInstance == passiveInstance);
             if (associatedPassive == null) return;
 
             unitPassiveIcons.Remove(associatedPassive);
-            Destroy(associatedPassive.gameObject);*/
+            Destroy(associatedPassive.gameObject);
         }
     }
 }

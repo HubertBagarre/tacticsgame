@@ -17,12 +17,12 @@ namespace Battle.ScriptableObjects.Passive
 
         protected override void OnAddedEffect(PassiveInstance instance, int startingStacks)
         {
-            Debug.Log("Here");
+            Debug.Log($"Added effect with {startingStacks} stacks");
         }
 
         protected override void OnStacksAddedEffect(PassiveInstance instance, int amount)
         {
-            
+            Debug.Log($"Added {amount} stacks to effect");
         }
 
         protected override void OnStacksRemovedEffect(PassiveInstance instance, int amount)

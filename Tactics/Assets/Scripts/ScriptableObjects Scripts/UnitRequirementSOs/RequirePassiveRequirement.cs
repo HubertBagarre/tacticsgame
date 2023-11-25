@@ -119,7 +119,7 @@ namespace Battle.ScriptableObjects.Requirement
             var unit = tile.Unit;
             foreach (var requiredPassive in requiredPassives)
             {
-                if (unit.GetPassiveEffectCount(UnitCondition, out _) == 0)
+                if (unit.GetPassiveInstancesCount(UnitCondition, out _) == 0)
                 {
                     //Debug.Log($"Missing Unit Passive : {requiredPassive.UnitPassive.Name}");
                     return false;
@@ -139,7 +139,7 @@ namespace Battle.ScriptableObjects.Requirement
             {
                 if (requiredPassive.PassiveSo != null && unit != null)
                 {
-                    unit.GetPassiveEffectCount(UnitCondition, out var passiveInstance);
+                    unit.GetPassiveInstancesCount(UnitCondition, out var passiveInstance);
                     passiveInstance?.RemoveStacks(requiredPassive.RequiredStacks);
                 }
                 

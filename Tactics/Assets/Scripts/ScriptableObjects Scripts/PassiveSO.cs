@@ -25,33 +25,32 @@ namespace Battle.ScriptableObjects
         [field: SerializeField, TextArea(10, 10)]
         public string Description { get; private set; }
 
+        [field: Header("Stacks")]
         [field: SerializeField] public bool IsStackable { get; private set; } = true;
 
         [field: SerializeField, Tooltip("0 is infinite")]
         public int MaxStacks { get; private set; } = 0; //0 is no limit
 
+        [field: Header("Instances")]
         [field: SerializeField] public bool IsUnmovable { get; private set; }
-
+        [field: SerializeField, Tooltip("0 is infinite")]
+        public int MaxInstances { get; private set; } = 0;
+        
         public abstract IPassivesContainer GetContainer(NewTile tile);
 
-        public virtual bool CanAddPassive(IPassivesContainer container,int amount,out PassiveInstance instance)
+        public virtual bool CanAddPassive(IPassivesContainer container)
         {
-            instance = container.GetPassiveInstance(this);
+            if (MaxInstances == 0) return true; 
 
-            if (instance == null || !IsStackable)
-            {
-                instance = CreateInstance(container, amount);
-            }
-            
-            return instance != null;
+            return container.GetPassiveInstancesCount(x => x.SO == this, out _) < MaxInstances;
         }
 
-        public virtual bool CanAddStacks(PassiveInstance instance, int amount, out int newAmount)
+        public virtual bool CanAddStacks(PassiveInstance instance,int amount, out int newAmount)
         {
             newAmount = 0;
             if (!IsStackable)
             {
-                Debug.LogWarning($"Trying to add stacks to {instance}, which is not stackable");
+                Debug.LogWarning($"Trying to add stacks to {instance.SO.Name}, which is not stackable");
                 return false;
             }
             
@@ -89,8 +88,12 @@ namespace Battle.ScriptableObjects
 
         public virtual void AddPassive(PassiveInstance instance,int startingStacks)
         {
+            if(!IsStackable) startingStacks = 0;
+            
             OnAddedEffect(instance,startingStacks);
-            instance.AddStacks(startingStacks);
+            instance.AddPassiveInstanceToContainer();
+            
+            if(IsStackable) instance.AddStacks(startingStacks);
         }
 
         public virtual void AddStacks(PassiveInstance instance, int amount = 1)
@@ -115,9 +118,9 @@ namespace Battle.ScriptableObjects
 
         protected abstract void OnRemovedEffect(PassiveInstance instance);
 
-        public PassiveInstance CreateInstance(IPassivesContainer container, int stacks = 1)
+        public PassiveInstance CreateInstance(IPassivesContainer container)
         {
-            return new PassiveInstance(this, container, stacks);
+            return new PassiveInstance(this, container);
         }
     }
 
@@ -242,13 +245,17 @@ namespace Battle
         public void RemoveOnPassiveAddedCallback(PassiveInstanceDelegate callback);
         public void RemoveOnPassiveRemovedCallback(PassiveInstanceDelegate callback);
         */
-
+        public IReadOnlyList<PassiveInstance> PassiveInstances { get; }
+        public void AddPassiveInstanceToList(PassiveInstance passiveInstance);
+        public void RemovePassiveInstanceFromList(PassiveInstance passiveInstance);
+        
+        
         public PassiveInstance GetPassiveInstance(PassiveSO passiveSo);
-        public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1);
+        public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1, bool force = false);
         public void RemovePassive(PassiveSO passiveSo);
         public void RemovePassiveInstance(PassiveInstance passiveInstance);
 
-        public int GetPassiveEffectCount(Func<PassiveInstance, bool> condition,
+        public int GetPassiveInstancesCount(Func<PassiveInstance, bool> condition,
             out PassiveInstance firstPassiveInstance);
     }
 
@@ -270,17 +277,22 @@ namespace Battle
         public event Action<int> OnCurrentStacksChanged;
         public Dictionary<string, object> Data { get; private set; }
 
-        public PassiveInstance(PassiveSO so, IPassivesContainer container, int startingStacks)
+        public PassiveInstance(PassiveSO so, IPassivesContainer container)
         {
             SO = so;
             Container = container;
-            CurrentStacks = startingStacks - 1;
+            CurrentStacks = 0;
             Data = new Dictionary<string, object>();
+        }
+        
+        public void AddPassiveInstanceToContainer()
+        {
+            Container.AddPassiveInstanceToList(this);
         }
         
         public void AddStacks(int amount)
         {
-            var canAddStacks = SO.CanAddStacks(this, amount, out var newAmount);
+            var canAddStacks = SO.CanAddStacks(this,amount, out var newAmount);
             
             if(!canAddStacks) return;
             
@@ -320,16 +332,49 @@ namespace Battle
             }
         }
         
-        public class AddPassiveBattleAction : PassiveInstanceBattleAction
+        public class AddPassiveBattleAction : SimpleStackableAction
         {
-            public AddPassiveBattleAction(PassiveInstance passiveInstance, int amount = 1) : base(passiveInstance, amount)
+            protected override YieldInstruction YieldInstruction { get; }
+            protected override CustomYieldInstruction CustomYieldInstruction { get; }
+            
+            public IPassivesContainer Container { get; }
+            public PassiveSO PassiveSo { get; }
+            public int Amount { get; }
+            public bool ForceNewInstance { get; }
+            
+            public PassiveInstance PassiveInstance { get; private set; }
+            
+            public AddPassiveBattleAction(IPassivesContainer container,PassiveSO passiveSo, int amount, bool force)
             {
-                
+                Container = container;
+                PassiveSo = passiveSo;
+                Amount = amount;
+                ForceNewInstance = force;
             }
             
             protected override void Main()
             {
-                PassiveInstance.SO.AddPassive(PassiveInstance,Amount);
+                PassiveInstance = Container.GetPassiveInstance(PassiveSo);
+                
+                var alreadyHasPassive = PassiveInstance != null;
+
+                if (!alreadyHasPassive || ForceNewInstance || !PassiveSo.IsStackable)
+                {
+                    var canAddPassive = PassiveSo.CanAddPassive(Container);
+
+                    if (!canAddPassive)
+                    {
+                        return;
+                    }
+                    
+                    PassiveInstance = PassiveSo.CreateInstance(Container);
+                
+                    PassiveInstance.SO.AddPassive(PassiveInstance,Amount);
+                    
+                    return;
+                }
+                
+                PassiveInstance.AddStacks(Amount);
             }
         }
 
@@ -341,7 +386,9 @@ namespace Battle
             
             protected override void Main()
             {
+                PassiveInstance.CurrentStacks += Amount;
                 PassiveInstance.SO.AddStacks(PassiveInstance,Amount);
+                PassiveInstance.OnCurrentStacksChanged?.Invoke(PassiveInstance.CurrentStacks);
             }
         }
         
@@ -353,7 +400,9 @@ namespace Battle
             
             protected override void Main()
             {
+                PassiveInstance.CurrentStacks -= Amount;
                 PassiveInstance.SO.RemoveStacks(PassiveInstance,Amount);
+                PassiveInstance.OnCurrentStacksChanged?.Invoke(PassiveInstance.CurrentStacks);
             }
         }
 

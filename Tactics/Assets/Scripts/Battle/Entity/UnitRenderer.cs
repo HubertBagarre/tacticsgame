@@ -27,5 +27,16 @@ public class UnitRenderer : MonoBehaviour
     }
     
     
+    #region DebugContextMenu
+    #if UNITY_EDITOR
+    
+    [ContextMenu("DebugPassivesInstances")]
+    public void DebugPassives()
+    {
+        Unit.DebugPassives();
+    }
+    #endif
+    
+    #endregion
     
 }

@@ -25,37 +25,13 @@ namespace Battle
         public void AddCallbacks()
         {
             InputManager.RightClickEvent += ClickUnit;
-            
-            ActionStartInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked += AddPassiveInstanceToUnitList;
-            ActionStartInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked += RemovePassiveInstanceToUnitList;
         }
 
         public void RemoveCallbacks()
         {
             InputManager.RightClickEvent -= ClickUnit;
-            
-            ActionStartInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked -= AddPassiveInstanceToUnitList;
-            ActionStartInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked -= RemovePassiveInstanceToUnitList;
-        }
-
-        private void AddPassiveInstanceToUnitList(PassiveInstance.AddPassiveBattleAction action)
-        {
-            if(action.PassiveInstance.Container is not NewUnit unit) return;
-            
-            var instance = action.PassiveInstance;
-            
-            unit.AddPassiveInstanceToList(instance);
         }
         
-        private void RemovePassiveInstanceToUnitList(PassiveInstance.RemovePassiveBattleAction action)
-        {
-            if(action.PassiveInstance.Container is not NewUnit unit) return;
-            
-            var instance = action.PassiveInstance;
-            
-            unit.RemovePassiveInstanceFromList(instance);
-        }
-
         public UnitRenderer SpawnUnit(NewUnit unit,UnitRenderer unitRendererPrefab,NewTile.Direction direction)
         {
             var useDefault = unitRendererPrefab == null;

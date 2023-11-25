@@ -17,6 +17,7 @@ namespace Battle
         public Tile Tile { get; private set; }
         
         private List<PassiveInstance> passiveInstances;
+        public IReadOnlyList<PassiveInstance> PassiveInstances => passiveInstances;
         
         private List<UnitAbilityInstance> abilityInstances;
         
@@ -29,6 +30,22 @@ namespace Battle
             passiveInstances = new List<PassiveInstance>();
             abilityInstances = new List<UnitAbilityInstance>();
         }
+        
+        #region DebugContextMenu
+#if UNITY_EDITOR
+        
+        public void DebugPassives()
+        {
+            Debug.Log($"Found {passiveInstances.Count} passives instances on {Name} :");
+            foreach (var passiveInstance in passiveInstances)
+            {
+                var text = $"{passiveInstance.SO.Name} - {passiveInstance.CurrentStacks}";
+                Debug.Log($"{text}");
+            }
+        }
+        
+#endif
+        #endregion
 
         public void SetTeam(int team)
         {
@@ -56,8 +73,6 @@ namespace Battle
         
         protected override void AddedToTimelineEffect()
         {
-            Debug.Log($"Adding {UnitSo.StartingPassives.Count} starting passives to {Name}");
-            
             foreach (var passiveToAdd in UnitSo.StartingPassives)
             {
                 passiveToAdd.AddPassiveToContainer(this);
@@ -100,19 +115,9 @@ namespace Battle
             return passiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
         }
 
-        public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1)
+        public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1, bool force = false)
         {
-            var canCanPassive = passiveSo.CanAddPassive(this,amount,out var passiveInstance);
-            
-            if(!canCanPassive) return;
-            
-            if (passiveInstances.Contains(passiveInstance))
-            {
-                passiveInstance.AddStacks(amount);
-                return;
-            }
-            
-            var addPassiveAction = new PassiveInstance.AddPassiveBattleAction(passiveInstance,amount);
+            var addPassiveAction = new PassiveInstance.AddPassiveBattleAction(this,passiveSo,amount,force);
             
             addPassiveAction.TryStack();
         }
@@ -137,7 +142,7 @@ namespace Battle
             removePassiveAction.TryStack();
         }
 
-        public int GetPassiveEffectCount(Func<PassiveInstance, bool> condition, out PassiveInstance firstPassiveInstance)
+        public int GetPassiveInstancesCount(Func<PassiveInstance, bool> condition, out PassiveInstance firstPassiveInstance)
         {
             firstPassiveInstance = passiveInstances.FirstOrDefault(condition);
             
@@ -145,6 +150,11 @@ namespace Battle
         }
 
         public override IEnumerable<StackableAction.YieldedAction> EntityTurnYieldedActions => new[] { new StackableAction.YieldedAction(new UnitTurnBattleAction(this).TryStack)};
+
+        public override string ToString()
+        {
+            return UnitSo != null ? $"Unit ({UnitSo.name})" : base.ToString();
+        }
     }
     
     public class UnitTurnBattleAction : SimpleStackableAction

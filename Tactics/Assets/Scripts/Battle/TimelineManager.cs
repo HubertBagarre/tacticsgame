@@ -142,6 +142,8 @@ namespace Battle
             
             roundEndEntity.SetSpeed(speed);
             roundEndEntity.SetDistanceFromTurnStart(distance);
+            
+            Debug.Log($"Resetting round end entity distance from turn start (now at {roundEndEntity.DistanceFromTurnStart} at {roundEndEntity.Speed} Speed)");
         }
 
         public void SetTimelineEntityDistanceFromTurnStart(TimelineEntity timelineEntity,float value)

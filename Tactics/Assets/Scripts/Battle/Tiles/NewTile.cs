@@ -31,6 +31,7 @@ namespace Battle
         }
         
         private List<PassiveInstance> passiveInstances { get; }
+        public IReadOnlyList<PassiveInstance> PassiveInstances => passiveInstances;
 
         public NewTile(Vector2Int position,Tile tile)
         {
@@ -60,19 +61,9 @@ namespace Battle
             return passiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
         }
 
-        public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1)
+        public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1, bool force = false)
         {
-            var canCanPassive = passiveSo.CanAddPassive(this,amount,out var passiveInstance);
-            
-            if(!canCanPassive) return;
-            
-            if (passiveInstances.Contains(passiveInstance))
-            {
-                passiveInstance.AddStacks(amount);
-                return;
-            }
-            
-            var addPassiveAction = new PassiveInstance.AddPassiveBattleAction(passiveInstance,amount);
+            var addPassiveAction = new PassiveInstance.AddPassiveBattleAction(this,passiveSo,amount,force);
             
             addPassiveAction.TryStack();
         }
@@ -97,7 +88,7 @@ namespace Battle
             removePassiveAction.TryStack();
         }
 
-        public int GetPassiveEffectCount(Func<PassiveInstance, bool> condition, out PassiveInstance firstPassiveInstance)
+        public int GetPassiveInstancesCount(Func<PassiveInstance, bool> condition, out PassiveInstance firstPassiveInstance)
         {
             firstPassiveInstance = passiveInstances.FirstOrDefault(condition);
             

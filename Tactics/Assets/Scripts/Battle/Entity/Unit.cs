@@ -76,6 +76,15 @@ namespace Battle
         
         public List<UnitAbilityInstance> AbilityInstances { get; } = new();
         public List<PassiveInstance> PassiveInstances { get; } = new();
+        public void AddPassiveInstanceToList(PassiveInstance passiveInstance)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemovePassiveInstanceFromList(PassiveInstance passiveInstance)
+        {
+            throw new NotImplementedException();
+        }
 
         private List<IEnumerator> onAttackOtherUnitRoutines = new ();
         private List<IEnumerator> onAttackedRoutines = new ();
@@ -477,15 +486,17 @@ namespace Battle
         {
             if(PassiveRemovedCallbacks.Contains(callback)) PassiveRemovedCallbacks.Remove(callback);
         }*/
-        
+
+        IReadOnlyList<PassiveInstance> IPassivesContainer.PassiveInstances => PassiveInstances;
+
         public PassiveInstance GetPassiveInstance(PassiveSO passiveSo)
         {
             return PassiveInstances.FirstOrDefault(passiveInstance => passiveInstance.SO == passiveSo);
         }
 
-        void IPassivesContainer.AddPassiveEffect(PassiveSO passiveSo, int amount)
+        void IPassivesContainer.AddPassiveEffect(PassiveSO passiveSo, int amount, bool force)
         {
-            
+            AddPassiveEffect(passiveSo, amount, force);
         }
 
         public void RemovePassive(PassiveSO passiveSo)
@@ -504,7 +515,7 @@ namespace Battle
         /// <param name="passiveSo"></param>
         /// <param name="amount"></param>
         /// <returns></returns>
-        public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1)
+        public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1, bool force = false)
         {
             //add passive instance to list
             if (!passiveSo.IsStackable || (passiveSo.IsStackable && amount <= 0)) amount = 1;
@@ -571,7 +582,7 @@ namespace Battle
             */
         }
         
-        public int GetPassiveEffectCount(Func<PassiveInstance,bool> condition,out PassiveInstance firstPassiveInstance)
+        public int GetPassiveInstancesCount(Func<PassiveInstance,bool> condition,out PassiveInstance firstPassiveInstance)
         {
             condition ??= _ => true;
             

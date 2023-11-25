@@ -200,8 +200,8 @@ namespace Battle
                 
                     var unitCreatedAction = new UnitCreatedAction(unit,tile,SpawnPlacedUnit);
                 
-                    unitCreatedAction.TryStack();
-
+                    EnqueueYieldedActions(new YieldedAction(unitCreatedAction.TryStack));
+                    
                     continue;
                     
                     UnitRenderer SpawnPlacedUnit()
