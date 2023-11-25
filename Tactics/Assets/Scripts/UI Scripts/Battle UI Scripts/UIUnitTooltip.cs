@@ -32,7 +32,7 @@ namespace Battle.UIComponent
         private UIStatElement AttackRangeElement => statElements[(int)UnitStat.AttackRange];
         private UIStatElement HpElement => statElements[(int)UnitStat.Hp];
 
-        private Unit currentDisplayingUnit;
+        private NewUnit currentDisplayingUnit;
 
         [SerializeField] private Transform statElementParent;
 
@@ -52,7 +52,7 @@ namespace Battle.UIComponent
         }
 
 
-        public void DisplayUnitTooltip(Unit unit)
+        public void DisplayUnitTooltip(NewUnit unit)
         {
             RemoveCallbacks(currentDisplayingUnit);
             HideCurrentStats();
@@ -132,11 +132,9 @@ namespace Battle.UIComponent
 
         private void AddPassive(PassiveInstance.AddPassiveBattleAction action)
         {
-            // TODO - rework here
+            var passiveInstance = action.PassiveInstance;
             
-            /*
-            if((Unit) ctx.Container !=  currentDisplayingUnit) return;
-            var passiveInstance = ctx.PassiveInstance;
+            if(currentDisplayingUnit != passiveInstance.Container) return;
             
             if (!passiveIconDict.ContainsKey(passiveInstance))
             {
@@ -146,16 +144,14 @@ namespace Battle.UIComponent
                 passiveIconDict.Add(passiveInstance,icon.gameObject);
             }
             
-            UpdateCurrentPassives();*/
+            UpdateCurrentPassives();
         }
 
         private void RemovePassive(PassiveInstance.RemovePassiveBattleAction action)
         {
-            // TODO - rework here
+            var passiveInstance = action.PassiveInstance;
             
-            /*
-            if((Unit) ctx.Container !=  currentDisplayingUnit) return;
-            var passiveInstance = ctx.PassiveInstance;
+            if(currentDisplayingUnit !=  passiveInstance.Container) return;
             
             if (passiveIconDict.ContainsKey(passiveInstance))
             {
@@ -164,7 +160,7 @@ namespace Battle.UIComponent
                 Destroy(icon);
             }
             
-            UpdateCurrentPassives();*/
+            UpdateCurrentPassives();
         }
 
         private void UpdateCurrentPassives()
@@ -214,7 +210,7 @@ namespace Battle.UIComponent
             SpeedElement.ChangeStatText("Spd :");
         }
 
-        private void AddCallbacks(Unit unit)
+        private void AddCallbacks(NewUnit unit)
         {
             if(unit == null) return;
             var statsInstance = unit.Stats;
@@ -231,7 +227,7 @@ namespace Battle.UIComponent
             ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked += RemovePassive;
         }
 
-        private void RemoveCallbacks(Unit unit)
+        private void RemoveCallbacks(NewUnit unit)
         {
             if(unit == null) return;
             var statsInstance = unit.Stats;
@@ -320,7 +316,7 @@ namespace Battle.UIComponent
             SpeedElement.ChangeValueText($"{statsInstance.Speed}");
         }
 
-        private void UpdateStatElements(Unit unit)
+        private void UpdateStatElements(NewUnit unit)
         {
             var statsInstance = unit.Stats;
             UpdateHpStatElement(statsInstance);

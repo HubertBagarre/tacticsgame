@@ -26,6 +26,7 @@ namespace Battle
         [SerializeField] private int maxRounds = 10;
 
         [Header("Managers")]
+        [SerializeField] private InputManager inputManager;
         [SerializeField] private TileManager tileManager;
         [SerializeField] private UnitManager unitManager;
         [SerializeField] private AbilityManager abilityManager;
@@ -47,7 +48,9 @@ namespace Battle
 
         public void StartBattle()
         {
+            
             // 0 - Setup default values (lists, dictionaries, etc)
+            inputManager.SetupCamera(Camera.main); //TODO : Change use a Camera Manager (also for ultimate animations)
             AddCallbacks();
             
             // 1 - Spawn Tiles

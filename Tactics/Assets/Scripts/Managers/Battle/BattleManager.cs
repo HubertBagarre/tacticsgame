@@ -82,7 +82,7 @@ namespace Battle
             startRoundPassives.Clear();
             endRoundPassives.Clear();
 
-            InputManager.SetupCamera(Camera.main);
+            //InputManager.SetupCamera(Camera.main);
 
             foreach (var tile in tileManager.AllTiles)
             {

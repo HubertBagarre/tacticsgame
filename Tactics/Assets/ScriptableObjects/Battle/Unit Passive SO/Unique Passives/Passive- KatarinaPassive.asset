@@ -20,6 +20,6 @@ MonoBehaviour:
   <IsStackable>k__BackingField: 0
   <MaxStacks>k__BackingField: 0
   <IsUnmovable>k__BackingField: 1
-  <MaxInstances>k__BackingField: 0
+  <MaxInstances>k__BackingField: 1
   daggerPassive: {fileID: 0}
   tileDaggerPassive: {fileID: 11400000, guid: a14e004f2bafe9b4b92d00a71ab1c93d, type: 2}

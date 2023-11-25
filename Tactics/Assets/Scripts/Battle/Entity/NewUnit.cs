@@ -10,6 +10,21 @@ namespace Battle
     [Serializable]
     public class NewUnit : TimelineEntity, IPassivesContainer
     {
+        [Header("Current Stats")]
+        [SerializeField] private int movementLeft;
+        
+        public int MovementLeft
+        {
+            get => movementLeft;
+            private set
+            {
+                movementLeft = value;
+                OnMovementLeftChanged?.Invoke(movementLeft);
+            }
+        }
+        
+        public event Action<int> OnMovementLeftChanged;
+        
         public UnitStatsInstance Stats { get; private set; }
         public UnitSO UnitSo => Stats.So;
         
@@ -20,6 +35,9 @@ namespace Battle
         public IReadOnlyList<PassiveInstance> PassiveInstances => passiveInstances;
         
         private List<UnitAbilityInstance> abilityInstances;
+        public IReadOnlyList<UnitAbilityInstance> AbilityInstances => abilityInstances;
+        
+        [field: SerializeField] public int CurrentUltimatePoints { get; protected set; }
         
         public NewUnit(UnitSO so,Tile tile,bool usePlayerBehaviour = false) : base(so.BaseSpeed, so.Initiative, so.Name)
         {

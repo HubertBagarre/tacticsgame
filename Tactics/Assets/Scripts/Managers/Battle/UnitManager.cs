@@ -54,11 +54,15 @@ namespace Battle
             EventManager.Trigger(new ClickUnitEvent(GetClickUnit()));
         }
 
-        public Unit GetClickUnit()
+        public NewUnit GetClickUnit()
         {
             InputManager.CastCamRay(out var unitHit, entityLayers);
+            
+            if(unitHit.transform == null) return null;
 
-            return unitHit.transform != null ? unitHit.transform.GetComponent<Unit>() : null;
+            if(!unitHit.transform.TryGetComponent(out UnitRenderer unitRenderer)) return null;
+            
+            return unitRenderer.Unit;
         }
     }
 }
@@ -67,9 +71,9 @@ namespace Battle.InputEvent
 {
     public class ClickUnitEvent
     {
-        public Unit Unit { get; }
+        public NewUnit Unit { get; }
 
-        public ClickUnitEvent(Unit unit)
+        public ClickUnitEvent(NewUnit unit)
         {
             Unit = unit;
         }

@@ -160,7 +160,7 @@ namespace Battle
                 return;
             }
             
-            unitTooltip.DisplayUnitTooltip(ctx.Unit);
+            //unitTooltip.DisplayUnitTooltip(ctx.Unit);
             unitTooltip.Show();
         }
         
@@ -320,7 +320,7 @@ namespace Battle
                 foreach (var abilityInstance in abilities)
                 {
                     var abilityButton = Instantiate(abilityButtonPrefab, abilityButtonParent);
-                    abilityButton.LinkAbility(abilityInstance,unit);
+                    //abilityButton.LinkAbility(abilityInstance,unit);
                     abilityButtons.Add(abilityButton);
                     dictValue.Add(abilityButton);
                 }

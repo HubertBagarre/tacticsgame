@@ -18,6 +18,10 @@ public class InputManager : MonoBehaviour
     private void SetupInputMap()
     {
         inputs = new Controls();
+        
+        inputs.InGame.MouseLeftClick.started += InvokeLeftClickEvent;
+        inputs.InGame.MouseRightClick.started += InvokeRightClickEvent;
+        
         inputs.Enable();
     }
     
@@ -33,9 +37,9 @@ public class InputManager : MonoBehaviour
         RightClickEvent?.Invoke();
     }
     
-    public static void SetupCamera(Camera camera)
+    public void SetupCamera(Camera c)
     {
-        cam = camera;
+        cam = c;
     }
 
     public static void CastCamRay(out RaycastHit hit, LayerMask layerMask)

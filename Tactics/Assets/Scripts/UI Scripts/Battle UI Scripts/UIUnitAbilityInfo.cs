@@ -21,7 +21,7 @@ namespace Battle.UIComponent
         [SerializeField] private TextMeshProUGUI abilityDescriptionText;
         
         private UnitAbilityInstance associatedAbility => abilityShower.AssociatedAbility;
-        private Unit associatedUnit => abilityShower.AssociatedUnit;
+        private NewUnit associatedUnit => abilityShower.AssociatedUnit;
 
         public bool IsHovering { get; private set; }
         [SerializeField] private bool show = true;
@@ -62,7 +62,7 @@ namespace Battle.UIComponent
             
             var info = abilityDescriptionText.textInfo.linkInfo[linkedTarget];
             
-            UIBattleManager.Tooltip.Show(mousePos,associatedAbility.SO.ConvertDescriptionLinks(associatedUnit,info.GetLinkID()));
+            //UIBattleManager.Tooltip.Show(mousePos,associatedAbility.SO.ConvertDescriptionLinks(associatedUnit,info.GetLinkID()));
         }
         
         private void UpdateDescription()
@@ -84,11 +84,13 @@ namespace Battle.UIComponent
             var cooldown = so.Cooldown;
             abilityCooldownText.text = cooldown > 0 ? $"{so.Cooldown} turn{(cooldown > 1 ? "s":"")}" : "";
             
+            /*
             StartCoroutine(AdjustPanelSizeRoutine());
             return;
             
             IEnumerator AdjustPanelSizeRoutine()
             {
+                
                 var description = so.ConvertedDescription(associatedUnit);
                 abilityDescriptionText.text = $"{description}";
                 
@@ -112,7 +114,7 @@ namespace Battle.UIComponent
 
                 size.y = 40 + sizeIncrease + 5; //cuz the text is at Y = -40
                 descriptionPanelTr.sizeDelta = size;
-            }
+            }*/
             
         }
         

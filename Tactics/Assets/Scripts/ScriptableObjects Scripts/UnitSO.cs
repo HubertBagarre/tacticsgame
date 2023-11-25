@@ -114,6 +114,7 @@ namespace Battle
         CurrentShield = 8
     }
     
+    [Serializable]
     public class UnitStatsInstance
     {
         public UnitSO So { get; }

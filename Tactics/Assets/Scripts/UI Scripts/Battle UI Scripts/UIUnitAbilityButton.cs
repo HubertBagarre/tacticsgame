@@ -29,7 +29,7 @@ namespace Battle.UIComponent
         [SerializeField] private UIUltimateCharge[] ultimateCharges;
 
         private UnitAbilityInstance associatedAbility;
-        private Unit associatedUnit;
+        private NewUnit associatedUnit;
 
         private void Start()
         {
@@ -39,22 +39,32 @@ namespace Battle.UIComponent
 
         private bool CanBeCast()
         {
-            if(!associatedAbility.SO.CanCastAbility(associatedUnit)) return false;
+            //TODO: rework this abilities to work with NewUnit
+            return false;
+
+            /*if(!associatedAbility.SO.CanCastAbility(associatedUnit)) return false;
             if (associatedAbility.CurrentCooldown > 0) return false;
-            return associatedUnit.CurrentUltimatePoints >= associatedAbility.UltimateCost;
+            return associatedUnit.CurrentUltimatePoints >= associatedAbility.UltimateCost;*/
         }
 
         private void UpdateButtonInteractable(EndAbilityTargetSelectionEvent ctx)
         {
+            //TODO: rework this abilities to work with NewUnit
+            
+            /*
             if(associatedUnit == null) return;
             if(associatedAbility == null) return;
             if(ctx.Caster != associatedUnit) return;
             
             Button.interactable = CanBeCast();
+            */
         }
         
-        public void LinkAbility(UnitAbilityInstance ability,Unit caster)
+        public void LinkAbility(UnitAbilityInstance ability,NewUnit caster)
         {
+            //TODO: rework this abilities to work with NewUnit
+            
+            /*
             if (associatedUnit != null)
             {
                 associatedUnit.OnUltimatePointsAmountChanged -= UpdateUltimateCharges;
@@ -69,7 +79,7 @@ namespace Battle.UIComponent
             associatedUnit.OnUltimatePointsAmountChanged += UpdateUltimateCharges;
             EventManager.AddListener<EndAbilityTargetSelectionEvent>(UpdateButtonInteractable);
 
-            UpdateAppearance();
+            UpdateAppearance();*/
         }
 
         public void UpdateAppearance()
@@ -124,9 +134,9 @@ namespace Battle.UIComponent
 
         private void StartAbilityTargetSelection()
         {
+            //TODO: rework this abilities to work with NewUnit
             
-            
-            EventManager.Trigger(new StartAbilityTargetSelectionEvent(associatedAbility,associatedUnit));
+            //EventManager.Trigger(new StartAbilityTargetSelectionEvent(associatedAbility,associatedUnit));
         }
     }
 }
