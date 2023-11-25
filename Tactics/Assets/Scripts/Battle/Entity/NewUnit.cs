@@ -29,6 +29,11 @@ namespace Battle
             passiveInstances = new List<PassiveInstance>();
             abilityInstances = new List<UnitAbilityInstance>();
         }
+
+        public void SetTeam(int team)
+        {
+            Team = team;
+        }
         
         public void SetUsePlayerBehaviour(bool usePlayerBehaviour)
         {

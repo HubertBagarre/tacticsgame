@@ -30,9 +30,12 @@ namespace Battle
         [SerializeField] private UnitManager unitManager;
         [SerializeField] private AbilityManager abilityManager;
         [SerializeField] private TimelineManager timelineManager;
+        [SerializeField] private NewUIBattleManager uiManager;
         
         //Level
         private BattleLevel CurrentLevel { get; set; }
+
+        private Queue<UnitPlacementSO.PlacedUnit> unitsToPlace = new();
         
         //Current Unit
         private UnitTurnBattleAction CurrentTurnUnitAction { get; set; }
@@ -52,14 +55,7 @@ namespace Battle
             
             tileManager.SetTiles(CurrentLevel.Tiles);
             
-            // 3 - Spawn Units (timeline should be set up and they should spawn with their passives)
-            
-            
-            
             // 4 - Setup Win/Lose Conditions
-            
-
-            // 5 - Start Round Entity's turn (a round starts at the end of Round entity's turn and end at the end of Round entity's turn)
             
             StackableAction.Manager.ShowLog(showLog);
             StackableAction.Manager.Init(this,maxIterations);
@@ -77,21 +73,15 @@ namespace Battle
             
             timelineManager.CreateNewTimeline();
             
-            foreach (var placedUnit in CurrentLevel.PlacedUnits.Where(unit => !unit.no))
-            {
-                var tile = tileManager.AllTiles.FirstOrDefault(tile => tile.Position == placedUnit.position);
-                
-                var unit = new NewUnit(placedUnit.so,tile,placedUnit.asPlayer);
-                
-                var unitRenderer = unitManager.SpawnUnit(unit);
+            var spawnStartingUnitsAction = new SpawnStartingUnitsAction(this);
             
-                var unitTr = unitRenderer.transform;
-                unitTr.position = tile.transform.position;
-                unitTr.rotation = Quaternion.identity;
-                unitTr.SetParent(transform);
-                
-                timelineManager.AddUnitToTimeline(unit,true);
-            }
+            spawnStartingUnitsAction.TryStack();
+            
+        }
+
+        private void ResetTimelineAfterEntitySpawn(SpawnStartingUnitsAction action)
+        {
+            ActionEndInvoker<SpawnStartingUnitsAction>.OnInvoked -= ResetTimelineAfterEntitySpawn;
             
             timelineManager.ResetRoundEntityDistanceFromTurnStart();
         }
@@ -100,17 +90,28 @@ namespace Battle
         {
             ActionStartInvoker<RoundAction>.OnInvoked += action => Debug.Log($"Starting round {action.CurrentRound}");
             ActionStartInvoker<MainBattleAction>.OnInvoked += SpawnStartingUnits;
+            ActionEndInvoker<SpawnStartingUnitsAction>.OnInvoked += ResetTimelineAfterEntitySpawn;
             
             ActionStartInvoker<UnitTurnBattleAction>.OnInvoked += SetCurrentUnitTurnBattleAction;
             ActionEndInvoker<UnitTurnBattleAction>.OnInvoked += ClearCurrentUnitTurnBattleAction;
+
+            ActionEndInvoker<UnitCreatedAction>.OnInvoked += AddCreatedUnitToTimeline;
             
             unitManager.AddCallbacks();
+            tileManager.AddCallbacks();
+            uiManager.AddCallbacks();
         }
         
         private void RemoveCallbacks()
         {
+            unitManager.RemoveCallbacks();
+            tileManager.RemoveCallbacks();
+            uiManager.RemoveCallbacks();
+            
             ActionStartInvoker<UnitTurnBattleAction>.OnInvoked -= SetCurrentUnitTurnBattleAction;
             ActionEndInvoker<UnitTurnBattleAction>.OnInvoked -= ClearCurrentUnitTurnBattleAction;
+            
+            ActionEndInvoker<UnitCreatedAction>.OnInvoked -= AddCreatedUnitToTimeline;
         }
         
         private void SetCurrentUnitTurnBattleAction(UnitTurnBattleAction action)
@@ -126,6 +127,11 @@ namespace Battle
             
             CurrentTurnUnitAction = null;
         }
+
+        private void AddCreatedUnitToTimeline(UnitCreatedAction action)
+        {
+            timelineManager.AddUnitToTimeline(action.Unit,true);
+        }
         
         [ContextMenu("Advance")]
         private void Advance()
@@ -134,19 +140,26 @@ namespace Battle
             
             StackableAction.Manager.AdvanceAction();
         }
-
-        private class MainBattleAction : SimpleStackableAction
+        
+        public abstract class BattleManagerAction : SimpleStackableAction
         {
-            private RoundAction currentRoundAction;
-            private NewBattleManager BattleManager { get; }
-
             protected override YieldInstruction YieldInstruction { get; }
             protected override CustomYieldInstruction CustomYieldInstruction { get; }
+            public NewBattleManager BattleManager { get; }
             
-            public MainBattleAction(NewBattleManager battleManager)
+            protected BattleManagerAction(NewBattleManager battleManager)
+            {
+                BattleManager = battleManager;
+            }
+        }
+
+        private class MainBattleAction : BattleManagerAction
+        {
+            private RoundAction currentRoundAction;
+            
+            public MainBattleAction(NewBattleManager battleManager) : base(battleManager)
             {
                 currentRoundAction = new RoundAction(battleManager,1);
-                BattleManager = battleManager;
             }
             
             protected override void Main()
@@ -161,19 +174,53 @@ namespace Battle
             }
         }
         
-        public class RoundAction : SimpleStackableAction
+        private class SpawnStartingUnitsAction : BattleManagerAction
+        {
+            public SpawnStartingUnitsAction(NewBattleManager battleManager) : base(battleManager)
+            {
+            }
+            
+            protected override void Main()
+            {
+                var unitsToPlace = BattleManager.CurrentLevel.PlacedUnits.Where(unit => !unit.no).ToArray();
+                
+                foreach (var placedUnit in unitsToPlace)
+                {
+                    var rendererPrefab = placedUnit.rendererPrefab;
+                    var so = placedUnit.so;
+                    var team = placedUnit.team;
+                    var position = placedUnit.position;
+                    var orientation = placedUnit.orientation;
+                    var asPlayer = placedUnit.asPlayer;
+                    
+                    var tile = BattleManager.tileManager.AllTiles.FirstOrDefault(tile => tile.Position == position);
+                
+                    var unit = new NewUnit(so,tile,asPlayer);
+                    unit.SetTeam(team); 
+                
+                    var unitCreatedAction = new UnitCreatedAction(unit,tile,SpawnPlacedUnit);
+                
+                    unitCreatedAction.TryStack();
+
+                    continue;
+                    
+                    UnitRenderer SpawnPlacedUnit()
+                    {
+                        return BattleManager.unitManager.SpawnUnit(unit,rendererPrefab,orientation);
+                    }
+                }
+            }
+        }
+        
+        public class RoundAction : BattleManagerAction
         {
             public int CurrentRound { get; }
-            private NewBattleManager BattleManager { get; }
         
-            public RoundAction(NewBattleManager battleManager,int round) : base()
+            public RoundAction(NewBattleManager battleManager,int round) : base(battleManager)
             {
                 CurrentRound = round;
-                BattleManager = battleManager;
             }
-
-            protected override YieldInstruction YieldInstruction { get; }
-            protected override CustomYieldInstruction CustomYieldInstruction { get; }
+            
             protected override void Main()
             {
                 var currentEntity = BattleManager.timelineManager.FirstTimelineEntity;
@@ -181,11 +228,7 @@ namespace Battle
                 
                 if(currentEntity == null) return;
                 
-                //Debug.Log($"Starting entity Round : {currentEntity.Name}");
-                
                 BattleManager.timelineManager.AdvanceTimeline();
-                
-                //Debug.Log($"Next entity Round should be : {BattleManager.timelineManager.FirstTimelineEntity.Name}");
                 
                 if(isEndTurn) return;
                 
@@ -194,6 +237,37 @@ namespace Battle
                 var entityTurnAction = new TimelineEntityTurnAction(currentEntity);
                     
                 entityTurnAction.TryStack();
+            }
+        }
+
+        public class UnitCreatedAction : SimpleStackableAction
+        {
+            protected override YieldInstruction YieldInstruction { get; }
+            protected override CustomYieldInstruction CustomYieldInstruction { get; }
+            
+            public NewUnit Unit { get; }
+            public Tile Tile { get; }
+            public UnitRenderer Renderer { get; private set; }
+            
+            private Func<UnitRenderer> GetRenderer { get; }
+            
+            public UnitCreatedAction(NewUnit unit,Tile tile,Func<UnitRenderer> getRenderer)
+            {
+                Unit = unit;
+                Tile = tile;
+                GetRenderer = getRenderer;
+                if(getRenderer == null) Debug.LogWarning("Get Render Method is Null");
+            }
+            protected override void Main()
+            {
+                Debug.Log($"Creating Unit {Unit.UnitSo.Name}");
+                
+                Renderer = GetRenderer.Invoke();
+                
+                var unitTr = Renderer.transform;
+                unitTr.position = Tile.transform.position;
+                unitTr.rotation = Quaternion.identity;
+                //unitTr.SetParent(transform);
             }
         }
 

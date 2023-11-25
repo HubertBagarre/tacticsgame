@@ -16,7 +16,7 @@ namespace Battle
     {
         [Header("Settings")] [SerializeField] protected LayerMask entityLayers;
 
-        [SerializeField] private UnitRenderer unitRendererPrefab;
+        [SerializeField] private UnitRenderer defaultRendererPrefab;
         
         [Header("Debug")] [SerializeField] private List<Unit> units = new List<Unit>();
         
@@ -56,9 +56,11 @@ namespace Battle
             unit.RemovePassiveInstanceFromList(instance);
         }
 
-        public UnitRenderer SpawnUnit(NewUnit unit)
+        public UnitRenderer SpawnUnit(NewUnit unit,UnitRenderer unitRendererPrefab,NewTile.Direction direction)
         {
-            var unitRenderer = Instantiate(unitRendererPrefab);
+            var useDefault = unitRendererPrefab == null;
+            
+            var unitRenderer = Instantiate(useDefault ? defaultRendererPrefab : unitRendererPrefab);
             unitRenderer.SetUnit(unit);
             
             unitRenderer.name = unit.Name;

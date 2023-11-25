@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Battle
@@ -49,6 +50,9 @@ public abstract class StackableAction
     private State currentState;
     protected State CurrentState => currentState;
     protected virtual bool AutoAdvance => true;
+
+    public event Action<StackableAction> OnStarted;
+    public event Action<StackableAction> OnEnded;
     
     protected StackableAction()
     {
@@ -76,11 +80,13 @@ public abstract class StackableAction
     
     private void InvokeStart()
     {
+        OnStarted?.Invoke(this);
         CreateGenericInstance(typeof(ActionStartInvoker<>));
     }
     
     private void InvokeEnd()
     {
+        OnEnded?.Invoke(this);
         CreateGenericInstance(typeof(ActionEndInvoker<>));
     }
 

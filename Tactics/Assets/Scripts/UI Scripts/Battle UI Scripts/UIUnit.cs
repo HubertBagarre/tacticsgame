@@ -12,6 +12,7 @@ namespace Battle.UIComponent
     public class UIUnit : MonoBehaviour
     {
         private Unit associatedUnit;
+        private NewUnit newAssociatedUnit;
         
         [SerializeField] private Transform uiParent;
         private GameObject uiParentGo;
@@ -55,6 +56,25 @@ namespace Battle.UIComponent
             
             associatedUnit.Stats.OnMaxShieldModified += UpdateShieldBar;
             associatedUnit.Stats.OnCurrentShieldModified += UpdateShieldBar;
+            
+            ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked += AddPassiveIcon;
+            ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked += RemovePassiveIcon;
+        }
+        
+        public void LinkToUnit(NewUnit unit)
+        {
+            newAssociatedUnit = unit;
+            
+            hpBarImage.color = newAssociatedUnit.Team == 0 ? allyColor : enemyColor;
+            
+            UpdateUIRotation();
+            
+            // TODO - setup after unit gets initialized
+            newAssociatedUnit.Stats.OnMaxHpModified += UpdateHpBar;
+            newAssociatedUnit.Stats.OnCurrentHpModified += UpdateHpBar;
+            
+            newAssociatedUnit.Stats.OnMaxShieldModified += UpdateShieldBar;
+            newAssociatedUnit.Stats.OnCurrentShieldModified += UpdateShieldBar;
             
             ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked += AddPassiveIcon;
             ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked += RemovePassiveIcon;

@@ -66,7 +66,7 @@ namespace Battle
         private RoundEndEntity roundEndEntity;
 
         public IList<TimelineEntity> EntitiesInTimeline => entitiesInTimeline.AsReadOnly();
-
+    
         public void CreateNewTimeline()
         {
             entitiesInTimeline = new List<TimelineEntity>();
