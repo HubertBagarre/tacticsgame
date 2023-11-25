@@ -19,6 +19,8 @@ namespace Battle.ScriptableObjects
             public int team;
             public Vector2Int position;
             public NewTile.Direction orientation;
+            public bool asPlayer;
+            public bool no;
         }
     }
 }

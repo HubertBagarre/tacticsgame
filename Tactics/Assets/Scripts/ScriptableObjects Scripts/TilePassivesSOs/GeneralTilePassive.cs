@@ -69,25 +69,25 @@ namespace Battle.ScriptableObjects.Passive
             yield break;
         }
         */
-
-        protected override void OnAddedEffect(IPassivesContainer container, PassiveInstance instance)
+        
+        protected override void OnAddedEffect(PassiveInstance instance, int startingStacks)
         {
-            
+            throw new System.NotImplementedException();
         }
 
-        protected override void OnRemovedEffect(IPassivesContainer container, PassiveInstance instance)
+        protected override void OnStacksAddedEffect(PassiveInstance instance, int amount)
         {
-            
+            throw new System.NotImplementedException();
         }
 
-        protected override void UnitEnterEffect(Tile tile, PassiveInstance instance)
+        protected override void OnStacksRemovedEffect(PassiveInstance instance, int amount)
         {
-            
+            throw new System.NotImplementedException();
         }
 
-        protected override void UnitExitEffect(Tile tile, PassiveInstance instance)
+        protected override void OnRemovedEffect(PassiveInstance instance)
         {
-            
+            throw new System.NotImplementedException();
         }
     }
 }

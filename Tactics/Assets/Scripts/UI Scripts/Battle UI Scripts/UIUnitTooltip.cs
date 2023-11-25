@@ -130,8 +130,11 @@ namespace Battle.UIComponent
             }
         }
 
-        private void AddPassive(AddPassiveBattleAction ctx)
+        private void AddPassive(PassiveInstance.AddPassiveBattleAction action)
         {
+            // TODO - rework here
+            
+            /*
             if((Unit) ctx.Container !=  currentDisplayingUnit) return;
             var passiveInstance = ctx.PassiveInstance;
             
@@ -143,11 +146,14 @@ namespace Battle.UIComponent
                 passiveIconDict.Add(passiveInstance,icon.gameObject);
             }
             
-            UpdateCurrentPassives();
+            UpdateCurrentPassives();*/
         }
 
-        private void RemovePassive(RemovePassiveBattleAction ctx)
+        private void RemovePassive(PassiveInstance.RemovePassiveBattleAction action)
         {
+            // TODO - rework here
+            
+            /*
             if((Unit) ctx.Container !=  currentDisplayingUnit) return;
             var passiveInstance = ctx.PassiveInstance;
             
@@ -158,7 +164,7 @@ namespace Battle.UIComponent
                 Destroy(icon);
             }
             
-            UpdateCurrentPassives();
+            UpdateCurrentPassives();*/
         }
 
         private void UpdateCurrentPassives()
@@ -221,8 +227,8 @@ namespace Battle.UIComponent
             
             unit.OnMovementLeftChanged += UpdateUnitStatElementsForMovement;
             
-            EventManager.AddListener<AddPassiveBattleAction>(AddPassive);
-            EventManager.AddListener<RemovePassiveBattleAction>(RemovePassive);
+            ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked += AddPassive;
+            ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked += RemovePassive;
         }
 
         private void RemoveCallbacks(Unit unit)
@@ -238,8 +244,8 @@ namespace Battle.UIComponent
             
             unit.OnMovementLeftChanged -= UpdateUnitStatElementsForMovement;
             
-            EventManager.RemoveListener<AddPassiveBattleAction>(AddPassive);
-            EventManager.RemoveListener<RemovePassiveBattleAction>(RemovePassive);
+            ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked -= AddPassive;
+            ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked -= RemovePassive;
         }
 
         private void UpdateHpStatElement(UnitStatsInstance statsInstance)

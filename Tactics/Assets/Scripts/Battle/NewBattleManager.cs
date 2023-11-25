@@ -77,11 +77,12 @@ namespace Battle
             
             timelineManager.CreateNewTimeline();
             
-            foreach (var placedUnit in CurrentLevel.PlacedUnits)
+            foreach (var placedUnit in CurrentLevel.PlacedUnits.Where(unit => !unit.no))
             {
                 var tile = tileManager.AllTiles.FirstOrDefault(tile => tile.Position == placedUnit.position);
                 
-                var unit = new NewUnit(placedUnit.so,tile);
+                var unit = new NewUnit(placedUnit.so,tile,placedUnit.asPlayer);
+                
                 var unitRenderer = unitManager.SpawnUnit(unit);
             
                 var unitTr = unitRenderer.transform;

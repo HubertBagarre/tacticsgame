@@ -15,6 +15,27 @@ namespace Battle.ScriptableObjects.Passive
             return tile.Unit;
         }
 
+        protected override void OnAddedEffect(PassiveInstance instance, int startingStacks)
+        {
+            Debug.Log("Here");
+        }
+
+        protected override void OnStacksAddedEffect(PassiveInstance instance, int amount)
+        {
+            
+        }
+
+        protected override void OnStacksRemovedEffect(PassiveInstance instance, int amount)
+        {
+            
+        }
+
+        protected override void OnRemovedEffect(PassiveInstance instance)
+        {
+            
+        }
+
+        /*
         protected override void OnAddedEffect(IPassivesContainer container, PassiveInstance instance)
         {
             EventManager.AddListener<AddPassiveBattleAction>(EffectOnDaggerAdded,true);
@@ -50,7 +71,7 @@ namespace Battle.ScriptableObjects.Passive
             }
             
             //unit.OnTileEnter -= AddDaggerOnThrownDaggerPickup;
-        }
+        }*/
     }
 }
 

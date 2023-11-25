@@ -56,8 +56,8 @@ namespace Battle.UIComponent
             associatedUnit.Stats.OnMaxShieldModified += UpdateShieldBar;
             associatedUnit.Stats.OnCurrentShieldModified += UpdateShieldBar;
             
-            EventManager.AddListener<AddPassiveBattleAction>(AddPassiveIcon);
-            EventManager.AddListener<RemovePassiveBattleAction>(RemovePassiveIcon);
+            ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked += AddPassiveIcon;
+            ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked += RemovePassiveIcon;
         }
 
         private void Update()
@@ -89,8 +89,11 @@ namespace Battle.UIComponent
             shieldBarImage.fillAmount = current / (float)max;
         }
         
-        private void AddPassiveIcon(AddPassiveBattleAction ctx)
+        private void AddPassiveIcon(PassiveInstance.AddPassiveBattleAction action)
         {
+            //TODO - rework here
+            
+            /*
             if((Unit) ctx.Container != associatedUnit) return;
 
             var passiveInstance = ctx.PassiveInstance;
@@ -103,11 +106,14 @@ namespace Battle.UIComponent
             associatedPassive = Instantiate(passiveIconPrefab, passiveIconParent);
             unitPassiveIcons.Add(associatedPassive);
             
-            associatedPassive.LinkToPassive(passiveInstance);
+            associatedPassive.LinkToPassive(passiveInstance);*/
         }
 
-        private void RemovePassiveIcon(RemovePassiveBattleAction ctx)
+        private void RemovePassiveIcon(PassiveInstance.RemovePassiveBattleAction action)
         {
+            //TODO - rework here
+            
+            /*
             if((Unit) ctx.Container != associatedUnit) return;
 
             var passiveInstance = ctx.PassiveInstance;
@@ -117,7 +123,7 @@ namespace Battle.UIComponent
             if (associatedPassive == null) return;
 
             unitPassiveIcons.Remove(associatedPassive);
-            Destroy(associatedPassive.gameObject);
+            Destroy(associatedPassive.gameObject);*/
         }
     }
 }

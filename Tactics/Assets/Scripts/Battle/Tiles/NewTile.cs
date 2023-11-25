@@ -39,15 +39,20 @@ namespace Battle
             Tile.SetNewTile(this);
 
             passiveInstances = new List<PassiveInstance>();
-            
-            EventManager.AddListener<AddPassiveBattleAction>(AddPassiveInstanceToList);
         }
 
-        private void AddPassiveInstanceToList(AddPassiveBattleAction ctx)
+        public void AddPassiveInstanceToList(PassiveInstance passiveInstance)
         {
-            if(ctx.Container != this || ctx.PassiveInstance != null) return;
+            if(passiveInstance == null || passiveInstances.Contains(passiveInstance)) return;
             
-            passiveInstances.Add(ctx.PassiveInstance);
+            passiveInstances.Add(passiveInstance);
+        }
+
+        public void RemovePassiveInstanceFromList(PassiveInstance passiveInstance)
+        {
+            if(passiveInstance == null || !passiveInstances.Contains(passiveInstance)) return;
+            
+            passiveInstances.Remove(passiveInstance);
         }
         
         public PassiveInstance GetPassiveInstance(PassiveSO passiveSo)
@@ -57,7 +62,19 @@ namespace Battle
 
         public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1)
         {
-            new AddPassiveBattleAction(this, passiveSo, amount).TryStack();
+            var canCanPassive = passiveSo.CanAddPassive(this,amount,out var passiveInstance);
+            
+            if(!canCanPassive) return;
+            
+            if (passiveInstances.Contains(passiveInstance))
+            {
+                passiveInstance.AddStacks(amount);
+                return;
+            }
+            
+            var addPassiveAction = new PassiveInstance.AddPassiveBattleAction(passiveInstance,amount);
+            
+            addPassiveAction.TryStack();
         }
 
         public void RemovePassive(PassiveSO passiveSo)
@@ -71,9 +88,13 @@ namespace Battle
             if(passiveInstance == null) return;
             if(!passiveInstances.Contains(passiveInstance)) return;
             
-            passiveInstances.Remove(passiveInstance);
+            var canRemovePassive = passiveInstance.SO.CanRemovePassive(this);
             
-            new RemovePassiveBattleAction(this,passiveInstance).TryStack();
+            if(!canRemovePassive) return;
+            
+            var removePassiveAction = new PassiveInstance.RemovePassiveBattleAction(passiveInstance);
+            
+            removePassiveAction.TryStack();
         }
 
         public int GetPassiveEffectCount(Func<PassiveInstance, bool> condition, out PassiveInstance firstPassiveInstance)

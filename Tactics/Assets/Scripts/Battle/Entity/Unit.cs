@@ -519,7 +519,7 @@ namespace Battle
                 //if passive isn't stackable, creating new and adding to list
                 if (instance == null || !passiveSo.IsStackable)
                 {
-                    instance = passiveSo.CreateInstance(amount);
+                    //instance = passiveSo.CreateInstance(amount);
                     PassiveInstances.Add(instance);
                 }
 
@@ -558,7 +558,7 @@ namespace Battle
             if (!PassiveInstances.Contains(passiveInstance)) return;
             PassiveInstances.Remove(passiveInstance);
 
-            passiveInstance.OnPassiveRemoved(this);
+            //passiveInstance.OnPassiveRemoved(this);
             
             /*
             var callbacks = PassiveRemovedCallbacks.ToList();

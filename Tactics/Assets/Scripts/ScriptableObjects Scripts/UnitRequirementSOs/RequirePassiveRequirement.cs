@@ -140,7 +140,7 @@ namespace Battle.ScriptableObjects.Requirement
                 if (requiredPassive.PassiveSo != null && unit != null)
                 {
                     unit.GetPassiveEffectCount(UnitCondition, out var passiveInstance);
-                    passiveInstance?.DecreaseStacks(requiredPassive.RequiredStacks);
+                    passiveInstance?.RemoveStacks(requiredPassive.RequiredStacks);
                 }
                 
                 continue;

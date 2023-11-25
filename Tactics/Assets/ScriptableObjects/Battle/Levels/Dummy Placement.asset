@@ -20,6 +20,8 @@ MonoBehaviour:
     team: 1
     position: {x: 1, y: 1}
     orientation: 6
+    asPlayer: 0
+    no: 1
   - prefab: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
       type: 3}
     rendererPrefab: {fileID: 0}
@@ -27,6 +29,8 @@ MonoBehaviour:
     team: 0
     position: {x: 2, y: 2}
     orientation: 4
+    asPlayer: 0
+    no: 1
   - prefab: {fileID: 7378418639198021650, guid: 495bb91bbb994334c948794bbe2cbf73,
       type: 3}
     rendererPrefab: {fileID: 0}
@@ -34,3 +38,5 @@ MonoBehaviour:
     team: 0
     position: {x: 3, y: 3}
     orientation: 4
+    asPlayer: 0
+    no: 0

@@ -24,7 +24,7 @@ namespace Battle
 
         public List<Tile> AllTiles => tiles.ToList();
         
-        private void Start()
+        public void AddCallbacks()
         {
             InputManager.LeftClickEvent += ClickTile;
             
@@ -34,7 +34,12 @@ namespace Battle
             
             EventManager.AddListener<StartAbilityCastEvent>(ShowSelectedTilesOnStartAbilityCast);
             EventManager.AddListener<EndAbilityCastEvent>(ClearSelectedTilesOnCastEnd);
+            
+            ActionStartInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked += AddPassiveInstanceToTileList;
+            ActionStartInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked += RemovePassiveInstanceToTileList;
 
+            return;
+            
             void ClearSelectableTilesOnTurnEnd(EndUnitTurnEvent _)
             {
                 ResetTileAppearance();
@@ -44,6 +49,36 @@ namespace Battle
             {
                 ResetTileAppearance();
             }
+        }
+
+        public void RemoveCallbacks()
+        {
+            InputManager.LeftClickEvent -= ClickTile;
+            
+            AbilityManager.OnUpdatedCastingAbility -= UpdateAbilityTargetSelection;
+            
+            EventManager.RemoveListener<StartAbilityCastEvent>(ShowSelectedTilesOnStartAbilityCast);
+            
+            ActionStartInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked -= AddPassiveInstanceToTileList;
+            ActionStartInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked -= RemovePassiveInstanceToTileList;
+        }
+        
+        private void AddPassiveInstanceToTileList(PassiveInstance.AddPassiveBattleAction action)
+        {
+            if(action.PassiveInstance.Container is not NewTile tile) return;
+            
+            var instance = action.PassiveInstance;
+            
+            tile.AddPassiveInstanceToList(instance);
+        }
+        
+        private void RemovePassiveInstanceToTileList(PassiveInstance.RemovePassiveBattleAction action)
+        {
+            if(action.PassiveInstance.Container is not NewTile tile) return;
+            
+            var instance = action.PassiveInstance;
+            
+            tile.RemovePassiveInstanceFromList(instance);
         }
 
         public void SetTiles(List<Tile> list)

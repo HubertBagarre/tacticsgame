@@ -12,19 +12,27 @@ namespace Battle
     {
         public UnitStatsInstance Stats { get; private set; }
         public UnitSO UnitSo => Stats.So;
+        
+        public bool UsePlayerBehaviour { get; private set; }
         public Tile Tile { get; private set; }
         
         private List<PassiveInstance> passiveInstances;
         
         private List<UnitAbilityInstance> abilityInstances;
         
-        public NewUnit(UnitSO so,Tile tile) : base(so.BaseSpeed, so.Initiative, so.Name)
+        public NewUnit(UnitSO so,Tile tile,bool usePlayerBehaviour = false) : base(so.BaseSpeed, so.Initiative, so.Name)
         {
             Stats = so.CreateInstance();
             Tile = tile;
+            UsePlayerBehaviour = usePlayerBehaviour;
             
             passiveInstances = new List<PassiveInstance>();
             abilityInstances = new List<UnitAbilityInstance>();
+        }
+        
+        public void SetUsePlayerBehaviour(bool usePlayerBehaviour)
+        {
+            UsePlayerBehaviour = usePlayerBehaviour;
         }
 
         public void AddPassiveInstanceToList(PassiveInstance passiveInstance)
@@ -32,8 +40,13 @@ namespace Battle
             if(passiveInstance == null || passiveInstances.Contains(passiveInstance)) return;
             
             passiveInstances.Add(passiveInstance);
+        }
+
+        public void RemovePassiveInstanceFromList(PassiveInstance passiveInstance)
+        {
+            if(passiveInstance == null || !passiveInstances.Contains(passiveInstance)) return;
             
-            Debug.Log($"Added passive instance to list, now has {passiveInstances.Count}");
+            passiveInstances.Remove(passiveInstance);
         }
         
         protected override void AddedToTimelineEffect()
@@ -84,7 +97,19 @@ namespace Battle
 
         public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1)
         {
-            new AddPassiveBattleAction(this,passiveSo,amount).TryStack();
+            var canCanPassive = passiveSo.CanAddPassive(this,amount,out var passiveInstance);
+            
+            if(!canCanPassive) return;
+            
+            if (passiveInstances.Contains(passiveInstance))
+            {
+                passiveInstance.AddStacks(amount);
+                return;
+            }
+            
+            var addPassiveAction = new PassiveInstance.AddPassiveBattleAction(passiveInstance,amount);
+            
+            addPassiveAction.TryStack();
         }
 
         public void RemovePassive(PassiveSO passiveSo)
@@ -98,8 +123,13 @@ namespace Battle
             if(passiveInstance == null) return;
             if(!passiveInstances.Contains(passiveInstance)) return;
             
-            passiveInstances.Remove(passiveInstance);
-            new RemovePassiveBattleAction(this,passiveInstance).TryStack();
+            var canRemovePassive = passiveInstance.SO.CanRemovePassive(this);
+            
+            if(!canRemovePassive) return;
+            
+            var removePassiveAction = new PassiveInstance.RemovePassiveBattleAction(passiveInstance);
+            
+            removePassiveAction.TryStack();
         }
 
         public int GetPassiveEffectCount(Func<PassiveInstance, bool> condition, out PassiveInstance firstPassiveInstance)
@@ -121,7 +151,7 @@ namespace Battle
         
         public NewUnit Unit { get; }
         public UnitStatsInstance Stats => Unit.Stats;
-        public bool IsPlayerTurn => Stats.Behaviour == null;
+        public bool IsPlayerTurn => Stats.Behaviour == null || Unit.UsePlayerBehaviour;
         
         public event Action OnRequestEndTurn;
         

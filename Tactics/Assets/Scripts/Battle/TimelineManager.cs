@@ -7,6 +7,7 @@ namespace Battle
 {
     public class TimelineManager : MonoBehaviour
     {
+#if UNITY_EDITOR
         [Serializable]
         public struct TimelineEntityShower
         {
@@ -47,15 +48,16 @@ namespace Battle
             }
         }
         
+        [SerializeField]
+        private List<TimelineEntityShower> timelineEntityShowers = new();
+#endif
+        
         private List<TimelineEntity> entitiesInTimeline = new();
 
         //Timeline
         [field: Header("Timeline")]
         [field: SerializeField]
         public int ResetTurnValue { get; private set; } = 100;
-        
-        [SerializeField]
-        private List<TimelineEntityShower> timelineEntityShowers = new();
         
         public TimelineEntity FirstTimelineEntity => EntitiesInTimeline.FirstOrDefault();
         public bool IsFirstEntityRoundEnd => FirstTimelineEntity == roundEndEntity;
@@ -105,7 +107,7 @@ namespace Battle
         {
             entitiesInTimeline = entitiesInTimeline.OrderBy(entity => entity).ToList();
 
-            UpdateShowers();
+            UpdateShowersForEditor();
             
             EventManager.Trigger(entitiesInTimeline);
         }
@@ -169,8 +171,9 @@ namespace Battle
             }
         }
 
-        private void UpdateShowers()
+        private void UpdateShowersForEditor()
         {
+#if UNITY_EDITOR            
             timelineEntityShowers.Clear();
             foreach (var timelineEntity in entitiesInTimeline)
             {
@@ -178,6 +181,7 @@ namespace Battle
                 timelineEntityShowers.Add(shower);
                 shower.UpdateValues();
             }
+#endif
         }
 
         private class RoundEndEntity : TimelineEntity
@@ -241,7 +245,7 @@ namespace Battle
             
                 Entity.OnAddedToTimeline();
 
-                manager.UpdateShowers();
+                manager.UpdateShowersForEditor();
             }
         }
     }

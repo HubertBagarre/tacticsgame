@@ -7,7 +7,6 @@ using UnityEngine;
 namespace Battle
 {
     using UnitEvents;
-    using BattleEvents;
     
     public class BattleLevel : MonoBehaviour
     {
@@ -63,7 +62,7 @@ namespace Battle
         public virtual IEnumerator SetupStartingEntities()
         {
             var units = new List<Unit>();
-            foreach (var placedUnit in unitPlacement.PlacedUnits)
+            foreach (var placedUnit in unitPlacement.PlacedUnits.Where(unit => !unit.no))
             {
                 var tile = Tiles.FirstOrDefault(tile => tile.Position == placedUnit.position);
                 
@@ -74,7 +73,11 @@ namespace Battle
                 unitTr.SetParent(transform);
 
                 unit.name = placedUnit.so.name;
-                yield return StartCoroutine(unit.InitUnit(tile,placedUnit.team,placedUnit.so,placedUnit.orientation));
+                
+                var so = placedUnit.so;
+                if (placedUnit.asPlayer) so = null;
+                
+                yield return StartCoroutine(unit.InitUnit(tile,placedUnit.team,so,placedUnit.orientation));
             
                 units.Add(unit);
             }
