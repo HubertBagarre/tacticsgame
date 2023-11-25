@@ -70,21 +70,15 @@ namespace Battle
         public void CreateNewTimeline()
         {
             entitiesInTimeline = new List<TimelineEntity>();
-            
+        }
+
+        public void AddEndRoundEntity()
+        {
             roundEndEntity = new RoundEndEntity(0, 0, "End Round");
             
             AddEntityToTimeline(roundEndEntity,false);
-            
         }
         
-        public void AddEntitiesToTimeline(bool useInitiative,List<TimelineEntity> entities)
-        {
-            foreach (var entityToAdd in entities)
-            {
-                AddEntityToTimeline(entityToAdd, useInitiative);
-            }
-        }
-
         public void AddEntityToTimeline(TimelineEntity entityToAdd,bool useInitiative)
         {
             InsertEntityInTimeline(entityToAdd, useInitiative ? entityToAdd.Initiative : ResetTurnValue);
@@ -124,6 +118,8 @@ namespace Battle
         
         public void ResetRoundEntityDistanceFromTurnStart()
         {
+            Debug.Log("Resetting round end entity distance from turn start");
+            
             var distance = roundEndEntity.DistanceFromTurnStart;
             var speed = roundEndEntity.Speed;
             if (entitiesInTimeline.Count > 1)
@@ -133,11 +129,12 @@ namespace Battle
                 var slowestEntity = entitiesInTimeline.Where(entity => entity != roundEndEntity)
                     .OrderBy(entity => entity.Speed).First();
                 speed = slowestEntity.Speed;
+                Debug.Log($"Slowest entity is {slowestEntity.Name} with {slowestEntity.Speed} Speed");
                 
                 var furthestEntity = entitiesInTimeline.Where(entity => entity != roundEndEntity)
                     .OrderBy(entity => entity.TurnOrder).Last();
                 distance = furthestEntity.DistanceFromTurnStart; // + 0.01f; // TODO : find a better way to do this (+0.01f should not be necessary)
-                
+                Debug.Log($"Furthest entity is {furthestEntity.Name} with {furthestEntity.DistanceFromTurnStart} Distance");
             }
             
             roundEndEntity.SetSpeed(speed);

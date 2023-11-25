@@ -83,6 +83,8 @@ namespace Battle
         {
             ActionEndInvoker<SpawnStartingUnitsAction>.OnInvoked -= ResetTimelineAfterEntitySpawn;
             
+            Debug.Log("Done spawning units");
+            
             timelineManager.ResetRoundEntityDistanceFromTurnStart();
         }
 
@@ -209,6 +211,8 @@ namespace Battle
                         return BattleManager.unitManager.SpawnUnit(unit,rendererPrefab,orientation);
                     }
                 }
+                
+                BattleManager.timelineManager.AddEndRoundEntity();
             }
         }
         
