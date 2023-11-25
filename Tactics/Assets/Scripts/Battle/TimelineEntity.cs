@@ -111,8 +111,6 @@ namespace Battle.ActionSystem.TimelineActions
         
         protected override void Main()
         {
-            Debug.Log($"Starting {Entity.Name} TimelineEntityTurn Battle Action");
-            
             var enumerable = Entity.EntityTurnYieldedActions;
             if (enumerable == null)
             {

@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using Battle;
 using Battle.InputEvent;
 using Battle.UIComponent;
+using DG.Tweening;
+using TMPro;
 using UnityEngine;
 
 public class NewUIBattleManager : MonoBehaviour
@@ -16,10 +18,16 @@ public class NewUIBattleManager : MonoBehaviour
     [Header("Tooltip")]
     [SerializeField] private UITooltip tooltip;
     public static UITooltip Tooltip { get; private set; }
+    
+    [Header("Battle State")]
+    [SerializeField] private RectTransform battleRoundIndicatorTr;
+    [SerializeField] private TextMeshProUGUI battleRoundIndicatorText;
+    [SerializeField] private RectTransform battleStartIndicatorTr;
 
     public void AddCallbacks()
     {
         ActionEndInvoker<NewBattleManager.UnitCreatedAction>.OnInvoked += InstantiateUnitUi;
+        ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked += PlayRoundStartAnimation;
         
         EventManager.AddListener<ClickUnitEvent>(ShowUnitTooltip);
     }
@@ -27,6 +35,7 @@ public class NewUIBattleManager : MonoBehaviour
     public void RemoveCallbacks()
     {
         ActionEndInvoker<NewBattleManager.UnitCreatedAction>.OnInvoked -= InstantiateUnitUi;
+        ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked -= PlayRoundStartAnimation;
         
         EventManager.RemoveListener<ClickUnitEvent>(ShowUnitTooltip);
     }
@@ -35,7 +44,12 @@ public class NewUIBattleManager : MonoBehaviour
     {
         AssignTooltip();
         
+        battleStartIndicatorTr.anchoredPosition = new Vector2(-Screen.width, battleStartIndicatorTr.anchoredPosition.y);
+        battleRoundIndicatorTr.anchoredPosition = new Vector2(-Screen.width, battleRoundIndicatorTr.anchoredPosition.y);
+        
         unitTooltip.Hide();
+        
+        AddCallbacks();
     }
     
     private void InstantiateUnitUi(NewBattleManager.UnitCreatedAction action)
@@ -66,5 +80,20 @@ public class NewUIBattleManager : MonoBehaviour
     {
         Tooltip = tooltip;
         Tooltip.Hide();
+    }
+    
+    private void PlayRoundStartAnimation(NewBattleManager.RoundAction action)
+    {
+        //currentEntityBattleTimeline.gameObject.SetActive(false);
+            
+        battleRoundIndicatorText.text = $"Round {action.CurrentRound}";
+
+        var sequence = DOTween.Sequence();
+        sequence.Append(battleRoundIndicatorTr.DOMoveX(0,action.TransitionDuration.x));
+        sequence.AppendInterval(action.TransitionDuration.y);
+        sequence.Append(battleRoundIndicatorTr.DOMoveX(Screen.width,action.TransitionDuration.z));
+        sequence.AppendCallback(()=>battleRoundIndicatorTr.anchoredPosition = new Vector2(-Screen.width,0));
+
+        sequence.Play();
     }
 }

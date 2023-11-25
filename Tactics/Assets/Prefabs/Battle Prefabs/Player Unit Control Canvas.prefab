@@ -113,7 +113,6 @@ GameObject:
   - component: {fileID: 1371654530433637942}
   - component: {fileID: 3888119252441381184}
   - component: {fileID: 9022627755020377437}
-  - component: {fileID: 8589506974153803994}
   m_Layer: 5
   m_Name: Player Unit Control Canvas
   m_TagString: Untagged
@@ -203,27 +202,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &8589506974153803994
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 640498079530213922}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d56973fc71d6414499c13649229669d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parent: {fileID: 2859396324606299853}
-  endTurnButton: {fileID: 1352682740641532090}
-  abilityTargetSelectionUIObj: {fileID: 338824192872231962}
-  confirmTileSelectionButton: {fileID: 2770204684074447848}
-  cancelTileSelectionButton: {fileID: 547362029280125196}
-  selectionsLeftText: {fileID: 2852358584083757001}
-  abilityPointChargePrefab: {fileID: 7443386184952824264, guid: 42a309e6da97c9f408df208c55f29df6,
-    type: 3}
-  abilityPointChargeParent: {fileID: 4399763015778914532}
 --- !u!1 &1298104237575086325
 GameObject:
   m_ObjectHideFlags: 0

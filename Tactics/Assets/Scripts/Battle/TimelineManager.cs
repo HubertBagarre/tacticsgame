@@ -53,6 +53,7 @@ namespace Battle
 #endif
         
         private List<TimelineEntity> entitiesInTimeline = new();
+        public static event Action<(List<TimelineEntity>,int)> OnTimelineUpdated; 
 
         //Timeline
         [field: Header("Timeline")]
@@ -103,7 +104,7 @@ namespace Battle
 
             UpdateShowersForEditor();
             
-            EventManager.Trigger(entitiesInTimeline);
+            OnTimelineUpdated?.Invoke((entitiesInTimeline,entitiesInTimeline.IndexOf(roundEndEntity)));
         }
 
         public void ResetTimelineEntityDistanceFromTurnStart(TimelineEntity timelineEntity)
@@ -118,8 +119,6 @@ namespace Battle
         
         public void ResetRoundEntityDistanceFromTurnStart()
         {
-            Debug.Log("Resetting round end entity distance from turn start");
-            
             var distance = roundEndEntity.DistanceFromTurnStart;
             var speed = roundEndEntity.Speed;
             if (entitiesInTimeline.Count > 1)
@@ -129,18 +128,14 @@ namespace Battle
                 var slowestEntity = entitiesInTimeline.Where(entity => entity != roundEndEntity)
                     .OrderBy(entity => entity.Speed).First();
                 speed = slowestEntity.Speed;
-                Debug.Log($"Slowest entity is {slowestEntity.Name} with {slowestEntity.Speed} Speed");
                 
                 var furthestEntity = entitiesInTimeline.Where(entity => entity != roundEndEntity)
                     .OrderBy(entity => entity.TurnOrder).Last();
                 distance = furthestEntity.DistanceFromTurnStart; // + 0.01f; // TODO : find a better way to do this (+0.01f should not be necessary)
-                Debug.Log($"Furthest entity is {furthestEntity.Name} with {furthestEntity.DistanceFromTurnStart} Distance");
             }
             
             roundEndEntity.SetSpeed(speed);
             roundEndEntity.SetDistanceFromTurnStart(distance);
-            
-            Debug.Log($"Resetting round end entity distance from turn start (now at {roundEndEntity.DistanceFromTurnStart} at {roundEndEntity.Speed} Speed)");
         }
 
         public void SetTimelineEntityDistanceFromTurnStart(TimelineEntity timelineEntity,float value)

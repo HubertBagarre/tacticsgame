@@ -21,17 +21,18 @@ namespace Battle
     /// </summary>
     public class NewBattleManager : MonoBehaviour
     {
-        [SerializeField] private bool showLog;
-        [SerializeField] private int maxIterations = 99999;
-        [SerializeField] private int maxRounds = 10;
-
         [Header("Managers")]
         [SerializeField] private InputManager inputManager;
         [SerializeField] private TileManager tileManager;
         [SerializeField] private UnitManager unitManager;
         [SerializeField] private AbilityManager abilityManager;
         [SerializeField] private TimelineManager timelineManager;
-        [SerializeField] private NewUIBattleManager uiManager;
+        
+        [Header("Settings")]
+        [SerializeField] private int maxIterations = 99999;
+        [SerializeField] private bool showLog;
+        [SerializeField] private int maxRounds = 10;
+        [SerializeField] private Vector3 roundTransitionDuration = Vector3.one;
         
         //Level
         private BattleLevel CurrentLevel { get; set; }
@@ -104,14 +105,12 @@ namespace Battle
             
             unitManager.AddCallbacks();
             tileManager.AddCallbacks();
-            uiManager.AddCallbacks();
         }
         
         private void RemoveCallbacks()
         {
             unitManager.RemoveCallbacks();
             tileManager.RemoveCallbacks();
-            uiManager.RemoveCallbacks();
             
             ActionStartInvoker<UnitTurnBattleAction>.OnInvoked -= SetCurrentUnitTurnBattleAction;
             ActionEndInvoker<UnitTurnBattleAction>.OnInvoked -= ClearCurrentUnitTurnBattleAction;
@@ -164,14 +163,14 @@ namespace Battle
             
             public MainBattleAction(NewBattleManager battleManager) : base(battleManager)
             {
-                currentRoundAction = new RoundAction(battleManager,1);
+                currentRoundAction = new RoundAction(battleManager, 1,battleManager.roundTransitionDuration);
             }
             
             protected override void Main()
             {
                 currentRoundAction.TryStack();
 
-                currentRoundAction = new RoundAction(BattleManager,currentRoundAction.CurrentRound + 1);
+                currentRoundAction = new RoundAction(BattleManager,currentRoundAction.CurrentRound + 1,BattleManager.roundTransitionDuration);
             
                 if(BattleManager.maxRounds > 0 && currentRoundAction.CurrentRound > BattleManager.maxRounds) return;
                 
@@ -222,13 +221,23 @@ namespace Battle
         public class RoundAction : BattleManagerAction
         {
             public int CurrentRound { get; }
-        
-            public RoundAction(NewBattleManager battleManager,int round) : base(battleManager)
+            public Vector3 TransitionDuration { get; }
+            public float TransitionDurationFloat => TransitionDuration.x + TransitionDuration.y + TransitionDuration.z;
+
+            protected override YieldInstruction YieldInstruction => new WaitForSeconds(TransitionDurationFloat);
+
+            public RoundAction(NewBattleManager battleManager,int round,Vector3 transitionDuration) : base(battleManager)
             {
                 CurrentRound = round;
+                TransitionDuration = transitionDuration;
             }
             
             protected override void Main()
+            {
+                
+            }
+
+            protected override void PostWaitAction()
             {
                 var currentEntity = BattleManager.timelineManager.FirstTimelineEntity;
                 var isEndTurn = BattleManager.timelineManager.IsFirstEntityRoundEnd;
@@ -239,12 +248,14 @@ namespace Battle
                 
                 if(isEndTurn) return;
                 
-                EnqueueYieldedActions(new YieldedAction(Main));
+                EnqueueYieldedActions(new YieldedAction(PostWaitAction));
                 
                 var entityTurnAction = new TimelineEntityTurnAction(currentEntity);
                     
                 entityTurnAction.TryStack();
             }
+            
+            
         }
 
         public class UnitCreatedAction : SimpleStackableAction

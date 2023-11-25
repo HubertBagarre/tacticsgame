@@ -185,20 +185,11 @@ namespace Battle
         {
             advance = true;
             
-            Debug.Log($"Starting {Unit.Name} UnitTurn Battle Action");
-            
-            if (IsPlayerTurn)
-            {
-                Debug.Log($"No behaviour for {Unit.Name}, player turn");
-                
-                return;
-            }
-            
-            Debug.Log($"Behaviour : {Stats.Behaviour}");
+            if (IsPlayerTurn) return;
             
             var enumerable = Stats.Behaviour.UnitTurnBehaviourActions(Unit,EnqueueYieldedActions);
             
-            if (enumerable == null)  return;
+            if (enumerable == null) return;
             
             foreach (var behaviourAction in enumerable)
             {

@@ -1,3 +1,4 @@
+using System.Collections;
 using Battle.ActionSystem.TimelineActions;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,18 +23,36 @@ namespace Battle.UIComponent
 
         private void AddCallbacks()
         {
-            EventManager.AddListener<List<TimelineEntity>>(UpdateTimeline);
+            TimelineManager.OnTimelineUpdated += UpdateTimeline;
             
             ActionStartInvoker<TimelineEntityTurnAction>.OnInvoked += ShowCurrentBattleEntityTimeline;
             ActionEndInvoker<TimelineEntityTurnAction>.OnInvoked += HideCurrentBattleEntityTimeline;
+
+            ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked += HideTimelineDuringTransition;
         }
 
         private void RemoveCallbacks()
         {
-            EventManager.RemoveListener<List<TimelineEntity>>(UpdateTimeline);
+            TimelineManager.OnTimelineUpdated -= UpdateTimeline;
             
             ActionStartInvoker<TimelineEntityTurnAction>.OnInvoked -= ShowCurrentBattleEntityTimeline;
             ActionEndInvoker<TimelineEntityTurnAction>.OnInvoked -= HideCurrentBattleEntityTimeline;
+            
+            ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked -= HideTimelineDuringTransition;
+        }
+        
+        private void HideTimelineDuringTransition(NewBattleManager.RoundAction action)
+        {
+            timelineContainer.gameObject.SetActive(false);
+
+            StartCoroutine(DelayShowTimeline());
+            
+            return;
+            IEnumerator DelayShowTimeline()
+            {
+                yield return new WaitForSeconds(action.TransitionDurationFloat);
+                timelineContainer.gameObject.SetActive(true);
+            }
         }
 
         private void ShowCurrentBattleEntityTimeline(TimelineEntityTurnAction action)
@@ -51,12 +70,14 @@ namespace Battle.UIComponent
             currentBattleEntityTimeline.ShowArrow(false);
         }
 
-        private void UpdateTimeline(List<TimelineEntity> timelineEntities)
+        private void UpdateTimeline((List<TimelineEntity> timelineEntities,int endRoundEntityIndex) data)
         {
-            foreach (var timelineEntity in timelineEntities)
+            for (var index = 0; index < data.timelineEntities.Count; index++)
             {
+                var timelineEntity = data.timelineEntities[index];
                 var uiEntity = GetUIBattleEntityTimeline(timelineEntity);
                 uiEntity.transform.SetSiblingIndex(0);
+                uiEntity.Show(index <= data.endRoundEntityIndex);
             }
         }
 
