@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -220,8 +219,7 @@ namespace Battle.UIComponent
             statsInstance.OnAttackRangeModified += UpdateAttackRangeStatElement;
             statsInstance.OnMovementModified += UpdateMovementStatElement;
             statsInstance.OnSpeedModified += UpdateSpeedStatElement;
-            
-            unit.OnMovementLeftChanged += UpdateUnitStatElementsForMovement;
+            statsInstance.OnCurrentMovementModified += UpdateMovementStatElement;
             
             ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked += AddPassive;
             ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked += RemovePassive;
@@ -237,8 +235,7 @@ namespace Battle.UIComponent
             statsInstance.OnAttackRangeModified -= UpdateAttackRangeStatElement;
             statsInstance.OnMovementModified -= UpdateMovementStatElement;
             statsInstance.OnSpeedModified -= UpdateSpeedStatElement;
-            
-            unit.OnMovementLeftChanged -= UpdateUnitStatElementsForMovement;
+            statsInstance.OnCurrentMovementModified -= UpdateMovementStatElement;
             
             ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked -= AddPassive;
             ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked -= RemovePassive;
@@ -290,19 +287,13 @@ namespace Battle.UIComponent
             {
                 var color = statsInstance.MovementDiff > 0 ? "<color=green>" : "<color=red>";
                 MovementElement.ChangeValueText(
-                    $"{currentDisplayingUnit.MovementLeft}/{color}{statsInstance.Movement}</color>");
+                    $"{statsInstance.CurrentMovement}/{color}{statsInstance.Movement}</color>");
                 return;
             }
 
-            MovementElement.ChangeValueText($"{currentDisplayingUnit.MovementLeft}/{statsInstance.Movement}");
+            MovementElement.ChangeValueText($"{statsInstance.CurrentMovement}/{statsInstance.Movement}");
         }
         
-        private void UpdateUnitStatElementsForMovement(int _)
-        {
-            if(currentDisplayingUnit == null) return;
-            UpdateMovementStatElement(currentDisplayingUnit.Stats);
-        }
-
         private void UpdateSpeedStatElement(UnitStatsInstance statsInstance)
         {
             var hasDif = statsInstance.SpeedDiff != 0;

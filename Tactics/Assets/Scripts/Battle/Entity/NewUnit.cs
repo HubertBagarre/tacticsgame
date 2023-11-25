@@ -10,22 +10,9 @@ namespace Battle
     [Serializable]
     public class NewUnit : TimelineEntity, IPassivesContainer
     {
-        [Header("Current Stats")]
-        [SerializeField] private int movementLeft;
+        [field: Header("Current Stats")]
         
-        public int MovementLeft
-        {
-            get => movementLeft;
-            private set
-            {
-                movementLeft = value;
-                OnMovementLeftChanged?.Invoke(movementLeft);
-            }
-        }
-        
-        public event Action<int> OnMovementLeftChanged;
-        
-        public UnitStatsInstance Stats { get; private set; }
+        [field: SerializeField] public UnitStatsInstance Stats { get; private set; }
         public UnitSO UnitSo => Stats.So;
         
         public bool UsePlayerBehaviour { get; private set; }

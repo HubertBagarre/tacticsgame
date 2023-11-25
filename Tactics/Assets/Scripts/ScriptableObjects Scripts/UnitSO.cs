@@ -121,7 +121,7 @@ namespace Battle
         
         // Hp
         public int BaseMaxHp => So.MaxHp;
-        public int MaxHpModifier { get; private set; }
+        [field: SerializeField] public int MaxHpModifier { get; private set; }
         public int MaxHp => BaseMaxHp + MaxHpModifier < 0 ? 0 : BaseMaxHp + MaxHpModifier;
         public int MaxHpDiff => MaxHpModifier == 0 ? 0 : MaxHpModifier > 0 ? 1 : -1;
         public event Action<UnitStatsInstance> OnMaxHpModified;
@@ -131,7 +131,7 @@ namespace Battle
             OnMaxHpModified?.Invoke(this);
         }
         
-        private int currentHp;
+        [field: SerializeField] private int currentHp;
         public event Action<UnitStatsInstance> OnCurrentHpModified;
         public int CurrentHp
         {
@@ -149,7 +149,7 @@ namespace Battle
         
         //Shield
         public int BaseMaxShield => So.MaxShield;
-        public int MaxShieldModifier { get; private set; }
+        [field: SerializeField] public int MaxShieldModifier { get; private set; }
         public int MaxShield => BaseMaxShield + MaxShieldModifier < 0 ? 0 : BaseMaxShield + MaxShieldModifier;
         public int MaxShieldDiff => MaxShieldModifier == 0 ? 0 : MaxShieldModifier > 0 ? 1 : -1;
         public event Action<UnitStatsInstance> OnMaxShieldModified;
@@ -159,7 +159,7 @@ namespace Battle
             OnMaxShieldModified?.Invoke(this);
         }
         
-        private int currentShield;
+        [field: SerializeField] private int currentShield;
         public event Action<UnitStatsInstance> OnCurrentShieldModified;
         public int CurrentShield
         {
@@ -177,7 +177,7 @@ namespace Battle
         }
         
         // Break
-        private bool isBroken;
+        [field: SerializeField] private bool isBroken;
         public event Action<UnitStatsInstance> OnBreakValueChanged; 
         public bool IsBroken
         {
@@ -193,7 +193,7 @@ namespace Battle
 
         // Attack
         public int BaseAttack => So.Attack;
-        public int AttackModifier { get; private set; }
+        [field: SerializeField] public int AttackModifier { get; private set; }
         public int Attack => BaseAttack + AttackModifier < 0 ? 0 : BaseAttack + AttackModifier;
         public int AttackDiff => AttackModifier == 0 ? 0 : AttackModifier > 0 ? 1 : -1;
         public event Action<UnitStatsInstance> OnAttackModified;
@@ -205,7 +205,7 @@ namespace Battle
         
         // Attack Range
         public int BaseAttackRange => So.AttackRange;
-        public int AttackRangeModifier { get; private set; }
+        [field: SerializeField] public int AttackRangeModifier { get; private set; }
         public int AttackRange => BaseAttackRange + AttackRangeModifier < 0 ? 0 : BaseAttackRange + AttackRangeModifier;
         public int AttackRangeDiff => AttackRangeModifier == 0 ? 0 : AttackRangeModifier > 0 ? 1 : -1;
         public event Action<UnitStatsInstance> OnAttackRangeModified;
@@ -217,7 +217,7 @@ namespace Battle
         
         // Movement
         public int BaseMovement => So.BaseMovement;
-        public int MovementModifier { get; private set; }
+        [field: SerializeField] public int MovementModifier { get; private set; }
         public int Movement => BaseMovement + MovementModifier < 0 ? 0 : BaseMovement + MovementModifier;
         public int MovementDiff => MovementModifier == 0 ? 0 : MovementModifier > 0 ? 1 : -1;
         public event Action<UnitStatsInstance> OnMovementModified;
@@ -227,7 +227,7 @@ namespace Battle
             OnMovementModified?.Invoke(this);
         }
         
-        private int currentMovement;
+        [field: SerializeField] private int currentMovement;
         public event Action<UnitStatsInstance> OnCurrentMovementModified;
         public int CurrentMovement
         {
@@ -241,7 +241,7 @@ namespace Battle
         
         // Turn Order
         public int BaseSpeed { get; }
-        public int SpeedModifier { get; private set; }
+        [field: SerializeField] public int SpeedModifier { get; private set; }
         public int Speed => BaseSpeed + SpeedModifier < 0 ? 0 : BaseSpeed + SpeedModifier;
         public int SpeedDiff => SpeedModifier == 0 ? 0 : SpeedModifier > 0 ? 1 : -1;
         public event Action<UnitStatsInstance> OnSpeedModified;
@@ -298,6 +298,11 @@ namespace Battle
             MovementModifier = 0;
             SpeedModifier = 0;
             
+            RefreshModifiers();
+        }
+
+        public void RefreshModifiers()
+        {
             OnMaxHpModified?.Invoke(this);
             OnMaxShieldModified?.Invoke(this);
             OnAttackModified?.Invoke(this);

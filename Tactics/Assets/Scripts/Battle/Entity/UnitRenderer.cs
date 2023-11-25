@@ -3,7 +3,7 @@ using Battle;
 
 public class UnitRenderer : MonoBehaviour
 {
-    public NewUnit Unit { get; private set; }
+    [field: SerializeField] public NewUnit Unit { get; private set; }
     public Tile Tile => Unit.Tile;
     public BattleModel BattleModel { get; private set; }
     [SerializeField] private BattleModel defaultModel;
@@ -35,6 +35,13 @@ public class UnitRenderer : MonoBehaviour
     {
         Unit.DebugPassives();
     }
+    
+    [ContextMenu("Refresh Unit Stats Modifiers")]
+    public void RefreshUnitStats()
+    {
+        Unit.Stats.RefreshModifiers();
+    }
+    
     #endif
     
     #endregion
