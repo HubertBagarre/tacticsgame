@@ -26,7 +26,7 @@ namespace Battle
         [SerializeField] private InputManager inputManager;
         [SerializeField] private TileManager tileManager;
         [SerializeField] private UnitManager unitManager;
-        [SerializeField] private AbilityManager abilityManager;
+        [SerializeField] private NewAbilityManager abilityManager;
         [SerializeField] private TimelineManager timelineManager;
         
         [Header("Settings")]
@@ -38,8 +38,6 @@ namespace Battle
         
         //Level
         private BattleLevel CurrentLevel { get; set; }
-
-        private Queue<UnitPlacementSO.PlacedUnit> unitsToPlace = new();
         
         //Current Unit
         private UnitTurnBattleAction CurrentTurnUnitAction { get; set; }
@@ -107,12 +105,14 @@ namespace Battle
             
             unitManager.AddCallbacks();
             tileManager.AddCallbacks();
+            abilityManager.AddCallbacks();
         }
         
         private void RemoveCallbacks()
         {
             unitManager.RemoveCallbacks();
             tileManager.RemoveCallbacks();
+            abilityManager.RemoveCallbacks();
             
             ActionStartInvoker<UnitTurnBattleAction>.invoked -= SetCurrentUnitTurnBattleAction;
             ActionEndInvoker<UnitTurnBattleAction>.invoked -= ClearCurrentUnitTurnBattleAction;
