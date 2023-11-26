@@ -175,7 +175,6 @@ namespace Battle
             
             protected override void Main()
             {
-                
             }
             
             protected override void PostWaitAction()

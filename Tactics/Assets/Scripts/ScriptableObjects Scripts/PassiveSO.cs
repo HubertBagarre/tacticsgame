@@ -306,7 +306,7 @@ namespace Battle
             callbackDictionary = new Dictionary<Delegate, List<Delegate>>();
         }
 
-        public void SubscribeToEvent<T>(ref Action<T> eventToSubscribeTo,Action<T> callback) where T : StackableAction
+        public void SubscribeToEvent<T>(ref Action<T> eventToSubscribeTo,Action<T> callback)
         {
             eventToSubscribeTo += callback;
             
@@ -322,6 +322,7 @@ namespace Battle
         public void UnsubscribeFromEvents<T>(ref Action<T> eventToUnSubscribeFrom)
         {
             if(!callbackDictionary.TryGetValue(eventToUnSubscribeFrom,out var callbacks)) return;
+            if(callbacks == null) return;
             
             foreach (var callback in callbacks)
             {

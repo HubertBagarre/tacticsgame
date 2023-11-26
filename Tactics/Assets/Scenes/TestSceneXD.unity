@@ -494,6 +494,16 @@ PrefabInstance:
       propertyPath: newBattleManager
       value: 
       objectReference: {fileID: 107337558}
+    - target: {fileID: 4029277281268939806, guid: d199fcebe4717a144b5aa807d02228a4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4749299947456972236, guid: d199fcebe4717a144b5aa807d02228a4,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7059149321718778210, guid: d199fcebe4717a144b5aa807d02228a4,
         type: 3}
       propertyPath: m_RootOrder
