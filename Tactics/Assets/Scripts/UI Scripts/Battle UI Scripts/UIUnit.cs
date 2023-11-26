@@ -57,8 +57,8 @@ namespace Battle.UIComponent
             associatedUnit.Stats.OnMaxShieldModified += UpdateShieldBar;
             associatedUnit.Stats.OnCurrentShieldModified += UpdateShieldBar;
             
-            ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked += AddPassiveIcon;
-            ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked += RemovePassiveIcon;
+            ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.invoked += AddPassiveIcon;
+            ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.invoked += RemovePassiveIcon;
         }
         
         public void LinkToUnit(NewUnit unit)
@@ -76,8 +76,8 @@ namespace Battle.UIComponent
             newAssociatedUnit.Stats.OnMaxShieldModified += UpdateShieldBar;
             newAssociatedUnit.Stats.OnCurrentShieldModified += UpdateShieldBar;
             
-            ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked += AddPassiveIcon;
-            ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked += RemovePassiveIcon;
+            ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.invoked += AddPassiveIcon;
+            ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.invoked += RemovePassiveIcon;
         }
 
         private void Update()

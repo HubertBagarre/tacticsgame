@@ -327,21 +327,21 @@ public abstract class StackableAction
 
 public class ActionStartInvoker<T> where T : StackableAction
 {
-    public static event Action<T> OnInvoked;
-        
+    public static Action<T> invoked; // TODO - unsafe :c
+
     public ActionStartInvoker(T stackableAction)
     {
-        OnInvoked?.Invoke(stackableAction);
+        invoked?.Invoke(stackableAction);
     }
 }
     
 public class ActionEndInvoker<T> where T : StackableAction
 {
-    public static event Action<T> OnInvoked;
+    public static Action<T> invoked; // TODO - unsafe :c
         
     public ActionEndInvoker(T stackableAction)
     {
-        OnInvoked?.Invoke(stackableAction);
+        invoked?.Invoke(stackableAction);
     }
 }
 }

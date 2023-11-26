@@ -65,14 +65,14 @@ public class UIPlayerControls : MonoBehaviour
         
         private void AddCallbacks()
         {
-                ActionStartInvoker<UnitTurnBattleAction>.OnInvoked += TryShowPlayerUI;
-                ActionEndInvoker<UnitTurnBattleAction>.OnInvoked += HidePlayerUI;
+                ActionStartInvoker<UnitTurnBattleAction>.invoked += TryShowPlayerUI;
+                ActionEndInvoker<UnitTurnBattleAction>.invoked += HidePlayerUI;
         }
 
         private void RemoveCallbacks()
         {
-                ActionStartInvoker<UnitTurnBattleAction>.OnInvoked -= TryShowPlayerUI;
-                ActionEndInvoker<UnitTurnBattleAction>.OnInvoked -= HidePlayerUI;
+                ActionStartInvoker<UnitTurnBattleAction>.invoked -= TryShowPlayerUI;
+                ActionEndInvoker<UnitTurnBattleAction>.invoked -= HidePlayerUI;
         }
         
         private void TryShowPlayerUI(UnitTurnBattleAction action)

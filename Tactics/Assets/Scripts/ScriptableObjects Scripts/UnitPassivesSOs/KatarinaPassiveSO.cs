@@ -17,7 +17,18 @@ namespace Battle.ScriptableObjects.Passive
 
         protected override void OnAddedEffect(PassiveInstance instance, int startingStacks)
         {
-            Debug.Log($"Added effect with {startingStacks} stacks");
+            //ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked += Test;
+            
+            instance.SubscribeToEvent(ref ActionStartInvoker<NewBattleManager.RoundAction>.invoked,Test);
+            
+            return;
+            
+            void Test(NewBattleManager.RoundAction action)
+            {
+                instance.UnsubscribeFromEvents(ref ActionStartInvoker<NewBattleManager.RoundAction>.invoked);
+                
+                Debug.Log("Test");
+            }
         }
 
         protected override void OnStacksAddedEffect(PassiveInstance instance, int amount)

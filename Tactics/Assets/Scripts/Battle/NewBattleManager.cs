@@ -75,7 +75,7 @@ namespace Battle
 
         private void SpawnStartingUnits(MainBattleAction action)
         {
-            ActionStartInvoker<MainBattleAction>.OnInvoked -= SpawnStartingUnits;
+            ActionStartInvoker<MainBattleAction>.invoked -= SpawnStartingUnits;
             
             timelineManager.CreateNewTimeline();
             
@@ -87,7 +87,7 @@ namespace Battle
 
         private void ResetTimelineAfterEntitySpawn(SpawnStartingUnitsAction action)
         {
-            ActionEndInvoker<SpawnStartingUnitsAction>.OnInvoked -= ResetTimelineAfterEntitySpawn;
+            ActionEndInvoker<SpawnStartingUnitsAction>.invoked -= ResetTimelineAfterEntitySpawn;
             
             Debug.Log("Done spawning units");
             
@@ -96,14 +96,14 @@ namespace Battle
 
         private void AddCallbacks()
         {
-            ActionStartInvoker<RoundAction>.OnInvoked += action => Debug.Log($"Starting round {action.CurrentRound}");
-            ActionStartInvoker<MainBattleAction>.OnInvoked += SpawnStartingUnits;
-            ActionEndInvoker<SpawnStartingUnitsAction>.OnInvoked += ResetTimelineAfterEntitySpawn;
+            ActionStartInvoker<RoundAction>.invoked += action => Debug.Log($"Starting round {action.CurrentRound}");
+            ActionStartInvoker<MainBattleAction>.invoked += SpawnStartingUnits;
+            ActionEndInvoker<SpawnStartingUnitsAction>.invoked += ResetTimelineAfterEntitySpawn;
             
-            ActionStartInvoker<UnitTurnBattleAction>.OnInvoked += SetCurrentUnitTurnBattleAction;
-            ActionEndInvoker<UnitTurnBattleAction>.OnInvoked += ClearCurrentUnitTurnBattleAction;
+            ActionStartInvoker<UnitTurnBattleAction>.invoked += SetCurrentUnitTurnBattleAction;
+            ActionEndInvoker<UnitTurnBattleAction>.invoked += ClearCurrentUnitTurnBattleAction;
 
-            ActionEndInvoker<UnitCreatedAction>.OnInvoked += AddCreatedUnitToTimeline;
+            ActionEndInvoker<UnitCreatedAction>.invoked += AddCreatedUnitToTimeline;
             
             unitManager.AddCallbacks();
             tileManager.AddCallbacks();
@@ -114,10 +114,10 @@ namespace Battle
             unitManager.RemoveCallbacks();
             tileManager.RemoveCallbacks();
             
-            ActionStartInvoker<UnitTurnBattleAction>.OnInvoked -= SetCurrentUnitTurnBattleAction;
-            ActionEndInvoker<UnitTurnBattleAction>.OnInvoked -= ClearCurrentUnitTurnBattleAction;
+            ActionStartInvoker<UnitTurnBattleAction>.invoked -= SetCurrentUnitTurnBattleAction;
+            ActionEndInvoker<UnitTurnBattleAction>.invoked -= ClearCurrentUnitTurnBattleAction;
             
-            ActionEndInvoker<UnitCreatedAction>.OnInvoked -= AddCreatedUnitToTimeline;
+            ActionEndInvoker<UnitCreatedAction>.invoked -= AddCreatedUnitToTimeline;
         }
         
         private void SetCurrentUnitTurnBattleAction(UnitTurnBattleAction action)

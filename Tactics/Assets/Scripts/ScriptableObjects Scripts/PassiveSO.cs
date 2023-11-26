@@ -88,8 +88,6 @@ namespace Battle.ScriptableObjects
 
         public virtual void AddPassive(PassiveInstance instance,int startingStacks)
         {
-            if(!IsStackable) startingStacks = 0;
-            
             OnAddedEffect(instance,startingStacks);
             instance.AddPassiveInstanceToContainer();
             
@@ -131,22 +129,34 @@ namespace Battle.ScriptableObjects
 
         public override void AddPassive(PassiveInstance instance,int startingStacks)
         {
-            //if(HasStartRoundEffect) BattleManager.AddStartRoundPassive(RoundStartEffect(container, instance));
-            //if(HasEndRoundEffect) BattleManager.AddEndRoundPassive(RoundEndEffect(container, instance));
+            if(HasStartRoundEffect) instance.SubscribeToEvent(ref ActionStartInvoker<NewBattleManager.RoundAction>.invoked, InvokeRoundStartEffect);
+            if(HasEndRoundEffect) instance.SubscribeToEvent(ref ActionEndInvoker<NewBattleManager.RoundAction>.invoked, InvokeRoundEndEffect);
 
             base.AddPassive(instance,startingStacks);
+            
+            return;
+            
+            void InvokeRoundStartEffect(NewBattleManager.RoundAction action)
+            {
+                RoundStartEffect(action, instance);
+            }
+            
+            void InvokeRoundEndEffect(NewBattleManager.RoundAction action)
+            {
+                RoundEndEffect(action, instance);
+            }
         }
 
         public override void RemovePassive(PassiveInstance instance)
         {
-            //if(HasStartRoundEffect) BattleManager.RemoveStartRoundPassive(RoundStartEffect(container, instance));
-            //if(HasEndRoundEffect) BattleManager.RemoveEndRoundPassive(RoundEndEffect(container, instance));
+            if(HasStartRoundEffect) instance.UnsubscribeFromEvents(ref ActionStartInvoker<NewBattleManager.RoundAction>.invoked);
+            if(HasEndRoundEffect) instance.UnsubscribeFromEvents(ref ActionEndInvoker<NewBattleManager.RoundAction>.invoked);
 
             base.RemovePassive(instance);
         }
 
-        protected abstract void RoundStartEffect(PassiveInstance instance);
-        protected abstract void RoundEndEffect(PassiveInstance instance);
+        protected abstract void RoundStartEffect(NewBattleManager.RoundAction action, PassiveInstance instance);
+        protected abstract void RoundEndEffect(NewBattleManager.RoundAction action, PassiveInstance instance);
     }
 
     public abstract class TilePassiveSo : PassiveSO
@@ -199,36 +209,45 @@ namespace Battle.ScriptableObjects
         [field: SerializeField] public bool RemoveOnTurnStart { get; private set; } = false;
 
         public override IPassivesContainer GetContainer(NewTile tile) => tile.Unit;
-/*
-        public override void AddPassive(IPassivesContainer container, PassiveInstance instance)
-        {
-        
-            if (HasStartTurnEffect) entity.OnTurnStart += TurnStartEffect;
-            if (HasEndTurnEffect) entity.OnTurnEnd += TurnEndEffect;
-        
-            base.AddPassive(container, instance);
-        }
 
-        public override void RemovePassive(IPassivesContainer container, PassiveInstance instance)
+        public override void AddPassive(PassiveInstance instance, int startingStacks)
+        {
+            if (HasStartTurnEffect) instance.SubscribeToEvent(ref ActionStartInvoker<UnitTurnBattleAction>.invoked,InvokeTurnStartEffect);
+            if (HasEndTurnEffect) instance.SubscribeToEvent(ref ActionEndInvoker<UnitTurnBattleAction>.invoked,InvokeTurnEndEffect);
+            
+            base.AddPassive(instance, startingStacks);
+            
+            return;
+            
+            void InvokeTurnStartEffect(UnitTurnBattleAction action)
+            {
+                if(RemoveOnTurnStart) instance.UnsubscribeFromEvents(ref ActionStartInvoker<UnitTurnBattleAction>.invoked);
+                TurnStartEffect(action, instance);
+            }
+            
+            void InvokeTurnEndEffect(UnitTurnBattleAction action)
+            {
+                if(RemoveOnTurnEnd) instance.UnsubscribeFromEvents(ref ActionEndInvoker<UnitTurnBattleAction>.invoked);
+                TurnEndEffect(action, instance);
+            }
+        }
+        
+        public override void RemovePassive(PassiveInstance instance)
+        {
+            if (HasStartTurnEffect) instance.UnsubscribeFromEvents(ref ActionStartInvoker<UnitTurnBattleAction>.invoked);
+            if (HasEndTurnEffect) instance.UnsubscribeFromEvents(ref ActionEndInvoker<UnitTurnBattleAction>.invoked);
+            
+            base.RemovePassive(instance);
+        }
+        
+        protected virtual void TurnEndEffect(UnitTurnBattleAction action, PassiveInstance instance)
         {
             
-            if (HasStartTurnEffect) entity.OnTurnStart -= TurnStartEffect;
-            if (HasEndTurnEffect) entity.OnTurnEnd -= TurnEndEffect;
-            
-            base.RemovePassive(container, instance);
         }
 
-        private void TurnStartEffect(TimelineEntity entity) => OnTurnStartEffect(entity);
-
-        private void TurnEndEffect(TimelineEntity entity) => OnTurnEndEffect(entity);
-
-        protected virtual void OnTurnEndEffect(TimelineEntity entity)
+        protected virtual void TurnStartEffect(UnitTurnBattleAction action, PassiveInstance instance)
         {
         }
-
-        protected virtual void OnTurnStartEffect(TimelineEntity entity)
-        {
-        }*/
     }
 }
 
@@ -248,7 +267,6 @@ namespace Battle
         public IReadOnlyList<PassiveInstance> PassiveInstances { get; }
         public void AddPassiveInstanceToList(PassiveInstance passiveInstance);
         public void RemovePassiveInstanceFromList(PassiveInstance passiveInstance);
-        
         
         public PassiveInstance GetPassiveInstance(PassiveSO passiveSo);
         public void AddPassiveEffect(PassiveSO passiveSo, int amount = 1, bool force = false);
@@ -277,13 +295,43 @@ namespace Battle
         public event Action<int> OnCurrentStacksChanged;
         public Dictionary<string, object> Data { get; private set; }
 
+        private Dictionary<Delegate, List<Delegate>> callbackDictionary;
+
         public PassiveInstance(PassiveSO so, IPassivesContainer container)
         {
             SO = so;
             Container = container;
             CurrentStacks = 0;
             Data = new Dictionary<string, object>();
+            callbackDictionary = new Dictionary<Delegate, List<Delegate>>();
         }
+
+        public void SubscribeToEvent<T>(ref Action<T> eventToSubscribeTo,Action<T> callback) where T : StackableAction
+        {
+            eventToSubscribeTo += callback;
+            
+            if(callbackDictionary.TryGetValue(eventToSubscribeTo,out var callbacks))
+            {
+                callbacks.Add(callback);
+                return;
+            }
+            
+            callbackDictionary.Add(eventToSubscribeTo,new List<Delegate>{callback});
+        }
+
+        public void UnsubscribeFromEvents<T>(ref Action<T> eventToUnSubscribeFrom)
+        {
+            if(!callbackDictionary.TryGetValue(eventToUnSubscribeFrom,out var callbacks)) return;
+            
+            foreach (var callback in callbacks)
+            {
+                eventToUnSubscribeFrom -= callback as Action<T>;
+            }
+            
+            callbacks.Clear();
+            callbackDictionary.Remove(eventToUnSubscribeFrom);
+        }
+
         
         public void AddPassiveInstanceToContainer()
         {
@@ -348,7 +396,7 @@ namespace Battle
             {
                 Container = container;
                 PassiveSo = passiveSo;
-                Amount = amount;
+                Amount = PassiveSo.IsStackable ? amount : 0;
                 ForceNewInstance = force;
             }
             
