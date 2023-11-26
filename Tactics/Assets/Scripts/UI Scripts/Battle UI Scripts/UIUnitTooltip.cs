@@ -34,23 +34,7 @@ namespace Battle.UIComponent
         private NewUnit currentDisplayingUnit;
 
         [SerializeField] private Transform statElementParent;
-
-        private void Start()
-        {
-            statElements.Clear();
-            abilityShowerDict.Clear();
-
-            for (var i = 0; i < 5; i++)
-            {
-                statElements.Add(Instantiate(UIStatElementPrefab, statElementParent));
-            }
-            
-            SetupStatElement();
-
-            Hide();
-        }
-
-
+        
         public void DisplayUnitTooltip(NewUnit unit)
         {
             RemoveCallbacks(currentDisplayingUnit);
@@ -200,8 +184,16 @@ namespace Battle.UIComponent
             }
         }
 
-        private void SetupStatElement()
+        public void SetupStatElement()
         {
+            statElements.Clear();
+            abilityShowerDict.Clear();
+
+            for (var i = 0; i < 5; i++)
+            {
+                statElements.Add(Instantiate(UIStatElementPrefab, statElementParent));
+            }
+            
             HpElement.ChangeStatText("Hp  :");
             AttackElement.ChangeStatText("Atk :");
             AttackRangeElement.ChangeStatText("AtkR:");

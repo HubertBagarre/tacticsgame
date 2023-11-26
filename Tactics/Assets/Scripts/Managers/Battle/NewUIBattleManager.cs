@@ -49,6 +49,7 @@ public class NewUIBattleManager : MonoBehaviour
         battleStartIndicatorTr.anchoredPosition = new Vector2(-Screen.width, battleStartIndicatorTr.anchoredPosition.y);
         battleRoundIndicatorTr.anchoredPosition = new Vector2(-Screen.width, battleRoundIndicatorTr.anchoredPosition.y);
         
+        unitTooltip.SetupStatElement();
         unitTooltip.Hide();
         
         AddCallbacks();
