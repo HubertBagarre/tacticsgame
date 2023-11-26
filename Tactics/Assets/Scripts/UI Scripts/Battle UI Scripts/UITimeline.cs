@@ -31,20 +31,20 @@ namespace Battle.UIComponent
         {
             TimelineManager.OnTimelineUpdated += UpdateTimeline;
             
-            ActionStartInvoker<TimelineEntityTurnAction>.invoked += ShowCurrentBattleEntityTimeline;
-            ActionEndInvoker<TimelineEntityTurnAction>.invoked += HideCurrentBattleEntityTimeline;
+            ActionStartInvoker<TimelineEntityTurnAction>.OnInvoked += ShowCurrentBattleEntityTimeline;
+            ActionEndInvoker<TimelineEntityTurnAction>.OnInvoked += HideCurrentBattleEntityTimeline;
 
-            ActionStartInvoker<NewBattleManager.RoundAction>.invoked += HideTimelineDuringTransition;
+            ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked += HideTimelineDuringTransition;
         }
 
         private void RemoveCallbacks()
         {
             TimelineManager.OnTimelineUpdated -= UpdateTimeline;
             
-            ActionStartInvoker<TimelineEntityTurnAction>.invoked -= ShowCurrentBattleEntityTimeline;
-            ActionEndInvoker<TimelineEntityTurnAction>.invoked -= HideCurrentBattleEntityTimeline;
+            ActionStartInvoker<TimelineEntityTurnAction>.OnInvoked -= ShowCurrentBattleEntityTimeline;
+            ActionEndInvoker<TimelineEntityTurnAction>.OnInvoked -= HideCurrentBattleEntityTimeline;
             
-            ActionStartInvoker<NewBattleManager.RoundAction>.invoked -= HideTimelineDuringTransition;
+            ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked -= HideTimelineDuringTransition;
         }
         
         private void HideTimelineDuringTransition(NewBattleManager.RoundAction action)

@@ -17,7 +17,7 @@ MonoBehaviour:
   <Type>k__BackingField: 0
   <Name>k__BackingField: Passive
   <Description>k__BackingField: SUUUUUUUU
-  <IsStackable>k__BackingField: 0
+  <IsStackable>k__BackingField: 1
   <MaxStacks>k__BackingField: 0
   <IsUnmovable>k__BackingField: 1
   <MaxInstances>k__BackingField: 1

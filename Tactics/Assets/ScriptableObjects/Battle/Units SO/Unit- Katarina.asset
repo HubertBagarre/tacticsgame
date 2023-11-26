@@ -43,7 +43,4 @@ MonoBehaviour:
   <StartingPassives>k__BackingField:
   - <SO>k__BackingField: {fileID: 11400000, guid: 6fcd7d4f362d1874f820c459430e18b8,
       type: 2}
-    <Stacks>k__BackingField: 2
-  - <SO>k__BackingField: {fileID: 11400000, guid: 6fcd7d4f362d1874f820c459430e18b8,
-      type: 2}
-    <Stacks>k__BackingField: 2
+    <Stacks>k__BackingField: 5

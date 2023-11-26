@@ -213,8 +213,8 @@ namespace Battle.UIComponent
             statsInstance.OnSpeedModified += UpdateSpeedStatElement;
             statsInstance.OnCurrentMovementModified += UpdateMovementStatElement;
             
-            ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.invoked += AddPassive;
-            ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.invoked += RemovePassive;
+            ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked += AddPassive;
+            ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked += RemovePassive;
         }
 
         private void RemoveCallbacks(NewUnit unit)
@@ -229,8 +229,8 @@ namespace Battle.UIComponent
             statsInstance.OnSpeedModified -= UpdateSpeedStatElement;
             statsInstance.OnCurrentMovementModified -= UpdateMovementStatElement;
             
-            ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.invoked -= AddPassive;
-            ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.invoked -= RemovePassive;
+            ActionEndInvoker<PassiveInstance.AddPassiveBattleAction>.OnInvoked -= AddPassive;
+            ActionEndInvoker<PassiveInstance.RemovePassiveBattleAction>.OnInvoked -= RemovePassive;
         }
 
         private void UpdateHpStatElement(UnitStatsInstance statsInstance)

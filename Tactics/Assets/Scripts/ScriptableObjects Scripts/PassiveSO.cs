@@ -129,8 +129,17 @@ namespace Battle.ScriptableObjects
 
         public override void AddPassive(PassiveInstance instance,int startingStacks)
         {
-            if(HasStartRoundEffect) instance.SubscribeToEvent(ref ActionStartInvoker<NewBattleManager.RoundAction>.invoked, InvokeRoundStartEffect);
-            if(HasEndRoundEffect) instance.SubscribeToEvent(ref ActionEndInvoker<NewBattleManager.RoundAction>.invoked, InvokeRoundEndEffect);
+            if (HasStartRoundEffect)
+            {
+                ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked += 
+                    instance.StoreDelegate<NewBattleManager.RoundAction>("InvokeRoundStartEffect", InvokeRoundStartEffect);
+            }
+
+            if (HasEndRoundEffect)
+            {
+                ActionEndInvoker<NewBattleManager.RoundAction>.OnInvoked +=
+                    instance.StoreDelegate<NewBattleManager.RoundAction>("InvokeRoundEndEffect", InvokeRoundEndEffect);
+            }
 
             base.AddPassive(instance,startingStacks);
             
@@ -149,8 +158,17 @@ namespace Battle.ScriptableObjects
 
         public override void RemovePassive(PassiveInstance instance)
         {
-            if(HasStartRoundEffect) instance.UnsubscribeFromEvents(ref ActionStartInvoker<NewBattleManager.RoundAction>.invoked);
-            if(HasEndRoundEffect) instance.UnsubscribeFromEvents(ref ActionEndInvoker<NewBattleManager.RoundAction>.invoked);
+            if (HasStartRoundEffect)
+            {
+                ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked -=
+                    instance.GetDelegate<NewBattleManager.RoundAction>("InvokeRoundStartEffect");
+            }
+
+            if (HasEndRoundEffect)
+            {
+                ActionEndInvoker<NewBattleManager.RoundAction>.OnInvoked -=
+                    instance.GetDelegate<NewBattleManager.RoundAction>("InvokeRoundEndEffect");
+            }
 
             base.RemovePassive(instance);
         }
@@ -212,8 +230,17 @@ namespace Battle.ScriptableObjects
 
         public override void AddPassive(PassiveInstance instance, int startingStacks)
         {
-            if (HasStartTurnEffect) instance.SubscribeToEvent(ref ActionStartInvoker<UnitTurnBattleAction>.invoked,InvokeTurnStartEffect);
-            if (HasEndTurnEffect) instance.SubscribeToEvent(ref ActionEndInvoker<UnitTurnBattleAction>.invoked,InvokeTurnEndEffect);
+            if (HasStartTurnEffect)
+            {
+                ActionStartInvoker<UnitTurnBattleAction>.OnInvoked +=
+                    instance.StoreDelegate<UnitTurnBattleAction>("InvokeTurnStartEffect",InvokeTurnStartEffect);
+            }
+
+            if (HasEndTurnEffect)
+            {
+                ActionEndInvoker<UnitTurnBattleAction>.OnInvoked +=
+                    instance.StoreDelegate<UnitTurnBattleAction>("InvokeTurnEndEffect",InvokeTurnEndEffect);
+            }
             
             base.AddPassive(instance, startingStacks);
             
@@ -221,33 +248,41 @@ namespace Battle.ScriptableObjects
             
             void InvokeTurnStartEffect(UnitTurnBattleAction action)
             {
-                if(RemoveOnTurnStart) instance.UnsubscribeFromEvents(ref ActionStartInvoker<UnitTurnBattleAction>.invoked);
+                if (RemoveOnTurnStart)
+                {
+                    ActionStartInvoker<UnitTurnBattleAction>.OnInvoked -= instance.GetDelegate<UnitTurnBattleAction>("InvokeTurnStartEffect");
+                }
                 TurnStartEffect(action, instance);
             }
             
             void InvokeTurnEndEffect(UnitTurnBattleAction action)
             {
-                if(RemoveOnTurnEnd) instance.UnsubscribeFromEvents(ref ActionEndInvoker<UnitTurnBattleAction>.invoked);
+                if (RemoveOnTurnEnd)
+                {
+                    ActionEndInvoker<UnitTurnBattleAction>.OnInvoked -= instance.GetDelegate<UnitTurnBattleAction>("InvokeTurnEndEffect");
+                }
                 TurnEndEffect(action, instance);
             }
         }
         
         public override void RemovePassive(PassiveInstance instance)
         {
-            if (HasStartTurnEffect) instance.UnsubscribeFromEvents(ref ActionStartInvoker<UnitTurnBattleAction>.invoked);
-            if (HasEndTurnEffect) instance.UnsubscribeFromEvents(ref ActionEndInvoker<UnitTurnBattleAction>.invoked);
+            if (HasStartTurnEffect)
+            {
+                ActionStartInvoker<UnitTurnBattleAction>.OnInvoked -= instance.GetDelegate<UnitTurnBattleAction>("InvokeTurnStartEffect");
+            }
+
+            if (HasEndTurnEffect)
+            {
+                ActionEndInvoker<UnitTurnBattleAction>.OnInvoked -= instance.GetDelegate<UnitTurnBattleAction>("InvokeTurnEndEffect");
+            }
             
             base.RemovePassive(instance);
         }
-        
-        protected virtual void TurnEndEffect(UnitTurnBattleAction action, PassiveInstance instance)
-        {
-            
-        }
 
-        protected virtual void TurnStartEffect(UnitTurnBattleAction action, PassiveInstance instance)
-        {
-        }
+        protected abstract void TurnEndEffect(UnitTurnBattleAction action, PassiveInstance instance);
+
+        protected abstract void TurnStartEffect(UnitTurnBattleAction action, PassiveInstance instance);
     }
 }
 
@@ -287,52 +322,35 @@ namespace Battle
             private set
             {
                 currentStacks = value;
-                OnCurrentStacksChanged?.Invoke(CurrentStacks);
+                //OnCurrentStacksChanged?.Invoke(CurrentStacks);
             } 
         }
 
         public IPassivesContainer Container { get; }
         public event Action<int> OnCurrentStacksChanged;
-        public Dictionary<string, object> Data { get; private set; }
-
-        private Dictionary<Delegate, List<Delegate>> callbackDictionary;
+        private Dictionary<string, Delegate> callbackDict;
 
         public PassiveInstance(PassiveSO so, IPassivesContainer container)
         {
             SO = so;
             Container = container;
             CurrentStacks = 0;
-            Data = new Dictionary<string, object>();
-            callbackDictionary = new Dictionary<Delegate, List<Delegate>>();
+            callbackDict = new Dictionary<string, Delegate>();
         }
 
-        public void SubscribeToEvent<T>(ref Action<T> eventToSubscribeTo,Action<T> callback)
+        public Action<T> StoreDelegate<T>(string key, Action<T> callback)
         {
-            eventToSubscribeTo += callback;
-            
-            if(callbackDictionary.TryGetValue(eventToSubscribeTo,out var callbacks))
-            {
-                callbacks.Add(callback);
-                return;
-            }
-            
-            callbackDictionary.Add(eventToSubscribeTo,new List<Delegate>{callback});
+            callbackDict.Add(key, callback);
+            return callback;
         }
 
-        public void UnsubscribeFromEvents<T>(ref Action<T> eventToUnSubscribeFrom)
+        public Action<T> GetDelegate<T>(string key)
         {
-            if(!callbackDictionary.TryGetValue(eventToUnSubscribeFrom,out var callbacks)) return;
-            if(callbacks == null) return;
+            if (!callbackDict.TryGetValue(key, out var callback)) return null;
+            callbackDict.Remove(key);
             
-            foreach (var callback in callbacks)
-            {
-                eventToUnSubscribeFrom -= callback as Action<T>;
-            }
-            
-            callbacks.Clear();
-            callbackDictionary.Remove(eventToUnSubscribeFrom);
+            return callback as Action<T>;
         }
-
         
         public void AddPassiveInstanceToContainer()
         {
@@ -435,6 +453,7 @@ namespace Battle
             
             protected override void Main()
             {
+                if(Amount == 0) return;
                 PassiveInstance.CurrentStacks += Amount;
                 PassiveInstance.SO.AddStacks(PassiveInstance,Amount);
                 PassiveInstance.OnCurrentStacksChanged?.Invoke(PassiveInstance.CurrentStacks);
@@ -449,6 +468,7 @@ namespace Battle
             
             protected override void Main()
             {
+                if(Amount == 0) return;
                 PassiveInstance.CurrentStacks -= Amount;
                 PassiveInstance.SO.RemoveStacks(PassiveInstance,Amount);
                 PassiveInstance.OnCurrentStacksChanged?.Invoke(PassiveInstance.CurrentStacks);

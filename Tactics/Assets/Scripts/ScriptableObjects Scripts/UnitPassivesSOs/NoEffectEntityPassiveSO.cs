@@ -25,6 +25,16 @@ namespace Battle.ScriptableObjects.Passive
         {
             
         }
+
+        protected override void TurnEndEffect(UnitTurnBattleAction action, PassiveInstance instance)
+        {
+            
+        }
+
+        protected override void TurnStartEffect(UnitTurnBattleAction action, PassiveInstance instance)
+        {
+            
+        }
     }
 }
 

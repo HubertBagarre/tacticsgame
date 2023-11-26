@@ -26,18 +26,18 @@ public class NewUIBattleManager : MonoBehaviour
 
     public void AddCallbacks()
     {
-        ActionEndInvoker<NewBattleManager.UnitCreatedAction>.invoked += InstantiateUnitUi;
-        ActionStartInvoker<NewBattleManager.MainBattleAction>.invoked += PlayBattleStartAnimation;
-        ActionStartInvoker<NewBattleManager.RoundAction>.invoked += PlayRoundStartAnimation;
+        ActionEndInvoker<NewBattleManager.UnitCreatedAction>.OnInvoked += InstantiateUnitUi;
+        ActionStartInvoker<NewBattleManager.MainBattleAction>.OnInvoked += PlayBattleStartAnimation;
+        ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked += PlayRoundStartAnimation;
         
         EventManager.AddListener<ClickUnitEvent>(ShowUnitTooltip);
     }
     
     public void RemoveCallbacks()
     {
-        ActionEndInvoker<NewBattleManager.UnitCreatedAction>.invoked -= InstantiateUnitUi;
-        ActionStartInvoker<NewBattleManager.MainBattleAction>.invoked -= PlayBattleStartAnimation;
-        ActionStartInvoker<NewBattleManager.RoundAction>.invoked -= PlayRoundStartAnimation;
+        ActionEndInvoker<NewBattleManager.UnitCreatedAction>.OnInvoked -= InstantiateUnitUi;
+        ActionStartInvoker<NewBattleManager.MainBattleAction>.OnInvoked -= PlayBattleStartAnimation;
+        ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked -= PlayRoundStartAnimation;
         
         EventManager.RemoveListener<ClickUnitEvent>(ShowUnitTooltip);
     }

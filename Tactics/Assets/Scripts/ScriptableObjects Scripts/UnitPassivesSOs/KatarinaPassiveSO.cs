@@ -17,17 +17,14 @@ namespace Battle.ScriptableObjects.Passive
 
         protected override void OnAddedEffect(PassiveInstance instance, int startingStacks)
         {
-            //ActionStartInvoker<NewBattleManager.RoundAction>.OnInvoked += Test;
-            
-            instance.SubscribeToEvent(ref ActionStartInvoker<NewBattleManager.RoundAction>.invoked,Test);
+            Debug.Log($"Added Katarina effect");
+            instance.OnCurrentStacksChanged += instance.StoreDelegate<int>("test", Test);
             
             return;
             
-            void Test(NewBattleManager.RoundAction action)
+            void Test(int amount)
             {
-                instance.UnsubscribeFromEvents(ref ActionStartInvoker<NewBattleManager.RoundAction>.invoked);
-                
-                Debug.Log("Test");
+                Debug.Log($"Stacks changed : now at {amount}");
             }
         }
 
@@ -43,7 +40,7 @@ namespace Battle.ScriptableObjects.Passive
 
         protected override void OnRemovedEffect(PassiveInstance instance)
         {
-            
+            instance.OnCurrentStacksChanged -= instance.GetDelegate<int>("test");
         }
 
         /*

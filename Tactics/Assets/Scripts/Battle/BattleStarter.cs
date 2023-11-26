@@ -5,7 +5,6 @@ namespace Battle
 {
     public class BattleStarter : MonoBehaviour
     {
-        [SerializeField] private BattleManager battleManager;
         [SerializeField] private NewBattleManager newBattleManager;
 
         [SerializeField] private BattleLevel defaultLevel;
