@@ -23,7 +23,7 @@ namespace Battle.ScriptableObjects.Passive
 
         protected override void OnRemovedEffect(PassiveInstance instance)
         {
-            
+            Debug.Log(" ");
         }
 
         protected override void TurnEndEffect(UnitTurnBattleAction action, PassiveInstance instance)

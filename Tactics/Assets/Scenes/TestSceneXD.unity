@@ -1823,7 +1823,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29d8941867c6ebb419656f0aa160aa83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  battleManager: {fileID: 0}
   newBattleManager: {fileID: 107337558}
   defaultLevel: {fileID: 558228172500973346, guid: 8fce1aeb1902f3b45bcc74daeaba4ead,
     type: 3}

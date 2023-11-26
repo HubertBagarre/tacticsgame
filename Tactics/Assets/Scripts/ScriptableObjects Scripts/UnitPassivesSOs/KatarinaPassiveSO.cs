@@ -17,7 +17,7 @@ namespace Battle.ScriptableObjects.Passive
 
         protected override void OnAddedEffect(PassiveInstance instance, int startingStacks)
         {
-            Debug.Log($"Added Katarina effect");
+            Debug.Log($"Added Katarina effect 1");
             instance.OnCurrentStacksChanged += instance.StoreDelegate<int>("test", Test);
             
             return;
