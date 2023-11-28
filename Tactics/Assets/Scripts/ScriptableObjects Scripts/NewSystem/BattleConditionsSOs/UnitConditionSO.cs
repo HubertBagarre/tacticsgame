@@ -25,6 +25,13 @@ namespace Battle.ScriptableObjects.Conditions
         
         protected virtual bool CheckUnit(NewTile referenceTile, NewUnit unit,Func<string,dynamic> parameterGetter)
         {
+            var referenceTeam = 0; // if no unit, assume 0 (player team)
+            if(referenceTile.HasUnit) referenceTeam = referenceTile.Unit.Team;
+            if (!targetAllies && !targetEnemies) return true;
+            
+            if(targetAllies && unit.Team != referenceTeam) return false;
+            if (targetEnemies && unit.Team == referenceTeam) return false;
+            
             return true;
         }
 
@@ -32,8 +39,8 @@ namespace Battle.ScriptableObjects.Conditions
         {
             var targetText = $"unit{(count > 1 ? "s" : "")}";
             
-            if (targetAllies || !targetEnemies) targetText = $"all{(count > 1 ? "ies" : "y")}";
-            if (targetEnemies || !targetAllies) targetText=  $"enem{(count > 1 ? "ies" : "y")}";
+            if (targetAllies && !targetEnemies) targetText = $"all{(count > 1 ? "ies" : "y")}";
+            if (targetEnemies && !targetAllies) targetText=  $"enem{(count > 1 ? "ies" : "y")}";
 
             var value = (targetText, $"{count}");
             
