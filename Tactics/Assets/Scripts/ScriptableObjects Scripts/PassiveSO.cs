@@ -12,6 +12,7 @@ namespace Battle.ScriptableObjects
         Neutral
     }
 
+    [Serializable]
     public abstract class PassiveSO : ScriptableObject
     {
         [field: Header("Ability Details")]

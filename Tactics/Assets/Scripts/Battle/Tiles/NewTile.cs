@@ -12,6 +12,7 @@ namespace Battle
     {
         public Tile Tile { get; private set; }
         public NewUnit Unit { get; private set; }
+        public bool HasUnit { get; private set; }
         public Vector2Int Position { get; }
         
         public bool IsWalkable { get; private set; }
