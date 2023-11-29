@@ -1,23 +1,44 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects.Effect
 {
-    public class ModifyStatsEffectSO : EffectSO
+    [CreateAssetMenu(menuName = "Battle Scriptables/Effect/Modify Stats")]
+    public class ModifyStatsEffectSO : AbilityEffectSO
     {
-        public override IEnumerable<string> SpecificParameters => Enum.GetNames(typeof(UnitStatsInstance.UnitStat));
+        public override IEnumerable<string> SpecificParameters => Enum.GetNames(typeof(UnitStat));
         
         protected override void Effect(NewUnit caster, NewTile[] targetTiles, Func<string, dynamic> parameterGetter)
         {
+            foreach (var parameter in SpecificParameters)
+            {
+                var operationData = parameterGetter.Invoke(parameter) as OperationData ? ?? new OperationData();
+                
+                if(operationData.use) ChangeStat(operationData);
+            }
             
+            return;
+
+            void ChangeStat(OperationData operationData)
+            {
+                var stat = operationData.stat;
+                var operation = operationData.operation;
+                var value = operationData.value;
+                
+                foreach (var targetTile in targetTiles)
+                {
+                    var unit = targetTile.Unit;
+
+                    unit?.Stats.ModifyStat(stat,operation,value);
+                }
+            }
         }
         
         private struct OperationData
         {
             public bool use;
-            public UnitStatsInstance.UnitStat stat;
+            public UnitStat stat;
             public Operation operation;
             public float value;
             
@@ -56,6 +77,11 @@ namespace Battle.ScriptableObjects.Effect
             result.use = true;
 
             return result;
+        }
+
+        protected override string Text(NewTile referenceTile, Func<string, dynamic> parameterGetter)
+        {
+            return "do something";
         }
     }
 }

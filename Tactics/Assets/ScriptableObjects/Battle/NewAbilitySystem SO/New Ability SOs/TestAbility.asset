@@ -12,19 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f922a8629138ac4881cd8705736e109, type: 3}
   m_Name: TestAbility
   m_EditorClassIdentifier: 
+  <Sprite>k__BackingField: {fileID: 0}
   <Name>k__BackingField: 
+  <Type>k__BackingField: 0
   <Requirements>k__BackingField:
     <Parameters>k__BackingField: Speed:100
     conditions:
     - {fileID: 11400000, guid: 9ee5f54731c1bee49b643931b53e9e9d, type: 2}
+  <ExpectedSelections>k__BackingField: 1
+  <SelectionCondition>k__BackingField:
+    <Parameters>k__BackingField: 
+    conditions: []
   selectedEffects:
     conditionalEffects:
     - <Depth>k__BackingField: 0
-      <BranchOperator>k__BackingField: 1
-      <Effect>k__BackingField:
+      <BranchOperator>k__BackingField: 0
+      effect:
         <Condition>k__BackingField:
           <Parameters>k__BackingField: 
           conditions: []
-        <Effects>k__BackingField:
+        effects:
         - <Parameters>k__BackingField: 
-          effects: []
+          effects:
+          - {fileID: 11400000, guid: 648ff5a49823f694eb2b4d639d18f88e, type: 2}

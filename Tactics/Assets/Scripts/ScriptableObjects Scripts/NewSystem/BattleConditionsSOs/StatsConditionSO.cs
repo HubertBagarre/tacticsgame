@@ -9,7 +9,7 @@ namespace Battle.ScriptableObjects.Conditions
     [CreateAssetMenu(menuName = "Battle Scriptables/Condition/Stats Condition")]
     public class StatsConditionSO : UnitConditionSO
     {
-        public override IEnumerable<string> SpecificParameters => Enum.GetNames(typeof(UnitStatsInstance.UnitStat));
+        public override IEnumerable<string> SpecificParameters => Enum.GetNames(typeof(UnitStat));
         
         protected override bool CheckUnit(NewTile referenceTile, NewUnit unit, Func<string, dynamic> parameterGetter)
         {
@@ -151,13 +151,13 @@ namespace Battle.ScriptableObjects.Conditions
         private struct ComparisonData
         {
             public bool use;
-            public UnitStatsInstance.UnitStat stat;
+            public UnitStat stat;
             public Comparison comparison;
             public int valueToCompareTo;
             
             public bool useStatToCompareTo;
             public bool compareWithCaster;
-            public UnitStatsInstance.UnitStat statToCompareTo;
+            public UnitStat statToCompareTo;
 
             public string debug;
         }

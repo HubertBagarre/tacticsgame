@@ -8,7 +8,7 @@ namespace Battle.ScriptableObjects.Requirement
     [Serializable]
     public class RequiredStat
     {
-        [field: SerializeField] public UnitStatsInstance.UnitStat Stat { get; private set; }
+        [field: SerializeField] public UnitStat Stat { get; private set; }
         [field: SerializeField] public int RequiredValue { get; private set; }
         [field: SerializeField] public bool RequireMaxValue { get; private set; }
         [field: SerializeField] public bool ConsumeStat { get; private set; } = false;
@@ -66,15 +66,15 @@ namespace Battle.ScriptableObjects.Requirement
                 var stat = requiredStat.Stat;
                 var statText = stat switch
                 {
-                    UnitStatsInstance.UnitStat.Hp => "Hp",
-                    UnitStatsInstance.UnitStat.MaxHp => "Max Hp",
-                    UnitStatsInstance.UnitStat.Movement => "Max Movement",
-                    UnitStatsInstance.UnitStat.CurrentMovement => "Movement",
-                    UnitStatsInstance.UnitStat.Speed => "Speed",
-                    UnitStatsInstance.UnitStat.Attack => "Attack",
-                    UnitStatsInstance.UnitStat.AttackRange => "Attack Range",
-                    UnitStatsInstance.UnitStat.MaxShield => "Max Shield",
-                    UnitStatsInstance.UnitStat.CurrentShield => "Shield",
+                    UnitStat.Hp => "Hp",
+                    UnitStat.MaxHp => "Max Hp",
+                    UnitStat.Movement => "Max Movement",
+                    UnitStat.CurrentMovement => "Movement",
+                    UnitStat.Speed => "Speed",
+                    UnitStat.Attack => "Attack",
+                    UnitStat.AttackRange => "Attack Range",
+                    UnitStat.MaxShield => "Max Shield",
+                    UnitStat.CurrentShield => "Shield",
                     _ => string.Empty
                 };
                 
@@ -88,32 +88,32 @@ namespace Battle.ScriptableObjects.Requirement
             }
         }
         
-        private static int GetStatValue(Unit unit,UnitStatsInstance.UnitStat stat)
+        private static int GetStatValue(Unit unit,UnitStat stat)
         {
             var stats = unit.Stats;
             return stat switch
             {
-                UnitStatsInstance.UnitStat.Hp => stats.CurrentHp,
-                UnitStatsInstance.UnitStat.MaxHp => stats.MaxHp,
-                UnitStatsInstance.UnitStat.Movement => stats.Movement,
-                UnitStatsInstance.UnitStat.CurrentMovement => unit.MovementLeft,
-                UnitStatsInstance.UnitStat.Speed => stats.Speed,
-                UnitStatsInstance.UnitStat.Attack => stats.Attack,
-                UnitStatsInstance.UnitStat.AttackRange => stats.AttackRange,
-                UnitStatsInstance.UnitStat.MaxShield => stats.MaxShield,
-                UnitStatsInstance.UnitStat.CurrentShield => stats.CurrentShield,
+                UnitStat.Hp => stats.CurrentHp,
+                UnitStat.MaxHp => stats.MaxHp,
+                UnitStat.Movement => stats.Movement,
+                UnitStat.CurrentMovement => unit.MovementLeft,
+                UnitStat.Speed => stats.Speed,
+                UnitStat.Attack => stats.Attack,
+                UnitStat.AttackRange => stats.AttackRange,
+                UnitStat.MaxShield => stats.MaxShield,
+                UnitStat.CurrentShield => stats.CurrentShield,
                 _ => 0
             };
         }
 
-        private static int GetStatMaxValue(Unit unit,UnitStatsInstance.UnitStat stat)
+        private static int GetStatMaxValue(Unit unit,UnitStat stat)
         {
             var stats = unit.Stats;
             return stat switch
             {
-                UnitStatsInstance.UnitStat.Hp => stats.MaxHp,
-                UnitStatsInstance.UnitStat.CurrentMovement => stats.Movement,
-                UnitStatsInstance.UnitStat.CurrentShield => stats.MaxShield,
+                UnitStat.Hp => stats.MaxHp,
+                UnitStat.CurrentMovement => stats.Movement,
+                UnitStat.CurrentShield => stats.MaxShield,
                 _ => 0
             };
         }
@@ -136,17 +136,17 @@ namespace Battle.ScriptableObjects.Requirement
             return currentValue >= requiredValue;
         }
 
-        private static bool HasNoMaxValue(UnitStatsInstance.UnitStat stat) => stat switch
+        private static bool HasNoMaxValue(UnitStat stat) => stat switch
         {
-            UnitStatsInstance.UnitStat.Hp => false,
-            UnitStatsInstance.UnitStat.MaxHp => true,
-            UnitStatsInstance.UnitStat.Movement => true,
-            UnitStatsInstance.UnitStat.CurrentMovement => false,
-            UnitStatsInstance.UnitStat.Speed => true,
-            UnitStatsInstance.UnitStat.Attack => true,
-            UnitStatsInstance.UnitStat.AttackRange => true,
-            UnitStatsInstance.UnitStat.MaxShield => true,
-            UnitStatsInstance.UnitStat.CurrentShield => false,
+            UnitStat.Hp => false,
+            UnitStat.MaxHp => true,
+            UnitStat.Movement => true,
+            UnitStat.CurrentMovement => false,
+            UnitStat.Speed => true,
+            UnitStat.Attack => true,
+            UnitStat.AttackRange => true,
+            UnitStat.MaxShield => true,
+            UnitStat.CurrentShield => false,
             _ => true
         };
         
@@ -197,31 +197,31 @@ namespace Battle.ScriptableObjects.Requirement
                 
                 switch (requiredStat.Stat)
                 {
-                    case UnitStatsInstance.UnitStat.Hp:
+                    case UnitStat.Hp:
                         unit.TakeHpDamage(currentValue ? stats.CurrentHp : consumedValue);
                         return;
-                    case UnitStatsInstance.UnitStat.MaxHp:
+                    case UnitStat.MaxHp:
                         stats.IncreaseMaxHpModifier(-(currentValue ? stats.MaxHp : consumedValue));
                         return;
-                    case UnitStatsInstance.UnitStat.Movement:
+                    case UnitStat.Movement:
                         stats.IncreaseMovementModifier(-(currentValue ? stats.Movement : consumedValue));
                         return;
-                    case UnitStatsInstance.UnitStat.CurrentMovement:
+                    case UnitStat.CurrentMovement:
                         unit.DecreaseMovement(currentValue ? unit.MovementLeft : consumedValue);
                         return;
-                    case UnitStatsInstance.UnitStat.Speed:
+                    case UnitStat.Speed:
                         stats.IncreaseSpeedModifier(-(currentValue ? stats.Speed : consumedValue));
                         return;
-                    case UnitStatsInstance.UnitStat.Attack:
+                    case UnitStat.Attack:
                         stats.IncreaseAttackModifier(-(currentValue ? stats.Attack : consumedValue));
                         return;
-                    case UnitStatsInstance.UnitStat.AttackRange:
+                    case UnitStat.AttackRange:
                         stats.IncreaseAttackRangeModifier(-(currentValue ? stats.AttackRange : consumedValue));
                         return;
-                    case UnitStatsInstance.UnitStat.MaxShield:
+                    case UnitStat.MaxShield:
                         stats.IncreaseMaxShieldModifier(-(currentValue ? stats.MaxShield : consumedValue));
                         return;
-                    case UnitStatsInstance.UnitStat.CurrentShield:
+                    case UnitStat.CurrentShield:
                         stats.CurrentShield -= (currentValue ? stats.CurrentShield : consumedValue);
                         return;
                     default:

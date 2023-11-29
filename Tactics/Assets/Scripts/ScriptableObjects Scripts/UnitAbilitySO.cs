@@ -3,16 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Battle.AbilityEvents;
-
 using UnityEngine;
 
 namespace Battle.ScriptableObjects
 {
-    public enum AbilityType
-    {
-        None,Movement,Offensive,Defensive
-    }
-
     [CreateAssetMenu(menuName = "Battle Scriptables/Ability")]
     public class UnitAbilitySO : ScriptableObject
     {

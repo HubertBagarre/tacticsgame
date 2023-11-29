@@ -297,18 +297,65 @@ namespace Battle
             OnMovementModified?.Invoke(this);
             OnSpeedModified?.Invoke(this);
         }
-        
-        public enum UnitStat
+
+        public void ModifyStat(UnitStat stat, Operation operation,float value)
         {
-            Hp = 4,
-            MaxHp = 5,
-            Movement = 0,
-            CurrentMovement = 6,
-            Speed = 1,
-            Attack = 2,
-            AttackRange = 3,
-            MaxShield = 7,
-            CurrentShield = 8
+            switch (stat)
+            {
+                case UnitStat.Hp:
+                    CurrentHp = ModifyValue(CurrentHp);
+                    // callback is already in CurrentHp setter
+                    return;
+                case UnitStat.MaxHp:
+                    MaxHpModifier = ModifyValue(MaxHpModifier);
+                    OnMaxHpModified?.Invoke(this);
+                    return;
+                case UnitStat.Movement:
+                    MovementModifier = ModifyValue(MovementModifier);
+                    OnMovementModified?.Invoke(this);
+                    return;
+                case UnitStat.CurrentMovement:
+                    CurrentMovement = ModifyValue(CurrentMovement);
+                    // callback is already in CurrentMovement setter
+                    return;
+                case UnitStat.Speed:
+                    SpeedModifier = ModifyValue(SpeedModifier);
+                    OnSpeedModified?.Invoke(this);
+                    return;
+                case UnitStat.Attack:
+                    AttackModifier = ModifyValue(AttackModifier);
+                    OnAttackModified?.Invoke(this);
+                    return;
+                case UnitStat.AttackRange:
+                    AttackRangeModifier = ModifyValue(AttackRangeModifier);
+                    OnAttackRangeModified?.Invoke(this);
+                    return;
+                case UnitStat.MaxShield:
+                    MaxShieldModifier = ModifyValue(MaxShieldModifier);
+                    OnMaxShieldModified?.Invoke(this);
+                    return;
+                case UnitStat.CurrentShield:
+                    CurrentShield = ModifyValue(CurrentShield);
+                    // callback is already in CurrentShield setter
+                    return;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(stat), stat, null);
+            }
+            
+            int ModifyValue(int statValue)
+            {
+                var result = operation switch
+                {
+                    Operation.Set => value,
+                    Operation.Add => statValue + value,
+                    Operation.Subtract => statValue - value,
+                    Operation.Multiply => statValue * value,
+                    Operation.Divide => statValue / value,
+                    _ => throw new ArgumentOutOfRangeException(nameof(operation), operation, null)
+                };
+
+                return Mathf.FloorToInt(result);
+            }
         }
         
         public static string UnitStatToText(UnitStat stat)

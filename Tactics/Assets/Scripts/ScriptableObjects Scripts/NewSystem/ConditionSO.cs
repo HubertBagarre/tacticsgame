@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Battle.ScriptableObjects
 {
     [Serializable]
-    public struct CustomizableCondition<T> where T : ConditionSO
+    public class CustomizableCondition<T> where T : ConditionSO
     {
         [field: TextArea(1,10),Tooltip(ParametableSO.ToolTipText)]
         [field:SerializeField] public string Parameters { get; private set; }
@@ -23,6 +23,34 @@ namespace Battle.ScriptableObjects
             }
 
             return true;
+        }
+    }
+    
+    [Serializable]
+    public class CustomizableAbilityCondition : CustomizableCondition<AbilityConditionSO>
+    {
+        public string ConditionText(NewTile referenceTile,int count)
+        {
+            if(Conditions.Count <= 0) return string.Empty;
+            
+            var text = "%COUNT% %TARGET%";
+            
+            (string targetText, string countText) texts = (string.Empty,$"{count}");
+            
+            foreach (var requirement in Conditions)
+            {
+                text += requirement.TextFullParameters(referenceTile,Parameters);
+                var req = requirement.TargetOverrideFullParameters(referenceTile, count, Parameters);
+
+                if (req.targetText != string.Empty && texts.targetText == string.Empty) texts = req;
+            }
+
+            if (texts.targetText == string.Empty) texts.targetText = "tile";
+            
+            text = text.Replace("%TARGET%",texts.targetText);
+            text = text.Replace("%COUNT%",texts.countText);
+            
+            return text;
         }
     }
     
@@ -82,7 +110,7 @@ namespace Battle.ScriptableObjects
         protected abstract string Text(NewTile referenceTile,Func<string,dynamic> parameterGetter);
         
         /// <summary>
-        ///  text that will replace %TARGET% in text
+        ///  text that will replace %TARGET% and %COUNT% in text
         /// </summary>
         protected virtual (string targetText, string countText) TargetOverride(NewTile referenceTile,int count,Func<string,dynamic> parameterGetter)
         {
