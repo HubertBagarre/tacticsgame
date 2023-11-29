@@ -3,23 +3,36 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Battle.ScriptableObjects
 {
     [CreateAssetMenu(menuName = "Battle Scriptables/New Ability")]
     public class NewAbilitySO : ScriptableObject
     {
-        private const string ToolTipText = "Parameter name is case insensitive\nSeparate parameters with \\n (don't type \\n just backspace)\nparameter:value";
+        private const string ToolTipText = "Parameter name is case sensitive\nSeparate parameters with \\n (don't type \\n just backspace)\nparameter(:value1,value2,...)";
         [SerializeField,TextArea(1,10),Tooltip(ToolTipText)] private string requirementsParameters;
         
         [SerializeField] private List<AbilityConditionSO> requirements = new ();
         public IReadOnlyList<AbilityConditionSO> Requirements => requirements;
 
-        public bool MatchesRequirements(NewTile casterTile)
+        [SerializeField,TextArea(1,10),Tooltip(ToolTipText)] private string conditionParameters;
+        
+        [SerializeField] private List<AbilityConditionSO> selectionConditions = new ();
+        public IReadOnlyList<AbilityConditionSO> SelectionConditions => selectionConditions;
+        
+        public bool MatchesRequirements(NewUnit caster)
         {
             if(requirements.Count <= 0) return true;
 
-            return requirements.All(requirement => requirement.CheckTileFullParameters(casterTile, casterTile,GetDictionary(requirementsParameters)));
+            return requirements.All(requirement => requirement.CheckTileFullParameters(caster.Tile, caster.Tile,GetDictionary(requirementsParameters)));
+        }
+        
+        public bool MatchesSelectionConditions(NewTile refTile,NewTile targetTile)
+        {
+            if(selectionConditions.Count <= 0) return true;
+
+            return selectionConditions.All(condition => condition.CheckTileFullParameters(refTile, targetTile,GetDictionary(conditionParameters)));
         }
         
         public string RequirementsText(NewTile casterTile)

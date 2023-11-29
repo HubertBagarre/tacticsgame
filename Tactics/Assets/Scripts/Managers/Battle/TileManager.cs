@@ -22,6 +22,7 @@ namespace Battle
         [Header("Debug")] [SerializeField] private List<Tile> tiles = new List<Tile>();
         private List<NewTile> newTiles = new List<NewTile>();
 
+        public IReadOnlyList<NewTile> NewTiles => newTiles;
         public List<Tile> AllTiles => tiles.ToList();
         
         public void AddCallbacks()

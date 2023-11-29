@@ -6,11 +6,10 @@ using UnityEngine;
 namespace Battle
 {
     using ScriptableObjects;
-    using ActionSystem;
     
     public class NewTile : IPassivesContainer
     {
-        public Tile Tile { get; private set; }
+        public Tile TileRenderer { get; private set; }
         public NewUnit Unit { get; private set; }
         public bool HasUnit { get; private set; }
         public Vector2Int Position { get; }
@@ -34,11 +33,11 @@ namespace Battle
         private List<PassiveInstance> passiveInstances { get; }
         public IReadOnlyList<PassiveInstance> PassiveInstances => passiveInstances;
 
-        public NewTile(Vector2Int position,Tile tile)
+        public NewTile(Vector2Int position,Tile tileRenderer)
         {
             Position = position;
-            Tile = tile;
-            Tile.SetNewTile(this);
+            TileRenderer = tileRenderer;
+            TileRenderer.SetNewTile(this);
 
             passiveInstances = new List<PassiveInstance>();
         }

@@ -177,7 +177,7 @@ namespace Battle.ScriptableObjects.Conditions
             
             result.stat = resultStat;
             
-            var split = value.Split(' ');
+            var split = value.Split(',');
             var operationText = ComparisonToText(Comparison.GreaterOrEqual);
             var valueToCompareToText = split[0];
             

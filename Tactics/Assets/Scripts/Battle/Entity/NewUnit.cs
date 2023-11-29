@@ -16,7 +16,7 @@ namespace Battle
         public UnitSO UnitSo => Stats.So;
         
         public bool UsePlayerBehaviour { get; private set; }
-        public Tile Tile { get; private set; }
+        public NewTile Tile { get; private set; }
         
         private List<PassiveInstance> passiveInstances;
         public IReadOnlyList<PassiveInstance> PassiveInstances => passiveInstances;
@@ -26,7 +26,7 @@ namespace Battle
         
         [field: SerializeField] public int CurrentUltimatePoints { get; protected set; }
         
-        public NewUnit(UnitSO so,Tile tile,bool usePlayerBehaviour = false) : base(so.BaseSpeed, so.Initiative, so.Name)
+        public NewUnit(UnitSO so,NewTile tile,bool usePlayerBehaviour = false) : base(so.BaseSpeed, so.Initiative, so.Name)
         {
             Stats = so.CreateInstance();
             Tile = tile;

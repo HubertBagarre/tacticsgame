@@ -208,7 +208,7 @@ namespace Battle
                     var orientation = placedUnit.orientation;
                     var asPlayer = placedUnit.asPlayer;
                     
-                    var tile = BattleManager.tileManager.AllTiles.FirstOrDefault(tile => tile.Position == position);
+                    var tile = BattleManager.tileManager.NewTiles.FirstOrDefault(tile => tile.Position == position);
                 
                     var unit = new NewUnit(so,tile,asPlayer);
                     unit.SetTeam(team); 
@@ -275,12 +275,12 @@ namespace Battle
             protected override CustomYieldInstruction CustomYieldInstruction { get; }
             
             public NewUnit Unit { get; }
-            public Tile Tile { get; }
+            public NewTile Tile { get; }
             public UnitRenderer Renderer { get; private set; }
             
             private Func<UnitRenderer> GetRenderer { get; }
             
-            public UnitCreatedAction(NewUnit unit,Tile tile,Func<UnitRenderer> getRenderer)
+            public UnitCreatedAction(NewUnit unit,NewTile tile,Func<UnitRenderer> getRenderer)
             {
                 Unit = unit;
                 Tile = tile;
@@ -294,7 +294,7 @@ namespace Battle
                 Renderer = GetRenderer.Invoke();
                 
                 var unitTr = Renderer.transform;
-                unitTr.position = Tile.transform.position;
+                unitTr.position = Tile.TileRenderer.transform.position;
                 unitTr.rotation = Quaternion.identity;
                 //unitTr.SetParent(transform);
             }
