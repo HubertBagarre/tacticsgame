@@ -327,5 +327,22 @@ namespace Battle
                 _ => throw new ArgumentOutOfRangeException(nameof(stat), stat, null)
             };
         }
+
+        public int GetStat(UnitStat stat)
+        {
+            return stat switch
+            {
+                UnitStat.Hp => CurrentHp,
+                UnitStat.MaxHp => MaxHp,
+                UnitStat.Movement => Movement,
+                UnitStat.CurrentMovement => CurrentMovement,
+                UnitStat.Speed => Speed,
+                UnitStat.Attack => Attack,
+                UnitStat.AttackRange => AttackRange,
+                UnitStat.MaxShield => MaxShield,
+                UnitStat.CurrentShield => CurrentShield,
+                _ => throw new ArgumentOutOfRangeException(nameof(stat), stat, null)
+            };
+        }
     }
 }

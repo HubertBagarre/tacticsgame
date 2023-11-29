@@ -18,14 +18,37 @@ namespace Battle.ScriptableObjects.Conditions
             foreach (var parameter in SpecificParameters)
             {
                 var comparison = parameterGetter.Invoke(parameter) as ComparisonData ? ?? new ComparisonData();
-
-                if (comparison.use)
-                {
-                    
-                }
+                
+                if (comparison.use && !CheckComparison(comparison)) return false;
             }
             
             return true;
+            
+            bool CheckComparison(ComparisonData comparisonData)
+            {
+                var statValue = unit.Stats.GetStat(comparisonData.stat);   
+                var refValue = comparisonData.valueToCompareTo;
+                
+                if (comparisonData.useStatToCompareTo)
+                {
+                    var unitToCompareTo = comparisonData.compareWithCaster ? referenceTile.Unit : unit;
+                    
+                    if(unitToCompareTo == null) return false;
+                    
+                    refValue = unitToCompareTo.Stats.GetStat(comparisonData.statToCompareTo);
+                }
+
+                return comparisonData.comparison switch
+                {
+                    Comparison.Equal => statValue == refValue,
+                    Comparison.NotEqual => statValue != refValue,
+                    Comparison.Greater => statValue > refValue,
+                    Comparison.GreaterOrEqual => statValue >= refValue,
+                    Comparison.Lesser => statValue < refValue,
+                    Comparison.LesserOrEqual => statValue <= refValue,
+                    _ => false
+                };
+            }
         }
         
         protected override string Text(NewTile referenceTile,Func<string,dynamic> parameterGetter)
@@ -46,8 +69,7 @@ namespace Battle.ScriptableObjects.Conditions
             returnText += list[0];
             
             if (list.Count == 1) return returnText;
-
-
+            
             for (int i = 1; i < list.Count; i++)
             {
                 var text = list[i];
