@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f922a8629138ac4881cd8705736e109, type: 3}
   m_Name: TestAbility
   m_EditorClassIdentifier: 
-  requirementsParameters: 
+  requirementsParameters: 'Speed:100
+
+    Range:6,3'
   requirements:
-  - {fileID: 11400000, guid: 2f7019c9de2adab4c8ec849364f7faed, type: 2}
-  - {fileID: 11400000, guid: 37f38b78872fadf46ac8ddd33e171e96, type: 2}
   - {fileID: 11400000, guid: 9ee5f54731c1bee49b643931b53e9e9d, type: 2}
+  - {fileID: 11400000, guid: 2f7019c9de2adab4c8ec849364f7faed, type: 2}

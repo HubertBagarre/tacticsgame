@@ -43,6 +43,8 @@ namespace Battle.ScriptableObjects
             
             text = text.Replace("%TARGET%",texts.targetText);
             text = text.Replace("%COUNT%",texts.countText);
+
+            text += ".";
             
             return text;
         }
