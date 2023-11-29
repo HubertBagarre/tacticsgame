@@ -22,7 +22,7 @@ public class NewAbilitySOEditor : Editor
 
         if (showRequirementsParameters)
         {
-            var parameters = abilitySO.Requirements.SelectMany(condition => condition.SpecificParameters).Distinct().ToArray();
+            var parameters = abilitySO.Requirements.Conditions.SelectMany(condition => condition.SpecificParameters).Distinct().ToArray();
             
             GUI.enabled = false;
             foreach (var parameter in parameters)

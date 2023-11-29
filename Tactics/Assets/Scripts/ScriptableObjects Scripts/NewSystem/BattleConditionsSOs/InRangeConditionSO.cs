@@ -9,7 +9,7 @@ namespace Battle.ScriptableObjects.Conditions
     {
         public override IEnumerable<string> SpecificParameters => new[] {"Range"};
         
-        protected override bool CheckTile(NewTile referenceTile, NewTile tileToCheck, Func<string,dynamic> parameterGetter)
+        protected override bool DoesTileMatchCondition(NewTile referenceTile, NewTile tileToCheck, Func<string,dynamic> parameterGetter)
         {
             var distance = tileToCheck.Position - referenceTile.Position;
 

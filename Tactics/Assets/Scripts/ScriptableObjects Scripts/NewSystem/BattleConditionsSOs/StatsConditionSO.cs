@@ -10,7 +10,7 @@ namespace Battle.ScriptableObjects.Conditions
     public class StatsConditionSO : UnitConditionSO
     {
         public override IEnumerable<string> SpecificParameters => Enum.GetNames(typeof(UnitStatsInstance.UnitStat));
-
+        
         protected override bool CheckUnit(NewTile referenceTile, NewUnit unit, Func<string, dynamic> parameterGetter)
         {
             if (!base.CheckUnit(referenceTile, unit, parameterGetter)) return false;
@@ -173,9 +173,9 @@ namespace Battle.ScriptableObjects.Conditions
 
             if (parameterNotFound) return result;
             
-            if (!Enum.TryParse(parameter, out UnitStatsInstance.UnitStat resultStat)) return result; //invalid Stat
+            var invalidStat = !Enum.TryParse(parameter, out result.stat);
             
-            result.stat = resultStat;
+            if (invalidStat) return result; //invalid Stat
             
             var split = value.Split(',');
             var operationText = ComparisonToText(Comparison.GreaterOrEqual);
@@ -191,18 +191,11 @@ namespace Battle.ScriptableObjects.Conditions
             
             result.use = true;
             
-            if (int.TryParse(valueToCompareToText, out var compareValue))
-            {
-                result.valueToCompareTo = compareValue;
-                
-                return result; // value is an int (use)
-            }
+            if (int.TryParse(valueToCompareToText, out result.valueToCompareTo)) return result;
             
             result.useStatToCompareTo = true;
             
-            result.compareWithCaster = !Enum.TryParse(valueToCompareToText, out UnitStatsInstance.UnitStat compareStat);
-            
-            result.statToCompareTo = compareStat;
+            result.compareWithCaster = !Enum.TryParse(valueToCompareToText, out result.statToCompareTo);
             
             if (split[0].Length != 0 && result.compareWithCaster) operationText = split[0];
             
@@ -215,7 +208,7 @@ namespace Battle.ScriptableObjects.Conditions
                 return result; //invalid Comparison
             }
             
-            if(result.statToCompareTo == resultStat && !result.compareWithCaster)
+            if(result.statToCompareTo == result.stat && !result.compareWithCaster)
             {
                 result.use = false;
                 return result; // redundant comparison

@@ -1,17 +1,36 @@
 using System;
 using System.Collections.Generic;
-using Unity.Collections;
 using UnityEngine;
 
 namespace Battle.ScriptableObjects
 {
-    public abstract class ConditionSO : ScriptableObject
+    [Serializable]
+    public struct CustomizableCondition<T> where T : ConditionSO
     {
-        public abstract IEnumerable<string> SpecificParameters { get; }
+        [field: TextArea(1,10),Tooltip(ParametableSO.ToolTipText)]
+        [field:SerializeField] public string Parameters { get; private set; }
+
+        [SerializeField] private T[] conditions;
+        public IReadOnlyCollection<T> Conditions => conditions;
         
-        public bool CheckTileFullParameters(NewTile referenceTile,NewTile tileToCheck,IReadOnlyDictionary<string,string> parameters)
+        public bool DoesTileMatchConditionFullParameters(NewTile referenceTile,NewTile tileToCheck)
         {
-            return CheckTile(referenceTile,tileToCheck,LocalGetParameterValue);
+            if(Conditions.Count <= 0) return true;
+            
+            foreach (var condition in Conditions)
+            {
+                if(!condition.DoesTileMatchConditionFullParameters(referenceTile,tileToCheck,Parameters)) return false;
+            }
+
+            return true;
+        }
+    }
+    
+    public abstract class ConditionSO : ParametableSO
+    {
+        public bool DoesTileMatchConditionFullParameters(NewTile referenceTile,NewTile tileToCheck,string parameters)
+        {
+            return DoesTileMatchCondition(referenceTile,tileToCheck,LocalGetParameterValue);
             
             dynamic LocalGetParameterValue(string parameter)
             {
@@ -19,85 +38,14 @@ namespace Battle.ScriptableObjects
             }
         }
         
-        protected abstract bool CheckTile(NewTile referenceTile,NewTile tileToCheck,Func<string,dynamic> parameterGetter);
-        
-        protected IReadOnlyDictionary<string,string> GetSpecificParameter(IReadOnlyDictionary<string, string> allParameters)
-        {
-            var dict = new Dictionary<string,string>();
-            foreach (var specificParameter in SpecificParameters)
-            {
-                if(allParameters.TryGetValue(specificParameter, out var parameter)) dict.Add(specificParameter,parameter);
-            }
-
-            return dict;
-        }
-
-        protected T GetParameterValue<T>(string parameter,IReadOnlyDictionary<string,string> specificParameters)
-        {
-            var parameterNotFound = !specificParameters.TryGetValue(parameter, out var value);
-            
-            return (T)InterpretParameter(parameter,value,parameterNotFound);
-        }
-
-        protected abstract object InterpretParameter(string parameter,string value,bool wasNotFound);
-        
-        protected enum Comparison
-        {
-            Equal,
-            NotEqual,
-            Greater,
-            GreaterOrEqual,
-            Lesser,
-            LesserOrEqual
-        }
-        
-        protected static string ComparisonToText(Comparison comparison)
-        {
-            return comparison switch
-            {
-                Comparison.Equal => "==",
-                Comparison.NotEqual => "!=",
-                Comparison.Greater => ">",
-                Comparison.GreaterOrEqual => ">=",
-                Comparison.Lesser => "<",
-                Comparison.LesserOrEqual => "<=",
-                _ => "=="
-            };
-        }
-        
-        protected static bool TextToComparison(string text,out Comparison comparison)
-        {
-            comparison = Comparison.Equal;
-            switch (text)
-            {
-                case "==":
-                    return true;
-                case "!=":
-                    comparison = Comparison.NotEqual;
-                    return true;
-                case ">":
-                    comparison = Comparison.Greater;
-                    return true;
-                case ">=":
-                    comparison = Comparison.GreaterOrEqual;
-                    return true;
-                case "<":
-                    comparison = Comparison.Lesser;
-                    return true;
-                case "<=":
-                    comparison = Comparison.LesserOrEqual;
-                    return true;
-                default:
-                    return false;
-            }
-        }
+        protected abstract bool DoesTileMatchCondition(NewTile referenceTile,NewTile tileToCheck,Func<string,dynamic> parameterGetter);
     }
     
     public abstract class AbilityConditionSO : ConditionSO
     {
         protected virtual IEnumerable<string> LinkKeys => Array.Empty<string>();
         
-        public string TextFullParameters(NewTile referenceTile,IReadOnlyDictionary<string,string> parameters)
+        public string TextFullParameters(NewTile referenceTile,string parameters)
         {
             return Text(referenceTile,LocalGetParameterValue);
             
@@ -107,7 +55,7 @@ namespace Battle.ScriptableObjects
             }
         }
         
-        public (string targetText, string countText) TargetOverrideFullParameters(NewTile referenceTile,int count,IReadOnlyDictionary<string,string> parameters)
+        public (string targetText, string countText) TargetOverrideFullParameters(NewTile referenceTile,int count,string parameters)
         {
             return TargetOverride(referenceTile,count,LocalGetParameterValue);
             
@@ -118,7 +66,7 @@ namespace Battle.ScriptableObjects
         }
         
         // TODO same thing with the specific parameter (maybe make another class cuz this will be use by lots of stuff)
-        protected bool ConvertDescriptionLinksFullParameters(NewTile referenceTile, string linkKey,IReadOnlyDictionary<string,string> parameters, out string text)
+        protected bool ConvertDescriptionLinksFullParameters(NewTile referenceTile, string linkKey,string parameters, out string text)
         {
             return ConvertDescriptionLinks(referenceTile,linkKey,LocalGetParameterValue,out text);
             

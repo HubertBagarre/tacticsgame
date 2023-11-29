@@ -11,7 +11,7 @@ namespace Battle.ScriptableObjects.Conditions
         [SerializeField] private bool targetEnemies = false;
         
         public override IEnumerable<string> SpecificParameters => Array.Empty<string>();
-        protected override bool CheckTile(NewTile referenceTile, NewTile tileToCheck, Func<string,dynamic> parameterGetter)
+        protected override bool DoesTileMatchCondition(NewTile referenceTile, NewTile tileToCheck, Func<string,dynamic> parameterGetter)
         {
             if (!tileToCheck.HasUnit) return false;
             
