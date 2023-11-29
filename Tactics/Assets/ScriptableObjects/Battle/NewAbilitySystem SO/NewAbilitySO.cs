@@ -9,10 +9,11 @@ namespace Battle.ScriptableObjects
     [CreateAssetMenu(menuName = "Battle Scriptables/New Ability")]
     public class NewAbilitySO : ScriptableObject
     {
-        
-        [SerializeField,TextArea(1,10)] private string requirementsParameters;
+        private const string ToolTipText = "Parameter name is case insensitive\nSeparate parameters with \\n (don't type \\n just backspace)\nparameter:value";
+        [SerializeField,TextArea(1,10),Tooltip(ToolTipText)] private string requirementsParameters;
         
         [SerializeField] private List<AbilityConditionSO> requirements = new ();
+        public IReadOnlyList<AbilityConditionSO> Requirements => requirements;
 
         public bool MatchesRequirements(NewTile casterTile)
         {

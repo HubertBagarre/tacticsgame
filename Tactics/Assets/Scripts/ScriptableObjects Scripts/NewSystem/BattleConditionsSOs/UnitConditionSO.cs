@@ -10,7 +10,7 @@ namespace Battle.ScriptableObjects.Conditions
         [SerializeField] private bool targetAllies = false;
         [SerializeField] private bool targetEnemies = false;
         
-        protected override IEnumerable<string> SpecificParameters => Array.Empty<string>();
+        public override IEnumerable<string> SpecificParameters => Array.Empty<string>();
         protected override bool CheckTile(NewTile referenceTile, NewTile tileToCheck, Func<string,dynamic> parameterGetter)
         {
             if (!tileToCheck.HasUnit) return false;
@@ -47,7 +47,7 @@ namespace Battle.ScriptableObjects.Conditions
             return value;
         }
 
-        protected override object InterpretParameter(string parameter, string value, bool defaultValue)
+        protected override object InterpretParameter(string parameter, string value, bool parameterNotFound)
         {
             return null;
         }

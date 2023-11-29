@@ -7,13 +7,13 @@ namespace Battle.ScriptableObjects.Conditions
     [CreateAssetMenu(menuName = "Battle Scriptables/Condition/Range Condition")]
     public class InRangeConditionSO : AbilityConditionSO
     {
-        protected override IEnumerable<string> SpecificParameters => new[] {"range"};
+        public override IEnumerable<string> SpecificParameters => new[] {"Range"};
         
         protected override bool CheckTile(NewTile referenceTile, NewTile tileToCheck, Func<string,dynamic> parameterGetter)
         {
             var distance = tileToCheck.Position - referenceTile.Position;
 
-            var range = parameterGetter.Invoke("range") as Vector2Int? ?? Vector2Int.zero;
+            var range = parameterGetter.Invoke("Range") as Vector2Int? ?? Vector2Int.zero;
             
             if(range.x > range.y) range = new Vector2Int(range.y,range.x);
             var minDistance = range.x;
@@ -24,7 +24,7 @@ namespace Battle.ScriptableObjects.Conditions
         
         protected override string Text(NewTile referenceTile,Func<string,dynamic> parameterGetter)
         {
-            var range = parameterGetter.Invoke("range") as Vector2Int? ?? Vector2Int.zero;
+            var range = parameterGetter.Invoke("Range") as Vector2Int? ?? Vector2Int.zero;
             
             if(range.x > range.y) range = new Vector2Int(range.y,range.x);
             var minDistance = range.x;
@@ -44,7 +44,7 @@ namespace Battle.ScriptableObjects.Conditions
         }
         protected override object InterpretParameter(string parameter, string value, bool useDefaultValue)
         {
-            if (parameter != "range") return null;
+            if (parameter != "Range") return null;
             
             var defaultValue = Vector2Int.zero;
 

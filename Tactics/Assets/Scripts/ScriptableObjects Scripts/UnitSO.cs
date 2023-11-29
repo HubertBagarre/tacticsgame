@@ -100,19 +100,6 @@ namespace Battle
             if(!TargetTileFirst && tileRoutine != null) yield return tile.StartCoroutine(tileRoutine);*/
         }
     }
-
-    public enum UnitStat
-    {
-        Hp = 4,
-        MaxHp = 5,
-        Movement = 0,
-        CurrentMovement = 6,
-        Speed = 1,
-        Attack = 2,
-        AttackRange = 3,
-        MaxShield = 7,
-        CurrentShield = 8
-    }
     
     [Serializable]
     public class UnitStatsInstance
@@ -309,6 +296,36 @@ namespace Battle
             OnAttackRangeModified?.Invoke(this);
             OnMovementModified?.Invoke(this);
             OnSpeedModified?.Invoke(this);
+        }
+        
+        public enum UnitStat
+        {
+            Hp = 4,
+            MaxHp = 5,
+            Movement = 0,
+            CurrentMovement = 6,
+            Speed = 1,
+            Attack = 2,
+            AttackRange = 3,
+            MaxShield = 7,
+            CurrentShield = 8
+        }
+        
+        public static string UnitStatToText(UnitStat stat)
+        {
+            return stat switch
+            {
+                UnitStat.Hp => "HP",
+                UnitStat.MaxHp => "Max HP",
+                UnitStat.Movement => "Movement",
+                UnitStat.CurrentMovement => "Movements Left",
+                UnitStat.Speed => "Speed",
+                UnitStat.Attack => "Attack",
+                UnitStat.AttackRange => "Attack Range",
+                UnitStat.MaxShield => "Max Shield",
+                UnitStat.CurrentShield => "Shield",
+                _ => throw new ArgumentOutOfRangeException(nameof(stat), stat, null)
+            };
         }
     }
 }
