@@ -53,34 +53,12 @@ namespace Battle.ScriptableObjects.Conditions
         
         protected override string Text(NewTile referenceTile,Func<string,dynamic> parameterGetter)
         {
-            var returnText = " with ";
+            return GenerateListOfParametersText<ComparisonData>(parameterGetter, GenerateComparisonText," with ");
             
-            var list = new List<string>();
-            
-            foreach (var parameter in SpecificParameters)
+            (bool,string) GenerateComparisonText(ComparisonData comparisonData)
             {
-                var comparison = parameterGetter.Invoke(parameter) as ComparisonData ? ?? new ComparisonData();
-
-                if (comparison.use) list.Add($"{GenerateComparisonText(comparison)}");
-            }
-            
-            if(list.Count == 0) return string.Empty;
-
-            returnText += list[0];
-            
-            if (list.Count == 1) return returnText;
-            
-            for (int i = 1; i < list.Count; i++)
-            {
-                var text = list[i];
-                var separator = i != list.Count-1 ? ", " : " and ";
-                returnText += $"{separator}{text}";
-            }
-            
-            return returnText;
-            
-            string GenerateComparisonText(ComparisonData comparisonData)
-            {
+                if (!comparisonData.use) return (false, string.Empty);
+                
                 var preValue = "";
                 var postValue = "";
                 var value = $"{comparisonData.valueToCompareTo}";
@@ -144,7 +122,7 @@ namespace Battle.ScriptableObjects.Conditions
 
                 var postStatText = comparisonData.compareWithCaster ? "" : $"{postValue} {statText}";
                 
-                return $"{preValue}{value}{postStatText}";
+                return (true,$"{preValue}{value}{postStatText}");
             }
         }
         

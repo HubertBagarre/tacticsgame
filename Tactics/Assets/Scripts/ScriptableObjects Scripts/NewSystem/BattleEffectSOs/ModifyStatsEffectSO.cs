@@ -55,24 +55,26 @@ namespace Battle.ScriptableObjects.Effect
             
             if (wasNotFound) return result;
             
-            var invalidStat = !Enum.TryParse(parameter, out result.stat);
+            var validStat = Enum.TryParse(parameter, out result.stat);
             
-            if (invalidStat) return result; //invalid Stat
+            if (!validStat) return result; //invalid Stat
             
             var operationText = value[0].ToString();
             var valueText = value[1..];
             
-            var invalidOperation = TextToOperation(operationText, out result.operation);
+            var validOperation = TextToOperation(operationText, out result.operation);
+            
+            result.debug = $"{result.operation}";
 
-            if (invalidOperation)
+            if (!validOperation)
             {
                 result.operation = Operation.Set;
                 valueText = value;
             }
             
-            var invalidValue = !float.TryParse(valueText, out result.value);
+            var validValue = float.TryParse(valueText, out result.value);
             
-            if(invalidValue) return result;
+            if(!validValue) return result;
             
             result.use = true;
 
@@ -81,7 +83,44 @@ namespace Battle.ScriptableObjects.Effect
 
         protected override string Text(NewTile referenceTile, Func<string, dynamic> parameterGetter)
         {
-            return "do something";
+            return GenerateListOfParametersText<OperationData>(parameterGetter, GenerateOperationText);
+            
+            (bool,string) GenerateOperationText(OperationData operationData)
+            {
+                if (!operationData.use) return (false,string.Empty);
+                
+                var stat =  UnitStatsInstance.UnitStatToText(operationData.stat);
+                var operation = operationData.operation;
+                var value = Mathf.FloorToInt(operationData.value);
+
+                string text;
+                string verb;
+                
+                switch (operation)
+                {
+                    case Operation.Set:
+                        text = $"set it's {stat} to {value} ({operationData.debug})";
+                        return (true,text);
+                    case Operation.Add:
+                        verb = "increase";
+                        break;
+                    case Operation.Subtract:
+                        verb = "decrease";
+                        break;
+                    case Operation.Multiply:
+                        verb = "multiply";
+                        break;
+                    case Operation.Divide:
+                        verb = "divide";
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                
+                text = $"{verb} it's {stat} by {value}";
+
+                return (true, text);
+            }
         }
     }
 }

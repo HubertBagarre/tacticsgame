@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
@@ -49,6 +50,35 @@ namespace Battle.ScriptableObjects
             }
 
             return new ReadOnlyDictionary<string, string>(dict);
+        }
+        
+        protected string GenerateListOfParametersText<T>(Func<string,dynamic> parameterGetter,Func<T,(bool use,string text)> generateLineFunc,string startText = "",string normalSeparator = ", ",string lastSeparator = " and ") where T : struct
+        {
+            var list = new List<string>();
+
+            foreach (var parameter in SpecificParameters)
+            {
+                var comparison = parameterGetter.Invoke(parameter) as T? ?? new T();
+
+                var generated = generateLineFunc.Invoke(comparison);
+                
+                if (generated.use) list.Add($"{generated.text}");
+            }
+
+            if (list.Count == 0) return string.Empty;
+
+            startText += list[0];
+
+            if (list.Count == 1) return startText;
+
+            for (int i = 1; i < list.Count; i++)
+            {
+                var text = list[i];
+                var separator = i != list.Count - 1 ? normalSeparator : lastSeparator;
+                startText += $"{separator}{text}";
+            }
+
+            return startText;
         }
         
         protected static string ComparisonToText(Comparison comparison)
