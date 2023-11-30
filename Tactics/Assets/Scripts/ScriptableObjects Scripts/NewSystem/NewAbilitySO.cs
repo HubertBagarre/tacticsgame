@@ -60,9 +60,7 @@ namespace Battle.ScriptableObjects
         {
             var firstConditionalEffect = SelectedEffects.ConditionalEffectsCollection.First().ConditionalEffect;
             
-            var firstEffectOnTarget = firstConditionalEffect.EffectsOnTarget.First();
-            
-            return firstEffectOnTarget?.EffectsText(caster?.Tile);
+            return firstConditionalEffect.EffectsText(caster?.Tile);
         }
         
         [ContextMenu("Test Requirement Text")]

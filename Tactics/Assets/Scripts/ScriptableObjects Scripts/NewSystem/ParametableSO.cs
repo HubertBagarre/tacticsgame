@@ -8,7 +8,7 @@ namespace Battle.ScriptableObjects
 
     public abstract class ParametableSO : ScriptableObject
     {
-        public const string ToolTipText = "Parameter name is case sensitive\nSeparate parameters with \\n (don't type \\n just backspace)\nparameter(:value1,value2,...)";
+        public const string ToolTipText = "Parameter name is case sensitive\nSeparate parameters with \\n (don't type \\n just backspace)\nparameter(:value1,value2,...)\nUse'\\\\' for comments\nInvalid values are ignored";
         
         public abstract IEnumerable<string> SpecificParameters { get; }
 
@@ -44,6 +44,8 @@ namespace Battle.ScriptableObjects
 
             foreach (var parameter in parametersArray)
             {
+                if (parameter.Length > 2) if(parameter[1] == '\\' && parameter[0] == '\\') continue;
+                
                 var split = parameter.Split(':');
 
                 dict.Add(split[0], split.Length > 1 ? split[1] : string.Empty);

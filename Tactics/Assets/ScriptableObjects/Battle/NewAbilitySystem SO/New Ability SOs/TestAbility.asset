@@ -16,9 +16,14 @@ MonoBehaviour:
   <Name>k__BackingField: 
   <Type>k__BackingField: 0
   <Requirements>k__BackingField:
-    <Parameters>k__BackingField: Speed:100
+    <Parameters>k__BackingField: 'Speed:100
+
+      Movement:<,10
+
+      Range:6'
     conditions:
     - {fileID: 11400000, guid: 9ee5f54731c1bee49b643931b53e9e9d, type: 2}
+    - {fileID: 11400000, guid: 2f7019c9de2adab4c8ec849364f7faed, type: 2}
   <ExpectedSelections>k__BackingField: 1
   <SelectionCondition>k__BackingField:
     <Parameters>k__BackingField: 
@@ -27,11 +32,18 @@ MonoBehaviour:
     conditionalEffects:
     - <Depth>k__BackingField: 0
       <BranchOperator>k__BackingField: 0
-      effect:
+      conditionalEffect:
         <Condition>k__BackingField:
           <Parameters>k__BackingField: 
           conditions: []
         effects:
-        - <Parameters>k__BackingField: 
+        - <Parameters>k__BackingField: '//Change Speed
+
+            Speed:+6'
+          effects:
+          - {fileID: 11400000, guid: 648ff5a49823f694eb2b4d639d18f88e, type: 2}
+        - <Parameters>k__BackingField: '//Change movement
+
+            Movement:-7'
           effects:
           - {fileID: 11400000, guid: 648ff5a49823f694eb2b4d639d18f88e, type: 2}

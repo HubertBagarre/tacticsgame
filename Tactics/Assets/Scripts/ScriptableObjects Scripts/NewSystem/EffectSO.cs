@@ -27,6 +27,34 @@ namespace Battle.ScriptableObjects
             
             return Condition.DoesTileMatchConditionFullParameters(caster.Tile,caster.Tile);
         }
+
+        public string EffectsText(NewTile referenceTile)
+        {
+            var effectsOnTargetTexts = new List<string>();
+
+            if(EffectsOnTarget.Count <= 0) return string.Empty;
+            
+            foreach (var effectsOnTarget in EffectsOnTarget)
+            {
+                effectsOnTargetTexts.AddRange(effectsOnTarget.GetEffectsOnTargetTexts(referenceTile));
+            }
+            
+            if(effectsOnTargetTexts.Count <= 0) return string.Empty;
+
+            var text = effectsOnTargetTexts[0];
+
+            if (effectsOnTargetTexts.Count == 1) return text;
+
+            for (int i = 1; i < effectsOnTargetTexts.Count; i++)
+            {
+                var effectText = effectsOnTargetTexts[i];
+                
+                text += "\n";
+                text += effectText;
+            }
+            
+            return text;
+        }
     }
     
     [Serializable]
@@ -48,32 +76,28 @@ namespace Battle.ScriptableObjects
             }
         }
         
-        public string EffectsText(NewTile referenceTile)
+        public IReadOnlyList<string> GetEffectsOnTargetTexts(NewTile referenceTile)
         {
-            if (typeof(T).IsSubclassOf(typeof(AbilityEffectSO))) return "<i>nothing happens</i>";
+            var defaultText = "<i>do something</i>";
+
+            if (typeof(T).IsSubclassOf(typeof(AbilityEffectSO))) return new List<string>(){defaultText};
             
             var count = Effects.Count;
             
-            if(count <= 0) return string.Empty;
-            
+            if(count <= 0) return new List<string>(){defaultText};
+
+            var returnList = new List<string>();
             var effectList = Effects.Cast<AbilityEffectSO>().ToList();
-
-            var text = $"{effectList[0].TextFullParameters(referenceTile, Parameters)}.";
-            text = char.ToUpper(text[0]) + text[1..];
-
-            if (count == 1) return text;
-
-            for (int i = 1; i < effectList.Count; i++)
+            
+            foreach (var effect in effectList)
             {
-                var effect = effectList[i];
                 var effectText = $"{effect.TextFullParameters(referenceTile, Parameters)}.";
                 effectText = char.ToUpper(effectText[0]) + effectText[1..];
                 
-                text += "\n";
-                text += effectText;
+                returnList.Add(effectText);
             }
-            
-            return text;
+
+            return returnList;
         }
     }
     
