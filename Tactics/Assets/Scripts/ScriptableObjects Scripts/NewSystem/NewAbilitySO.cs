@@ -5,16 +5,12 @@ using UnityEngine;
 
 namespace Battle.ScriptableObjects
 {
+    using Ability;
+    using Ability.Components;
+    
     [CreateAssetMenu(menuName = "Battle Scriptables/New Ability")]
     public class NewAbilitySO : ScriptableObject
     {
-        [Serializable]
-        public struct ConditionalEffects<T> where T : AbilityEffectSO
-        {
-            [SerializeField] private BranchedConditionalEffect<AbilityEffectSO>[] conditionalEffects;
-            public IReadOnlyCollection<BranchedConditionalEffect<AbilityEffectSO>> ConditionalEffectsCollection => conditionalEffects;
-        }
-
         [field: Header("Ability Description")]
         [field: SerializeField]
         public Sprite Sprite { get; private set; }
@@ -60,7 +56,7 @@ namespace Battle.ScriptableObjects
         {
             var firstConditionalEffect = SelectedEffects.ConditionalEffectsCollection.First().ConditionalEffect;
             
-            return firstConditionalEffect.EffectsText(caster?.Tile);
+            return firstConditionalEffect.Text(caster?.Tile);
         }
         
         [ContextMenu("Test Requirement Text")]

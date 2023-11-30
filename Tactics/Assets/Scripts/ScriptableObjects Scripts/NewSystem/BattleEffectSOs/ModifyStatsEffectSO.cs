@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Battle.ScriptableObjects.Effect
+namespace Battle.ScriptableObjects.Ability.Effect
 {
     [CreateAssetMenu(menuName = "Battle Scriptables/Effect/Modify Stats")]
     public class ModifyStatsEffectSO : AbilityEffectSO
