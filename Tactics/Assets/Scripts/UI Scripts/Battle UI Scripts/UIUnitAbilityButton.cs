@@ -28,7 +28,7 @@ namespace Battle.UIComponent
         private Transform ultimateChargesParent;
         [SerializeField] private UIUltimateCharge[] ultimateCharges;
 
-        private UnitAbilityInstance associatedAbility;
+        private AbilityInstance associatedAbility;
         private NewUnit associatedUnit;
 
         private void Start()
@@ -40,46 +40,34 @@ namespace Battle.UIComponent
         private bool CanBeCast()
         {
             //TODO: rework this abilities to work with NewUnit
-            return false;
+            if (!associatedAbility.SO.MatchesRequirements(associatedUnit)) return false;
+            
+            return true;
 
             /*if(!associatedAbility.SO.CanCastAbility(associatedUnit)) return false;
             if (associatedAbility.CurrentCooldown > 0) return false;
             return associatedUnit.CurrentUltimatePoints >= associatedAbility.UltimateCost;*/
         }
-
-        private void UpdateButtonInteractable(EndAbilityTargetSelectionEvent ctx)
-        {
-            //TODO: rework this abilities to work with NewUnit
-            
-            /*
-            if(associatedUnit == null) return;
-            if(associatedAbility == null) return;
-            if(ctx.Caster != associatedUnit) return;
-            
-            Button.interactable = CanBeCast();
-            */
-        }
         
-        public void LinkAbility(UnitAbilityInstance ability,NewUnit caster)
+        public void LinkAbility(AbilityInstance ability,NewUnit owner)
         {
             //TODO: rework this abilities to work with NewUnit
             
-            /*
             if (associatedUnit != null)
             {
                 associatedUnit.OnUltimatePointsAmountChanged -= UpdateUltimateCharges;
-                EventManager.RemoveListener<EndAbilityTargetSelectionEvent>(UpdateButtonInteractable);
+                //EventManager.RemoveListener<EndAbilityTargetSelectionEvent>(UpdateButtonInteractable);
             }
             
             associatedAbility = ability;
-            associatedUnit = caster;
+            associatedUnit = owner;
             
-            abilityShower.LinkAbility(ability,caster);
+            abilityShower.LinkAbility(ability,owner);
 
             associatedUnit.OnUltimatePointsAmountChanged += UpdateUltimateCharges;
-            EventManager.AddListener<EndAbilityTargetSelectionEvent>(UpdateButtonInteractable);
+            //EventManager.AddListener<EndAbilityTargetSelectionEvent>(UpdateButtonInteractable);
 
-            UpdateAppearance();*/
+            UpdateAppearance();
         }
 
         public void UpdateAppearance()
@@ -135,6 +123,8 @@ namespace Battle.UIComponent
         private void StartAbilityTargetSelection()
         {
             //TODO: rework this abilities to work with NewUnit
+            
+            Debug.Log($"Requesting selection for {associatedAbility.SO.Name}");
             
             //EventManager.Trigger(new StartAbilityTargetSelectionEvent(associatedAbility,associatedUnit));
         }

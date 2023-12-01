@@ -448,11 +448,12 @@ MonoBehaviour:
   unitManager: {fileID: 107337561}
   abilityManager: {fileID: 107337560}
   timelineManager: {fileID: 107337559}
+  startingAbilityPoints: 3
+  battleStartTransitionDuration: {x: 0.1, y: 0.1, z: 0.1}
+  roundStartTransitionDuration: {x: 0.1, y: 0.1, z: 0.1}
   maxIterations: 1000
   showLog: 0
   maxRounds: 10
-  battleStartTransitionDuration: {x: 1, y: 1, z: 1}
-  roundStartTransitionDuration: {x: 1, y: 1, z: 1}
 --- !u!114 &107337559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -479,7 +480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0335fb895c210240aac7d5a55c938e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CurrentAbilityPoints>k__BackingField: 3
+  currentAbilityPoints: 0
   <MaxAbilityPoints>k__BackingField: 6
 --- !u!114 &107337561
 MonoBehaviour:
@@ -545,6 +546,7 @@ GameObject:
   - component: {fileID: 489740190}
   - component: {fileID: 489740192}
   - component: {fileID: 489740191}
+  - component: {fileID: 489740193}
   m_Layer: 0
   m_Name: Battle UI Manager
   m_TagString: Untagged
@@ -603,14 +605,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1145486022}
+  uiAbilityManager: {fileID: 489740193}
   endTurnButton: {fileID: 2061429859}
-  abilityTargetSelectionUIObj: {fileID: 496578134}
-  confirmTileSelectionButton: {fileID: 1861397411}
-  cancelTileSelectionButton: {fileID: 300457157}
-  selectionsLeftText: {fileID: 643391124}
-  abilityPointChargePrefab: {fileID: 7443386184952824264, guid: 42a309e6da97c9f408df208c55f29df6,
-    type: 3}
-  abilityPointChargeParent: {fileID: 149239453}
 --- !u!114 &489740192
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -627,6 +623,28 @@ MonoBehaviour:
   timelineObj: {fileID: 1445914794}
   entityTimelinePrefab: {fileID: 8208835791797979481, guid: a98e4692f99d9344bafa11b222490fef,
     type: 3}
+--- !u!114 &489740193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 489740188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbfdcad8a5e3c254ab7ae87cd674f2e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilityTargetSelectionUIObj: {fileID: 496578134}
+  confirmTileSelectionButton: {fileID: 1861397411}
+  cancelTileSelectionButton: {fileID: 300457157}
+  selectionsLeftText: {fileID: 643391124}
+  abilityButtonPrefab: {fileID: 8884394064699142754, guid: d1ff55a559b96b648b0f03978671bc35,
+    type: 3}
+  abilityButtonParent: {fileID: 3055979059778456764}
+  abilityPointChargePrefab: {fileID: 7443386184952824264, guid: 42a309e6da97c9f408df208c55f29df6,
+    type: 3}
+  abilityPointChargeParent: {fileID: 149239453}
 --- !u!1 &496578134 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 338824192872231962, guid: ff46836e02f007843b920ec7d9bb90fe,
@@ -2214,3 +2232,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ff46836e02f007843b920ec7d9bb90fe, type: 3}
+--- !u!224 &3055979059778456764 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 629851859068793524, guid: ff46836e02f007843b920ec7d9bb90fe,
+    type: 3}
+  m_PrefabInstance: {fileID: 3055979059778456763}
+  m_PrefabAsset: {fileID: 0}

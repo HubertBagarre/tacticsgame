@@ -18,6 +18,17 @@ namespace Battle.ScriptableObjects
         [field: SerializeField] public string Name { get; private set; }
         [field: SerializeField] public AbilityType Type { get; private set; }
         
+        [field:Header("Costs")]
+        [field: SerializeField,Min(0)] public int Cooldown { get; private set; }
+        [field: SerializeField] public int Cost { get; private set; }
+        [field: SerializeField] public bool IsUltimate { get; private set; } = false;
+        [field: SerializeField] public int UltimateCost { get; private set; } = 0;
+        
+        [field: Header("Special")]
+        [field: SerializeField] public bool SkipTargetSelection { get; private set; } = false;
+        [field: SerializeField] public bool SkipTargetConfirmation { get; private set; } = false;
+        [field: SerializeField] public bool EndUnitTurnAfterCast { get; private set; } = true;
+        
         [field: Space]
         [field: Tooltip("Requirements on the caster's tile to be able to cast this ability.")]
         [field: SerializeField] public CustomizableAbilityCondition Requirements { get; private set; } = new();
@@ -30,9 +41,19 @@ namespace Battle.ScriptableObjects
         [SerializeField] private ConditionalEffects<AbilityEffectSO> selectedEffects = new ();
         public ConditionalEffects<AbilityEffectSO> SelectedEffects => selectedEffects;
         
+        public AbilityInstance CreateInstance(bool showInUI = true)
+        {
+            return new AbilityInstance(new AbilityToAdd(this,showInUI));
+        }
+        
         public bool MatchesRequirements(NewUnit caster)
         {
             return Requirements.DoesTileMatchConditionFullParameters(caster?.Tile,caster?.Tile);
+        }
+
+        public bool IsSelectableTile(NewTile referenceTile, NewTile targetTile)
+        {
+            return SelectionCondition.DoesTileMatchConditionFullParameters(referenceTile, targetTile);
         }
         
         public string RequirementText(NewUnit caster)

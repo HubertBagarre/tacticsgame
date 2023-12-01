@@ -41,6 +41,16 @@ namespace Battle
 
             passiveInstances = new List<PassiveInstance>();
         }
+        
+        public void SetUnit(NewUnit unit)
+        {
+            // TODO - Add callbacks, battle actions for unit enter, unit exit
+            
+            Unit = unit;
+            HasUnit = true;
+        }
+
+        #region Passives
 
         public void AddPassiveInstanceToList(PassiveInstance passiveInstance)
         {
@@ -94,6 +104,8 @@ namespace Battle
             
             return passiveInstances.Count(condition);
         }
+
+        #endregion
     }
 
 }

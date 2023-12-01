@@ -7,8 +7,6 @@ using UnityEngine.EventSystems;
 
 namespace Battle.UIComponent
 {
-    using ScriptableObjects;
-    
     public class UIUnitAbilityInfo : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,IPointerClickHandler
     {
         [SerializeField] private UIUnitAbilityShower abilityShower;
@@ -20,7 +18,7 @@ namespace Battle.UIComponent
         [SerializeField] private TextMeshProUGUI abilityCooldownText;
         [SerializeField] private TextMeshProUGUI abilityDescriptionText;
         
-        private UnitAbilityInstance associatedAbility => abilityShower.AssociatedAbility;
+        private AbilityInstance associatedAbility => abilityShower.AssociatedAbility;
         private NewUnit associatedUnit => abilityShower.AssociatedUnit;
 
         public bool IsHovering { get; private set; }
@@ -34,7 +32,7 @@ namespace Battle.UIComponent
 
         public void ShowDescription()
         {
-            UIBattleManager.Tooltip.Hide();
+            NewUIBattleManager.Tooltip.Hide();
             
             descriptionPanelGo.SetActive(true);
             UpdateDescription();
@@ -42,15 +40,15 @@ namespace Battle.UIComponent
         
         public void HideDescription()
         {
-            UIBattleManager.Tooltip.Hide();
+            NewUIBattleManager.Tooltip.Hide();
             descriptionPanelGo.SetActive(false);
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (UIBattleManager.Tooltip.IsEnabled)
+            if (NewUIBattleManager.Tooltip.IsEnabled)
             {
-                UIBattleManager.Tooltip.Hide();
+                NewUIBattleManager.Tooltip.Hide();
                 return;
             }
             
@@ -115,7 +113,6 @@ namespace Battle.UIComponent
                 size.y = 40 + sizeIncrease + 5; //cuz the text is at Y = -40
                 descriptionPanelTr.sizeDelta = size;
             }*/
-            
         }
         
         public void OnPointerEnter(PointerEventData eventData)

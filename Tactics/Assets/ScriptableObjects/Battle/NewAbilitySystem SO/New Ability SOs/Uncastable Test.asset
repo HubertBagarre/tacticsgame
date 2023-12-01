@@ -10,20 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8f922a8629138ac4881cd8705736e109, type: 3}
-  m_Name: TestAbility
+  m_Name: Uncastable Test
   m_EditorClassIdentifier: 
   <Sprite>k__BackingField: {fileID: 0}
-  <Name>k__BackingField: 
+  <Name>k__BackingField: Uncastable
   <Type>k__BackingField: 0
+  <Cooldown>k__BackingField: 0
+  <Cost>k__BackingField: 0
+  <IsUltimate>k__BackingField: 0
+  <UltimateCost>k__BackingField: 0
+  <SkipTargetSelection>k__BackingField: 0
+  <SkipTargetConfirmation>k__BackingField: 0
+  <EndUnitTurnAfterCast>k__BackingField: 1
   <Requirements>k__BackingField:
-    <Parameters>k__BackingField: 'Speed:100
-
-      Movement:<,10
-
-      Range:6'
+    <Parameters>k__BackingField: Hp:7
     conditions:
     - {fileID: 11400000, guid: 9ee5f54731c1bee49b643931b53e9e9d, type: 2}
-    - {fileID: 11400000, guid: 2f7019c9de2adab4c8ec849364f7faed, type: 2}
   <ExpectedSelections>k__BackingField: 1
   <SelectionCondition>k__BackingField:
     <Parameters>k__BackingField: 

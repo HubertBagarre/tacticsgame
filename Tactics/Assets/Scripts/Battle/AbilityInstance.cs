@@ -5,122 +5,16 @@ using System.Linq;
 using Battle.AbilityEvents;
 using UnityEngine;
 
-namespace Battle.ScriptableObjects
-{
-    [CreateAssetMenu(menuName = "Battle Scriptables/Ability")]
-    public class UnitAbilitySO : ScriptableObject
-    {
-        [field: Header("Ability Description")]
-        [field: SerializeField]
-        public Sprite Sprite { get; private set; }
-
-        [field: SerializeField] public string Name { get; private set; }
-        [field: SerializeField] public AbilityType Type { get; private set; }
-        [SerializeField, TextArea(10, 10)] protected string description;
-        [field:SerializeField] public UnitAbilitySelectorSO Selector { get; private set; }
-        [field:SerializeField] public UnitAbilityRequirementSO Requirement { get; private set; }
-        [field:SerializeField] public UnitAbilityEffectSO[] Effects { get; private set; }
-        
-        [field:Header("Costs")]
-        [field: SerializeField,Min(0)] public int Cooldown { get; private set; }
-        [field: SerializeField] public int Cost { get; private set; }
-        [field: SerializeField] public bool IsUltimate { get; private set; } = false;
-        [field: SerializeField] public int UltimateCost { get; private set; } = 0;
-        
-        [field: Header("Special")]
-        [field: SerializeField] public bool SkipTargetSelection { get; private set; } = false;
-        [field: SerializeField] public bool SkipTargetConfirmation { get; private set; } = false;
-        [field: SerializeField] public bool EndUnitTurnAfterCast { get; private set; } = true;
-
-        public virtual string ConvertedDescription(Unit caster)
-        {
-            var requirementsText = string.Empty;
-
-            if (Requirement != null)
-            {
-                //requirementsText = $"<i>{Requirement.Description(caster)}</i>\n";
-                var requirementsDescriptions = Requirement.Descriptions(caster.Tile);
-                foreach (var tuple in requirementsDescriptions)
-                {
-                    requirementsText += $"<i>{tuple.verb} {tuple.content}</i>\n";
-                }
-                //if(requirementsDescriptions.Count > 0) requirementsText = requirementsText.TrimEnd('\n');
-            }
-            
-            var effectsText = string.Empty;
-            foreach (var effect in Effects)
-            {
-                var desc = effect.ConvertedDescription(caster);
-                if(!desc.EndsWith("\n")) desc += "\n";
-                effectsText += $"{desc}";
-            }
-            effectsText = effectsText.TrimEnd('\n');
-
-            if(Selector == null) return $"{effectsText}";
-            
-            //Maybe do something cleaner of multi effects
-            var descriptionText = Selector.Description(caster);
-            
-            var affectedDesc = Selector.AffectedDescription(caster);
-            var toAffectedDesc = affectedDesc == string.Empty ? string.Empty : $" to{affectedDesc}";
-            effectsText = effectsText.Replace("%toAFFECTED%", $"{toAffectedDesc}");
-            effectsText = effectsText.Replace("%AFFECTED%", Selector.AffectedDescription(caster));
-            
-            if(descriptionText == string.Empty) return $"{requirementsText}{effectsText}";
-            
-            return $"{requirementsText}Select {descriptionText}.\n{effectsText}";
-        }
-
-        public string ConvertDescriptionLinks(Unit caster, string linkKey)
-        {
-            var text = linkKey;
-            if(Selector != null) if (Selector.ConvertDescriptionLinks(caster,linkKey, out var selectorText)) text = selectorText;
-            if(Requirement != null) if (Requirement.ConvertDescriptionLinks(caster.Tile,linkKey, out var requirementText)) text = requirementText;
-            foreach (var effect in Effects)
-            {
-                if (effect.ConvertDescriptionLinks(caster,linkKey, out var effectText)) text = effectText;
-            }
-            return text;
-        }
-
-        public bool CanCastAbility(Unit caster)
-        {
-            return Requirement == null || Requirement.CanCastAbility(caster.Tile);
-        }
-        
-        public IEnumerator CastAbility(Unit caster, Tile[] targetTiles)
-        {
-            if(!CanCastAbility(caster)) yield break;
-
-            if(Requirement != null) Requirement.ConsumeRequirement(caster.Tile);
-            
-            foreach (var effect in Effects)
-            {
-                yield return caster.StartCoroutine(effect.AbilityEffect(caster, targetTiles));
-            }
-        }
-        
-        public UnitAbilityInstance CreateInstance(bool showInUI = true)
-        {
-            return new UnitAbilityInstance(new AbilityToAdd(null,showInUI));
-        }
-
-    }
-}
-
 namespace Battle
 {
     using ScriptableObjects;
     
-    public class UnitAbilityInstance
+    public class AbilityInstance
     {
         private AbilityToAdd Origin { get; }
         public NewAbilitySO SO => Origin.NewAbility;
         public bool ShowInTooltip => Origin.ShowInUI;
-        private UnitAbilitySelectorSO Selector { get; }
-        private UnitAbilityEffectSO[] Effects { get; }
-        public int ExpectedSelections => Selector.ExpectedSelections;
-        public int SelectionsLeft => Selector.ExpectedSelections - CurrentSelectionCount;
+        public int ExpectedSelections => SO.ExpectedSelections;
         private int costModifier = 0;
         public int Cost => SO.Cost + costModifier;
         public bool IsUltimate => SO.IsUltimate;
@@ -129,11 +23,9 @@ namespace Battle
         public int CurrentCooldown { get; private set; }
         public int CurrentSelectionCount => currentSelectedTiles.Count;
 
-        public bool IsTileSelectable(Unit caster, Tile tile)
+        public bool IsTileSelectable(NewUnit caster, NewTile tile)
         {
-            if (CurrentSelectionCount >= ExpectedSelections && Selector.UseSelectionOrder) return false;
-            
-            return Selector.IsTileSelectable(caster, tile, currentSelectedTiles);
+            return SO.IsSelectableTile(caster.Tile, tile);
         } 
 
         private List<Tile> currentSelectedTiles = new();
@@ -145,18 +37,14 @@ namespace Battle
         public event Action<int> OnCurrentSelectedTilesUpdated;
         public event Action<int> OnCurrentCooldownUpdated;
 
-        public UnitAbilityInstance(AbilityToAdd origin)
+        public AbilityInstance(AbilityToAdd origin)
         {
             Origin = origin;
-            Selector = null;
-            Effects = null;
             
             CurrentCooldown = 0;
             currentAffectedTiles.Clear();
             currentSelectedTiles.Clear();
             affectedTilesDict.Clear();
-            
-            if(Selector == null) Debug.LogWarning($"Selector is null for {SO} !!",SO);
         }
 
         public override string ToString()
@@ -189,13 +77,14 @@ namespace Battle
         
         public void StartTileSelection(Unit caster)
         {
-            Selector.ChangeAppearanceForTileSelectionStart(caster);
+            
         }
         
         //TODO - rework to update affected tiles (also visual), probably add overrides in the so
         public void AddTileToSelection(Unit caster, Tile tile, bool force = false)
         {
-            var useSelectionOrder = true; /*SO.Selector.UseSelectionOrder*/;
+            /*
+            var useSelectionOrder = true; SO.Selector.UseSelectionOrder;
             
             // remove tile if already selected
             if (currentSelectedTiles.Contains(tile))
@@ -236,6 +125,7 @@ namespace Battle
             {
                 EventManager.Trigger(new EndAbilityTargetSelectionEvent(caster,false));
             }
+            */
         }
 
         public void RemoveTileFromSelection(Unit caster, Tile tile)
@@ -289,3 +179,5 @@ namespace Battle
         }
     }
 }
+
+

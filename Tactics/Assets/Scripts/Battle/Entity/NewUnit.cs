@@ -21,19 +21,36 @@ namespace Battle
         private List<PassiveInstance> passiveInstances;
         public IReadOnlyList<PassiveInstance> PassiveInstances => passiveInstances;
         
-        private List<UnitAbilityInstance> abilityInstances;
-        public IReadOnlyList<UnitAbilityInstance> AbilityInstances => abilityInstances;
+        private List<AbilityInstance> abilityInstances;
+        public IReadOnlyList<AbilityInstance> AbilityInstances => abilityInstances;
         
-        [field: SerializeField] public int CurrentUltimatePoints { get; protected set; }
-        
+        [SerializeField] private int currentUltimatePoints;
+        public int CurrentUltimatePoints
+        {
+            get => currentUltimatePoints;
+            protected set
+            {
+                var previous = currentUltimatePoints;
+                currentUltimatePoints = value;
+                OnUltimatePointsAmountChanged?.Invoke(previous,currentUltimatePoints);
+            }
+        }
+        public event Action<int, int> OnUltimatePointsAmountChanged;
+
         public NewUnit(UnitSO so,NewTile tile,bool usePlayerBehaviour = false) : base(so.BaseSpeed, so.Initiative, so.Name)
         {
             Stats = so.CreateInstance();
+            
             Tile = tile;
             UsePlayerBehaviour = usePlayerBehaviour;
             
             passiveInstances = new List<PassiveInstance>();
-            abilityInstances = new List<UnitAbilityInstance>();
+            abilityInstances = new List<AbilityInstance>();
+
+            foreach (var abilityToAdd in so.Abilities)
+            {
+                abilityInstances.Add(abilityToAdd.CreateInstance());
+            }
         }
         
         #region DebugContextMenu

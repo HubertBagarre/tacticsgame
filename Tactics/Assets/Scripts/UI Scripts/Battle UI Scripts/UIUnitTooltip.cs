@@ -15,7 +15,7 @@ namespace Battle.UIComponent
         [Header("Abilities")]
         [SerializeField] private UIUnitAbilityShower unitAbilityShowerPrefab;
         [SerializeField] private Transform abilityShowerParent;
-        private Dictionary<UnitAbilityInstance,GameObject> abilityShowerDict = new();
+        private Dictionary<AbilityInstance,GameObject> abilityShowerDict = new();
         
         [Header("Passives")]
         [SerializeField] private UIUnitPassiveIcon unitPassiveIconPrefab;

@@ -9,50 +9,12 @@ using UnityEngine.UI;
 
 public class UIPlayerControls : MonoBehaviour
 {
+        [Header("Components")]
         [SerializeField] private GameObject parent;
+        [SerializeField] private UIAbilityManager uiAbilityManager;
         
-        /*
-        [Header("Battle State")]
-        [SerializeField] private RectTransform battleRoundIndicatorTr;
-        [SerializeField] private TextMeshProUGUI battleRoundIndicatorText;
-        [SerializeField] private RectTransform battleStartIndicatorTr;*/
-
-        /*
-        [Header("Unit UI")]
-        [SerializeField] private UIUnit uiUnitPrefab;
-        private Dictionary<Unit, UIUnit> uiUnitsDict = new ();
-        
-        [Header("Unit Tooltip")]
-        [SerializeField] private UIUnitTooltip unitTooltip;
-        */
-                
         [Header("Player Controls")]
         [SerializeField] private Button endTurnButton;
-        
-        /*
-        [Header("Ability Buttons")]
-        [SerializeField] private UIUnitAbilityButton abilityButtonPrefab;
-        [SerializeField] private Transform abilityButtonParent;
-        private List<UIUnitAbilityButton> abilityButtons = new();
-        private Dictionary<Unit, List<UIUnitAbilityButton>> unitAbilitButtonsDict = new();
-        
-
-        [Header("Tooltip")]
-        [SerializeField] private UITooltip tooltip;
-        public static UITooltip Tooltip { get; private set; }
-        */
-        
-        [Header("Ability Tile Selection")]
-        [SerializeField] private GameObject abilityTargetSelectionUIObj;
-        [SerializeField] private Button confirmTileSelectionButton;
-        [SerializeField] private Button cancelTileSelectionButton;
-        [SerializeField] private TextMeshProUGUI selectionsLeftText;
-        private UnitAbilityInstance currentAbilityInTargetSelection;
-
-        [Header("Ability Points")]
-        [SerializeField] private UIAbilityPointCharge abilityPointChargePrefab;
-        [SerializeField] private Transform abilityPointChargeParent;
-        private UIAbilityPointCharge[] abilityPointCharges;
         
         private UnitTurnBattleAction currentTurnUnitAction;
 
@@ -87,7 +49,9 @@ public class UIPlayerControls : MonoBehaviour
         private void ShowPlayerUI()
         {
                 parent.SetActive(true);
-                abilityTargetSelectionUIObj.SetActive(false);
+                
+                uiAbilityManager.ShowAbilityTargetSelection();
+                uiAbilityManager.ShowUnitAbilitiesButton(currentTurnUnitAction.Unit);
                 
                 endTurnButton.onClick.AddListener(currentTurnUnitAction.RequestEndTurn);
         }
@@ -100,6 +64,10 @@ public class UIPlayerControls : MonoBehaviour
                 }
                 
                 currentTurnUnitAction = null;
+                
+                uiAbilityManager.ShowAbilityTargetSelection(false);
+                uiAbilityManager.HideUnitAbilitiesButton();
+                
                 parent.SetActive(false);
         }
 }

@@ -27,18 +27,25 @@ MonoBehaviour:
   <Abilities>k__BackingField:
   - <Ability>k__BackingField: {fileID: 11400000, guid: 112bc70c7d75c9f41a41f2d352b09d80,
       type: 2}
-    <ShowInUI>k__BackingField: 0
+    <NewAbility>k__BackingField: {fileID: 11400000, guid: a096b95f6cafa714ba1e7e01a9b5f2cc,
+      type: 2}
+    <ShowInUI>k__BackingField: 1
   - <Ability>k__BackingField: {fileID: 11400000, guid: f00d3bec0f9a6824fb4b345c1d0f9efe,
       type: 2}
-    <ShowInUI>k__BackingField: 0
+    <NewAbility>k__BackingField: {fileID: 11400000, guid: be9c117c73e8ce64f9bce2b3424df0c7,
+      type: 2}
+    <ShowInUI>k__BackingField: 1
   - <Ability>k__BackingField: {fileID: 11400000, guid: 31e6ceaff8da4aa48af84465371c69df,
       type: 2}
+    <NewAbility>k__BackingField: {fileID: 0}
     <ShowInUI>k__BackingField: 0
   - <Ability>k__BackingField: {fileID: 11400000, guid: 11ab3d6717fb3c842bbb0e70d24aa862,
       type: 2}
+    <NewAbility>k__BackingField: {fileID: 0}
     <ShowInUI>k__BackingField: 0
   - <Ability>k__BackingField: {fileID: 11400000, guid: bfd55d89b0ea6604ba9a1ee2c155afa8,
       type: 2}
+    <NewAbility>k__BackingField: {fileID: 0}
     <ShowInUI>k__BackingField: 0
   <StartingPassives>k__BackingField:
   - <SO>k__BackingField: {fileID: 11400000, guid: 6fcd7d4f362d1874f820c459430e18b8,

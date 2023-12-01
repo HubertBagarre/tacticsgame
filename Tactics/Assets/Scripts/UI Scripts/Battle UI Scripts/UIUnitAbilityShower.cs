@@ -10,8 +10,7 @@ namespace Battle.UIComponent
     {
         [SerializeField] private UIUnitAbilityInfo abilityInfo;
         [SerializeField] private Image abilityImage;
-        
-        public UnitAbilityInstance AssociatedAbility { get; private set; }
+        public AbilityInstance AssociatedAbility { get; private set; }
         public NewUnit AssociatedUnit { get; private set; }
         
         public bool IsHovering { get; private set; }
@@ -22,7 +21,7 @@ namespace Battle.UIComponent
             IsHovering = false;
         }
 
-        public void LinkAbility(UnitAbilityInstance ability,NewUnit caster)
+        public void LinkAbility(AbilityInstance ability,NewUnit caster)
         {
             AssociatedAbility = ability;
             AssociatedUnit = caster;

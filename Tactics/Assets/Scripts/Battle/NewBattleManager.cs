@@ -30,11 +30,14 @@ namespace Battle
         [SerializeField] private TimelineManager timelineManager;
         
         [Header("Settings")]
+        [SerializeField] private int startingAbilityPoints = 3;
+        [SerializeField] private Vector3 battleStartTransitionDuration = Vector3.one;
+        [SerializeField] private Vector3 roundStartTransitionDuration = Vector3.one;
+        
+        [Header("Debug")]
         [SerializeField] private int maxIterations = 99999;
         [SerializeField] private bool showLog;
         [SerializeField] private int maxRounds = 10;
-        [SerializeField] private Vector3 battleStartTransitionDuration = Vector3.one;
-        [SerializeField] private Vector3 roundStartTransitionDuration = Vector3.one;
         
         //Level
         private BattleLevel CurrentLevel { get; set; }
@@ -52,6 +55,7 @@ namespace Battle
             
             // 0 - Setup default values (lists, dictionaries, etc)
             inputManager.SetupCamera(Camera.main); //TODO : Change use a Camera Manager (also for ultimate animations)
+            abilityManager.Setup(startingAbilityPoints);
             AddCallbacks();
             
             // 1 - Spawn Tiles
@@ -297,6 +301,8 @@ namespace Battle
                 unitTr.position = Tile.TileRenderer.transform.position;
                 unitTr.rotation = Quaternion.identity;
                 //unitTr.SetParent(transform);
+                
+                Tile.SetUnit(Unit);
             }
         }
 

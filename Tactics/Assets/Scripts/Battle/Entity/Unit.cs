@@ -74,7 +74,7 @@ namespace Battle
         public int MaxUltimatePoints => GetHighestCostUltimate();
         public event Action<int, int> OnUltimatePointsAmountChanged;
         
-        public List<UnitAbilityInstance> AbilityInstances { get; } = new();
+        public List<AbilityInstance> AbilityInstances { get; } = new();
         public List<PassiveInstance> PassiveInstances { get; } = new();
         public void AddPassiveInstanceToList(PassiveInstance passiveInstance)
         {
@@ -96,8 +96,6 @@ namespace Battle
         public event IBattleEntity.BattleEntityDelegate OnTurnStart;
         public event IBattleEntity.BattleEntityDelegate OnTurnEnd;
         public event Action OnDeath;
-        //private List<IPassivesContainer<Unit>.PassiveInstanceDelegate> PassiveAddedCallbacks { get; } = new();
-        //private List<IPassivesContainer<Unit>.PassiveInstanceDelegate>  PassiveRemovedCallbacks { get; } = new();
         public delegate IEnumerator TileDelegate(Unit unit,Tile tile);
         public event TileDelegate OnTileEnter;
         public event TileDelegate OnTileExit;

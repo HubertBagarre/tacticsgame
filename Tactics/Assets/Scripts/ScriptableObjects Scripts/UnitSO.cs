@@ -28,7 +28,6 @@ namespace Battle.ScriptableObjects
         public int Initiative { get; private set; } = 1000;
         [field: SerializeField] public UnitBehaviourSO Behaviour { get; private set; }
         [field: SerializeField] public List<AbilityToAdd> Abilities { get; private set; }
-        
         [field: SerializeField] public List<PassiveToAdd> StartingPassives { get; private set; }
         public UnitStatsInstance CreateInstance(Unit unit) => new UnitStatsInstance(this,unit);
         public UnitStatsInstance CreateInstance() => new UnitStatsInstance(this);
@@ -40,20 +39,22 @@ namespace Battle
     using ScriptableObjects;
 
     [Serializable]
-    public class AbilityToAdd
+    public struct AbilityToAdd
     {
         [field: SerializeField] public UnitAbilitySO Ability { get; private set; }
+        [field: SerializeField] public NewAbilitySO NewAbility { get; private set; }
         [field: SerializeField] public bool ShowInUI { get; private set; }
 
-        public AbilityToAdd(UnitAbilitySO ability,bool showInUI = true)
+        public AbilityToAdd(NewAbilitySO ability,bool showInUI = true)
         {
-            Ability = ability;
+            Ability = null;
+            NewAbility = ability;
             ShowInUI = showInUI;
         }
-        
-        public UnitAbilityInstance CreateInstance()
+
+        public AbilityInstance CreateInstance()
         {
-            return new UnitAbilityInstance(this);
+            return new AbilityInstance(this);
         }
     }
     

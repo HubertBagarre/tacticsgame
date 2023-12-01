@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f922a8629138ac4881cd8705736e109, type: 3}
+  m_Name: TestAbility 1
+  m_EditorClassIdentifier: 
+  <Sprite>k__BackingField: {fileID: 0}
+  <Name>k__BackingField: Test Ability :)
+  <Type>k__BackingField: 0
+  <Cooldown>k__BackingField: 0
+  <Cost>k__BackingField: 0
+  <IsUltimate>k__BackingField: 0
+  <UltimateCost>k__BackingField: 0
+  <SkipTargetSelection>k__BackingField: 0
+  <SkipTargetConfirmation>k__BackingField: 0
+  <EndUnitTurnAfterCast>k__BackingField: 1
+  <Requirements>k__BackingField:
+    <Parameters>k__BackingField: 
+    conditions:
+    - {fileID: 11400000, guid: 37f38b78872fadf46ac8ddd33e171e96, type: 2}
+  <ExpectedSelections>k__BackingField: 1
+  <SelectionCondition>k__BackingField:
+    <Parameters>k__BackingField: 
+    conditions: []
+  selectedEffects:
+    conditionalEffects:
+    - <Depth>k__BackingField: 0
+      <BranchOperator>k__BackingField: 0
+      conditionalEffect:
+        <Condition>k__BackingField:
+          <Parameters>k__BackingField: 
+          conditions: []
+        effects:
+        - <Parameters>k__BackingField: '//Change Speed
+
+            Speed:+6'
+          effects:
+          - {fileID: 11400000, guid: 648ff5a49823f694eb2b4d639d18f88e, type: 2}
+        - <Parameters>k__BackingField: '//Change movement
+
+            Movement:-7'
+          effects:
+          - {fileID: 11400000, guid: 648ff5a49823f694eb2b4d639d18f88e, type: 2}
