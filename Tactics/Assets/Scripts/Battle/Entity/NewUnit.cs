@@ -13,7 +13,7 @@ namespace Battle
         [field: Header("Current Stats")]
         
         [field: SerializeField] public UnitStatsInstance Stats { get; private set; }
-        public UnitSO UnitSo => Stats.So;
+        public UnitSO SO => Stats.So;
         
         public bool UsePlayerBehaviour { get; private set; }
         public NewTile Tile { get; private set; }
@@ -95,7 +95,7 @@ namespace Battle
         
         protected override void AddedToTimelineEffect()
         {
-            foreach (var passiveToAdd in UnitSo.StartingPassives)
+            foreach (var passiveToAdd in SO.StartingPassives)
             {
                 passiveToAdd.AddPassiveToContainer(this);
             }
@@ -175,7 +175,7 @@ namespace Battle
 
         public override string ToString()
         {
-            return UnitSo != null ? $"Unit ({UnitSo.name})" : base.ToString();
+            return SO != null ? $"Unit ({SO.name})" : base.ToString();
         }
     }
     

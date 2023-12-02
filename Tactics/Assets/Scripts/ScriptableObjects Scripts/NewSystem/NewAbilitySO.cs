@@ -37,14 +37,9 @@ namespace Battle.ScriptableObjects
         [field: SerializeField] public CustomizableAbilityCondition SelectionCondition { get; private set; } = new();
         
         [field: Space]
-        [Tooltip("Effects that will be applied to the selected tiles if the ability is cast.")]
+        [Tooltip("Effects that will be applied to the selected tiles when the ability is cast.")]
         [SerializeField] private ConditionalEffects<AbilityEffectSO> selectedEffects = new ();
         public ConditionalEffects<AbilityEffectSO> SelectedEffects => selectedEffects;
-        
-        public AbilityInstance CreateInstance(bool showInUI = true)
-        {
-            return new AbilityInstance(new AbilityToAdd(this,showInUI));
-        }
         
         public bool MatchesRequirements(NewUnit caster)
         {

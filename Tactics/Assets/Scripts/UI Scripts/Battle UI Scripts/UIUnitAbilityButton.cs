@@ -4,9 +4,6 @@ using Button = UnityEngine.UI.Button;
 
 namespace Battle.UIComponent
 {
-    using AbilityEvents;
-    using UIEvents;
-    
     public class UIUnitAbilityButton : MonoBehaviour
     {
         [field: SerializeField] public Button Button { get; private set; }
@@ -122,11 +119,7 @@ namespace Battle.UIComponent
 
         private void StartAbilityTargetSelection()
         {
-            //TODO: rework this abilities to work with NewUnit
-            
-            Debug.Log($"Requesting selection for {associatedAbility.SO.Name}");
-            
-            //EventManager.Trigger(new StartAbilityTargetSelectionEvent(associatedAbility,associatedUnit));
+            NewAbilityManager.RequestStartAbilityTargetSelection(associatedAbility, associatedUnit);
         }
     }
 }

@@ -293,7 +293,7 @@ namespace Battle
             }
             protected override void Main()
             {
-                Debug.Log($"Creating Unit {Unit.UnitSo.Name}");
+                Debug.Log($"Creating Unit {Unit.SO.Name}");
                 
                 Renderer = GetRenderer.Invoke();
                 

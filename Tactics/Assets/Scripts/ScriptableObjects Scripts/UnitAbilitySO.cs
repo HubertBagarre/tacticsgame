@@ -234,7 +234,7 @@ namespace Battle
 
             if (SO.SkipTargetConfirmation)
             {
-                EventManager.Trigger(new EndAbilityTargetSelectionEvent(caster,false));
+                //EventManager.Trigger(new EndAbilityTargetSelectionEvent(caster,false));
             }
         }
 

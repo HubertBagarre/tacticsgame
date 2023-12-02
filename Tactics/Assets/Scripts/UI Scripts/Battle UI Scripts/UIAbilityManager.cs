@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Battle;
@@ -28,17 +27,29 @@ public class UIAbilityManager : MonoBehaviour
     
     private void Start()
     {
-        
+        AddCallbacks();
     }
     
     public void AddCallbacks()
     {
-        
+        cancelTileSelectionButton.onClick.AddListener(CancelAbilityTargetSelection);
+        confirmTileSelectionButton.onClick.AddListener(ConfirmAbilityTargetSelection);
     }
 
     public void RemoveCallbacks()
     {
-        
+        cancelTileSelectionButton.onClick.RemoveListener(CancelAbilityTargetSelection);
+        confirmTileSelectionButton.onClick.RemoveListener(ConfirmAbilityTargetSelection);
+    }
+    
+    private void CancelAbilityTargetSelection()
+    {
+        NewAbilityManager.RequestEndAbilityTargetSelection(true);
+    }
+    
+    private void ConfirmAbilityTargetSelection()
+    {
+        NewAbilityManager.RequestEndAbilityTargetSelection(false);
     }
     
     public void ShowAbilityTargetSelection(bool value = true)
@@ -48,8 +59,6 @@ public class UIAbilityManager : MonoBehaviour
     
     public void ShowUnitAbilitiesButton(NewUnit unit)
     {
-        abilityTargetSelectionUIObj.SetActive(true);
-
         foreach (var abilityInstance in unit.AbilityInstances.Where(instance => instance.ShowInTooltip))
         {
             ShowAbilityButton(abilityInstance,unit);

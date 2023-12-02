@@ -548,7 +548,7 @@ GameObject:
   - component: {fileID: 489740191}
   - component: {fileID: 489740193}
   m_Layer: 0
-  m_Name: Battle UI Manager
+  m_Name: UI Battle Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2120,6 +2120,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 489740189}
     m_Modifications:
+    - target: {fileID: 338824192872231962, guid: ff46836e02f007843b920ec7d9bb90fe,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 640498079530213922, guid: ff46836e02f007843b920ec7d9bb90fe,
         type: 3}
       propertyPath: m_Name
