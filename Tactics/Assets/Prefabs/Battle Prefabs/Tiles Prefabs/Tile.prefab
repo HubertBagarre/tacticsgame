@@ -197,7 +197,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 0
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8a6c1cd1722c0344fa973316808e2757, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8a6c1cd1722c0344fa973316808e2757, type: 2}
@@ -530,7 +530,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &4107665880556385396
 RectTransform:
   m_ObjectHideFlags: 0
@@ -539,7 +539,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3608690751965690310}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
   m_LocalScale: {x: 0.025, y: 0.025, z: 0.025}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -549,7 +549,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0.65}
+  m_AnchoredPosition: {x: 0, y: 0.1}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &8477253815471275733
@@ -1221,6 +1221,7 @@ GameObject:
   - component: {fileID: 8016762143392105963}
   - component: {fileID: 3111611391138522784}
   - component: {fileID: 5829309526706148865}
+  - component: {fileID: 7243633976517800202}
   m_Layer: 7
   m_Name: Tile
   m_TagString: Untagged
@@ -1289,6 +1290,30 @@ MonoBehaviour:
   - {fileID: 9207391746734138612}
   - {fileID: 8483765426281386775}
   - {fileID: 4185785975407110477}
+  modelRenderer: {fileID: 3588536119445390888}
+  defaultMat: {fileID: 2100000, guid: 35f88edf3851c9b44bfd57ff363c8bf6, type: 2}
+  selectableMat: {fileID: 2100000, guid: e3bd85f4b2d20fd4f99caffc811fe899, type: 2}
+  selectedMat: {fileID: 2100000, guid: 3fddec1670a946f4f9f94d222426a5a7, type: 2}
+  affectedMat: {fileID: 2100000, guid: b05c6e12d61f56445983db13cc18181a, type: 2}
+  unselectableMat: {fileID: 2100000, guid: 317868c7db5d55346afb50823e09b1c5, type: 2}
+  modelPosition: {x: 0, y: 0.05, z: 0}
+  <DebugText>k__BackingField: {fileID: 902476225510808331}
+--- !u!114 &7243633976517800202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7745284781180678188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 814671de869bc574690e5690ee34abc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  modelParent: {fileID: 363528258605730243}
+  lineRenderer: {fileID: 7771275285761903841}
+  lineRendererGo: {fileID: 3377287639292168893}
+  lineRendererHeight: 0.08
   modelRenderer: {fileID: 3588536119445390888}
   defaultMat: {fileID: 2100000, guid: 35f88edf3851c9b44bfd57ff363c8bf6, type: 2}
   selectableMat: {fileID: 2100000, guid: e3bd85f4b2d20fd4f99caffc811fe899, type: 2}

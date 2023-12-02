@@ -1,15 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-
+using Battle.InputEvent;
 using UnityEngine;
 
 namespace Battle
 {
-    using UnitEvents;
-    using InputEvent;
-    using AbilityEvents;
-    using ScriptableObjects.Ability;
-
     /// <summary>
     /// Handles Tiles
     ///
@@ -20,7 +15,8 @@ namespace Battle
         [Header("Settings")] [SerializeField] protected LayerMask worldLayers;
 
         [Header("Debug")] [SerializeField] private List<Tile> tiles = new List<Tile>();
-        private List<NewTile> newTiles = new List<NewTile>();
+        private readonly List<NewTile> newTiles = new List<NewTile>();
+        private readonly Dictionary<NewTile,Tile> tileRenderers = new (); //TODO - replace with TileRenderer (instead of Tile)
 
         public IReadOnlyList<NewTile> NewTiles => newTiles;
         public List<Tile> AllTiles => tiles.ToList();
@@ -28,6 +24,12 @@ namespace Battle
         public void AddCallbacks()
         {
             InputManager.LeftClickEvent += ClickTile;
+            
+            EventManager.AddListener<StartAbilityTargetSelectionEvent>(ResetTileAppearance);
+            EventManager.AddListener<StartAbilityTargetSelectionEvent>(AddAbilityCallbacks);
+            EventManager.AddListener<EndAbilityTargetSelectionEvent>(RemoveAbilityCallbacks);
+            
+            /*
             
             EventManager.AddListener<EndUnitTurnEvent>(ClearSelectableTilesOnTurnEnd);
             
@@ -46,16 +48,21 @@ namespace Battle
             void ClearSelectedTilesOnCastEnd(EndAbilityCastEvent _)
             {
                 ResetTileAppearance();
-            }
+            }*/
         }
 
         public void RemoveCallbacks()
         {
             InputManager.LeftClickEvent -= ClickTile;
             
+            EventManager.RemoveListener<StartAbilityTargetSelectionEvent>(ResetTileAppearance);
+            EventManager.RemoveListener<StartAbilityTargetSelectionEvent>(AddAbilityCallbacks);
+            EventManager.RemoveListener<EndAbilityTargetSelectionEvent>(RemoveAbilityCallbacks);
+            
+            /*
             AbilityManager.OnUpdatedCastingAbility -= UpdateAbilityTargetSelection;
             
-            EventManager.RemoveListener<StartAbilityCastEvent>(ShowSelectedTilesOnStartAbilityCast);
+            EventManager.RemoveListener<StartAbilityCastEvent>(ShowSelectedTilesOnStartAbilityCast);*/
         }
 
         public void SetTiles(List<Tile> list)
@@ -67,8 +74,14 @@ namespace Battle
             {
                 var t = new NewTile(tile.Position,tile);
                 newTiles.Add(t);
+                tileRenderers.Add(t,tile);
             }
             
+            ResetTileAppearance();
+        }
+
+        private void ResetTileAppearance(StartAbilityTargetSelectionEvent _)
+        {
             ResetTileAppearance();
         }
         
@@ -82,7 +95,7 @@ namespace Battle
             }
         }
         
-        private void UpdateAbilityTargetSelection(Unit caster,UnitAbilityInstance ability)
+        private void UpdateSelectedTiles(AbilityInstance ability)
         {
             if (ability == null)
             {
@@ -90,36 +103,39 @@ namespace Battle
                 return;
             }
             
-            foreach (var tile in AllTiles)
+            foreach (var tile in NewTiles)
             {
-                var selectable = ability.IsTileSelectable(caster,tile);
-                tile.SetAppearance(selectable ? Tile.Appearance.Selectable : Tile.Appearance.Unselectable );
-                //if(selectable) Debug.Log($"{tile} is selectable",tile.gameObject);
+                tileRenderers[tile].SetAppearance(ability.IsTileSelectable(tile)
+                    ? Tile.Appearance.Selectable
+                    : Tile.Appearance.Unselectable);
             }
             
             //TODO - find a way to show both selected and affected tiles
             foreach (var tile in ability.CurrentAffectedTiles)
             {
-                tile.SetAppearance(Tile.Appearance.Affected);
+                tileRenderers[tile].SetAppearance(Tile.Appearance.Affected);
             }
             
             foreach (var tile in ability.CurrentSelectedTiles)
             {
-                tile.SetAppearance(Tile.Appearance.Selected);
+                tileRenderers[tile].SetAppearance(Tile.Appearance.Selected);
             }
         }
         
-        private void ShowSelectedTilesOnStartAbilityCast(StartAbilityCastEvent ctx)
+        private void AddAbilityCallbacks(StartAbilityTargetSelectionEvent ctx)
+        {
+            var ability = ctx.AbilityInstance;
+            
+            ability.OnCurrentSelectedTilesUpdated += UpdateSelectedTiles;
+        }
+        
+        private void RemoveAbilityCallbacks(EndAbilityTargetSelectionEvent ctx)
         {
             ResetTileAppearance();
-
-            var selected = ctx.SelectedTiles;
-            if(selected.Count <= 0) return;
             
-            foreach (var tile in selected)
-            {
-                tile.SetAppearance(Tile.Appearance.Selected);
-            }
+            var ability = ctx.AbilityInstance;
+            
+            ability.OnCurrentSelectedTilesUpdated -= UpdateSelectedTiles;
         }
         
         private void ClickTile()
@@ -127,13 +143,21 @@ namespace Battle
             EventManager.Trigger(new ClickTileEvent(GetClickTile()));
         }
         
-        private Tile GetClickTile()
+        private NewTile GetClickTile()
         {
             InputManager.CastCamRay(out var tileHit, worldLayers);
             
             //Debug.Log($"Pew {tileHit.transform}",tileHit.transform);
 
-            return tileHit.transform != null ? tileHit.transform.GetComponent<Tile>() : null;
+            if (tileHit.transform == null) return null;
+            
+            var tileRenderer = tileHit.transform.GetComponent<Tile>(); //TODO - replace with TileRenderer (instead of Tile)
+            
+            var tile = tileRenderer != null ? tileRenderer.NewTile : null;
+            
+            //Debug.Log($"Hit tile {tile}");
+            
+            return tile;
         }
     }
 }
@@ -142,9 +166,9 @@ namespace Battle.InputEvent
 {
     public class ClickTileEvent
     {
-        public Tile Tile { get; }
+        public NewTile Tile { get; }
 
-        public ClickTileEvent(Tile tile)
+        public ClickTileEvent(NewTile tile)
         {
             Tile = tile;
         }

@@ -35,7 +35,7 @@ namespace Battle.ScriptableObjects.Conditions
             return true;
         }
 
-        protected override (string targetText, string countText) TargetOverride(NewTile referenceTile,int count, Func<string,dynamic> parameterGetter)
+        protected override (string targetText, string countText) TargetOverride(int count, Func<string,dynamic> parameterGetter)
         {
             var targetText = $"unit{(count > 1 ? "s" : "")}";
             

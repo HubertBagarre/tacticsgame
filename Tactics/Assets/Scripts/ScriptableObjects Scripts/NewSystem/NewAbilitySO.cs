@@ -62,11 +62,13 @@ namespace Battle.ScriptableObjects
         {
             var selectionConditionText = SelectionCondition.ConditionText(caster?.Tile, ExpectedSelections);
             
-            var text = $"Requires {selectionConditionText}.";
+            var text = $"Select {selectionConditionText}.";
             if(selectionConditionText == string.Empty) text = "<i>No selection required.</i>";
 
             return text;
         }
+        
+        
 
         public string SelectedEffectsText(NewUnit caster)
         {

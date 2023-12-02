@@ -112,7 +112,7 @@ namespace Battle
 
                 if (tile == null) return;
                 
-                currentCastingAbilityInstance.AddTileToSelection(caster, tile);
+                //urrentCastingAbilityInstance.AddTileToSelection(caster, tile);
                 
                 OnUpdatedCastingAbility?.Invoke(caster, currentCastingAbilityInstance);
             }

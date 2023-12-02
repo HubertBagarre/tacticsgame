@@ -11,6 +11,15 @@ public enum UnitStat
     CurrentShield = 8
 }
 
+public enum TileAppearance
+{
+    Default,
+    Selectable,
+    Selected,
+    Affected,
+    Unselectable,
+}
+
 public enum AbilityType
 {
     None,Movement,Offensive,Defensive

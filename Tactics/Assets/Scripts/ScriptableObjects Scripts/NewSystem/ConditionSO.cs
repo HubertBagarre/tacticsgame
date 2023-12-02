@@ -35,22 +35,35 @@ namespace Battle.ScriptableObjects
             
             var text = "%COUNT% %TARGET%";
             
+            foreach (var requirement in Conditions)
+            {
+                text += requirement.TextFullParameters(referenceTile,Parameters);
+            }
+            
+            return OverrideTargetText(text,count);
+        }
+
+        /// <summary>
+        /// Replaces the %TARGET% and %COUNT% in inputText with the correct text
+        /// </summary>
+        public string OverrideTargetText(string inputText,int count)
+        {
+            if(Conditions.Count <= 0) return inputText;
+            
             (string targetText, string countText) texts = (string.Empty,$"{count}");
             
             foreach (var requirement in Conditions)
             {
-                text += requirement.TextFullParameters(referenceTile,Parameters);
-                var req = requirement.TargetOverrideFullParameters(referenceTile, count, Parameters);
-
+                var req = requirement.TargetOverrideFullParameters(count, Parameters);
                 if (req.targetText != string.Empty && texts.targetText == string.Empty) texts = req;
             }
 
-            if (texts.targetText == string.Empty) texts.targetText = "tile";
+            if (texts.targetText == string.Empty) texts.targetText = count > 1 ? "tiles" : "tile";
             
-            text = text.Replace("%TARGET%",texts.targetText);
-            text = text.Replace("%COUNT%",texts.countText);
+            inputText = inputText.Replace("%TARGET%",texts.targetText);
+            inputText = inputText.Replace("%COUNT%",texts.countText);
             
-            return text;
+            return inputText;
         }
     }
     
@@ -83,9 +96,9 @@ namespace Battle.ScriptableObjects
             }
         }
         
-        public (string targetText, string countText) TargetOverrideFullParameters(NewTile referenceTile,int count,string parameters)
+        public (string targetText, string countText) TargetOverrideFullParameters(int count,string parameters)
         {
-            return TargetOverride(referenceTile,count,LocalGetParameterValue);
+            return TargetOverride(count,LocalGetParameterValue);
             
             dynamic LocalGetParameterValue(string parameter)
             {
@@ -112,7 +125,7 @@ namespace Battle.ScriptableObjects
         /// <summary>
         ///  text that will replace %TARGET% and %COUNT% in text
         /// </summary>
-        protected virtual (string targetText, string countText) TargetOverride(NewTile referenceTile,int count,Func<string,dynamic> parameterGetter)
+        protected virtual (string targetText, string countText) TargetOverride(int count,Func<string,dynamic> parameterGetter)
         {
             return (string.Empty,string.Empty);
         }

@@ -23,18 +23,20 @@ namespace Battle
         public int CurrentCooldown { get; private set; }
         public int CurrentSelectionCount => currentSelectedTiles.Count;
 
-        public bool IsTileSelectable(NewUnit caster, NewTile tile)
+        public bool IsTileSelectable(NewTile tile)
         {
-            return SO.IsSelectableTile(caster.Tile, tile);
+            if(CurrentCaster == null || CurrentSelectionCount >= ExpectedSelections) return false;
+            
+            return SO.IsSelectableTile(CurrentCaster.Tile, tile);
         } 
-
-        private List<Tile> currentSelectedTiles = new();
-        public Tile[] CurrentSelectedTiles => currentSelectedTiles.ToArray();
-        private List<Tile> currentAffectedTiles = new();
-        public Tile[] CurrentAffectedTiles => currentAffectedTiles.ToArray();
-        private Dictionary<Tile,List<Tile>> affectedTilesDict = new();
-
-        public event Action<int> OnCurrentSelectedTilesUpdated;
+        private readonly List<NewTile> currentSelectedTiles = new();
+        public IReadOnlyList<NewTile> CurrentSelectedTiles => currentSelectedTiles;
+        private readonly List<NewTile> currentAffectedTiles = new();
+        public IReadOnlyList<NewTile> CurrentAffectedTiles => currentAffectedTiles;
+        private Dictionary<NewTile,List<NewTile>> affectedTilesDict = new();
+        
+        public NewUnit CurrentCaster { get; private set; }
+        public event Action<AbilityInstance> OnCurrentSelectedTilesUpdated;
         public event Action<int> OnCurrentCooldownUpdated;
 
         public AbilityInstance(AbilityToAdd origin)
@@ -73,16 +75,50 @@ namespace Battle
             currentSelectedTiles.Clear();
             currentAffectedTiles.Clear();
             affectedTilesDict.Clear();
+            CurrentCaster = null;
         }
         
-        public void StartTileSelection(Unit caster)
+        public void StartTileSelection(NewUnit caster)
         {
+            ClearSelection();
             
+            //TODO add auto selected tiles here
+            
+            CurrentCaster = caster;
+            
+            OnCurrentSelectedTilesUpdated?.Invoke(this);
+        }
+        
+        public void EndTileSelection()
+        {
+            CurrentCaster = null;
+            
+            OnCurrentSelectedTilesUpdated?.Invoke(this);
         }
         
         //TODO - rework to update affected tiles (also visual), probably add overrides in the so
-        public void AddTileToSelection(Unit caster, Tile tile, bool force = false)
+        public void TryAddTileToSelection(NewTile tile, bool force = false)
         {
+            Debug.Log($"Adding {tile} to selection");
+            
+            if (force)
+            {
+                AddTileToSelection(tile);
+                return;
+            }
+            
+            if (currentSelectedTiles.Contains(tile))
+            {
+                RemoveTileFromSelection(tile);
+                return;
+            }
+            
+            var isTileSelectable = IsTileSelectable(tile);
+            
+            if(!isTileSelectable) return;
+            
+            AddTileToSelection(tile);
+            
             /*
             var useSelectionOrder = true; SO.Selector.UseSelectionOrder;
             
@@ -127,8 +163,19 @@ namespace Battle
             }
             */
         }
+        
+        private void AddTileToSelection(NewTile tile)
+        {
+            currentSelectedTiles.Add(tile);
+            var affectedTiles = new List<NewTile>() {tile}; // TODO - use affector here
 
-        public void RemoveTileFromSelection(Unit caster, Tile tile)
+            affectedTilesDict.Add(tile,affectedTiles);
+            currentAffectedTiles.AddRange(affectedTiles);
+            
+            OnCurrentSelectedTilesUpdated?.Invoke(this);
+        }
+
+        public void RemoveTileFromSelection(NewTile tile)
         {
             if (!currentSelectedTiles.Contains(tile)) return;
             currentSelectedTiles.Remove(tile);
@@ -144,7 +191,7 @@ namespace Battle
                 affectedTilesDict.Remove(tile);
             }
             
-            OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
+            OnCurrentSelectedTilesUpdated?.Invoke(this);
         }
         
         public void CastAbility(Unit caster)

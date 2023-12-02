@@ -28,8 +28,9 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 37f38b78872fadf46ac8ddd33e171e96, type: 2}
   <ExpectedSelections>k__BackingField: 1
   <SelectionCondition>k__BackingField:
-    <Parameters>k__BackingField: 
-    conditions: []
+    <Parameters>k__BackingField: Range:3
+    conditions:
+    - {fileID: 11400000, guid: 2f7019c9de2adab4c8ec849364f7faed, type: 2}
   selectedEffects:
     conditionalEffects:
     - <Depth>k__BackingField: 0

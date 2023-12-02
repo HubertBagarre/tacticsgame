@@ -1,5 +1,6 @@
 using System;
 using Battle;
+using Battle.InputEvent;
 using UnityEngine;
 
 public class NewAbilityManager : MonoBehaviour
@@ -18,12 +19,11 @@ public class NewAbilityManager : MonoBehaviour
 
     [field: SerializeField] public int MaxAbilityPoints { get; private set; } = 6;
     public static event Action<int, int> OnUpdatedAbilityPoints;
-
+    
     private static event Action<AbilityInstance,NewUnit> OnStartAbilityTargetSelection;
     private static event Action<bool> OnEndAbilityTargetSelection;
     private NewUnit currentCaster;
     private AbilityInstance currentAbilityInstance;
-    
     public void Setup(int startingAbilityPoints)
     {
         currentAbilityPoints = startingAbilityPoints;
@@ -49,6 +49,31 @@ public class NewAbilityManager : MonoBehaviour
         Debug.Log("Starting");
         
         EventManager.Trigger(new StartAbilityTargetSelectionEvent(currentAbilityInstance, currentCaster));
+        
+        currentAbilityInstance.ClearSelection();
+        
+        if (currentCaster.CurrentUltimatePoints < currentAbilityInstance.UltimateCost)
+        {
+            EndAbilityTargetSelection(true);
+            return;
+        }
+        
+        //EventManager.AddListener<EndAbilityTargetSelectionEvent>(TryCastAbility, true);
+
+        //TODO add event to cancel ability on caster death
+
+        currentAbilityInstance.StartTileSelection(caster);
+        
+        EventManager.AddListener<ClickTileEvent>(SelectTile);
+    }
+    
+    private void SelectTile(ClickTileEvent clickEvent)
+    {
+        var tile = clickEvent.Tile;
+        
+        if (tile == null) return;
+        
+        currentAbilityInstance.TryAddTileToSelection(tile);
     }
     
     private void EndAbilityTargetSelection(bool canceled)
@@ -62,6 +87,8 @@ public class NewAbilityManager : MonoBehaviour
         if(ability == null || caster == null) return;
         
         Debug.Log($"Ending {(canceled ? "(canceled)" : "")} ");
+        
+        ability.EndTileSelection();
         
         EventManager.Trigger(new EndAbilityTargetSelectionEvent(ability,caster,canceled));
     }

@@ -12,6 +12,9 @@ namespace Battle.ScriptableObjects.Conditions
         protected override bool DoesTileMatchCondition(NewTile referenceTile, NewTile tileToCheck, Func<string,dynamic> parameterGetter)
         {
             var distance = tileToCheck.Position - referenceTile.Position;
+            distance = new Vector2Int(Mathf.Abs(distance.x),Mathf.Abs(distance.y));
+            
+            //tileToCheck.TileRenderer.DebugText.text = $"{distance.x},{distance.y}";
 
             var range = parameterGetter.Invoke("Range") as Vector2Int? ?? Vector2Int.zero;
             

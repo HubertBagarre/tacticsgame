@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Battle;
+using Battle.ScriptableObjects;
 using Battle.UIComponent;
 using TMPro;
 using UnityEngine;
@@ -34,12 +35,18 @@ public class UIAbilityManager : MonoBehaviour
     {
         cancelTileSelectionButton.onClick.AddListener(CancelAbilityTargetSelection);
         confirmTileSelectionButton.onClick.AddListener(ConfirmAbilityTargetSelection);
+        
+        EventManager.AddListener<StartAbilityTargetSelectionEvent>(AddAbilityCallbacks);
+        EventManager.AddListener<EndAbilityTargetSelectionEvent>(RemoveAbilityCallbacks);
     }
 
     public void RemoveCallbacks()
     {
         cancelTileSelectionButton.onClick.RemoveListener(CancelAbilityTargetSelection);
         confirmTileSelectionButton.onClick.RemoveListener(ConfirmAbilityTargetSelection);
+        
+        EventManager.RemoveListener<StartAbilityTargetSelectionEvent>(AddAbilityCallbacks);
+        EventManager.RemoveListener<EndAbilityTargetSelectionEvent>(RemoveAbilityCallbacks);
     }
     
     private void CancelAbilityTargetSelection()
@@ -85,5 +92,34 @@ public class UIAbilityManager : MonoBehaviour
         
         abilityButton.gameObject.SetActive(true);
         abilityButton.UpdateAppearance();
+    }
+    
+    private void AddAbilityCallbacks(StartAbilityTargetSelectionEvent startAbilityTargetSelectionEvent)
+    {
+        var abilityInstance = startAbilityTargetSelectionEvent.AbilityInstance;
+        
+        abilityInstance.OnCurrentSelectedTilesUpdated += UpdateAbilityTargetSelection;
+    }
+    
+    private void RemoveAbilityCallbacks(EndAbilityTargetSelectionEvent endAbilityTargetSelectionEvent)
+    {
+        var abilityInstance = endAbilityTargetSelectionEvent.AbilityInstance;
+        
+        abilityInstance.OnCurrentSelectedTilesUpdated -= UpdateAbilityTargetSelection;
+    }
+    
+    private void UpdateAbilityTargetSelection(AbilityInstance abilityInstance)
+    {
+        var ability = abilityInstance;
+        
+        var selectionsLeft = ability.ExpectedSelections - ability.CurrentSelectionCount;
+        if(selectionsLeft < 0) selectionsLeft = 0;
+        
+        var text = "Select %COUNT% %TARGET%.";
+        text = ability.SO.SelectionCondition.OverrideTargetText(text,selectionsLeft);
+        
+        selectionsLeftText.text = selectionsLeft != 0 ? text : string.Empty;
+        
+        confirmTileSelectionButton.interactable = selectionsLeft == 0;
     }
 }

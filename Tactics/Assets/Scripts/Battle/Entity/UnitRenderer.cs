@@ -4,7 +4,7 @@ using Battle;
 public class UnitRenderer : MonoBehaviour
 {
     [field: SerializeField] public NewUnit Unit { get; private set; }
-    public NewTile Tile => Unit.Tile;
+    public NewTile Tile => Unit?.Tile;
     public BattleModel BattleModel { get; private set; }
     [SerializeField] private BattleModel defaultModel;
     
