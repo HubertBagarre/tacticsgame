@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Battle.AbilityEvents;
+using Battle.ScriptableObjects.Ability;
+using Battle.ScriptableObjects.Ability.Components;
 using UnityEngine;
 
 namespace Battle
@@ -34,6 +36,7 @@ namespace Battle
         private readonly List<NewTile> currentAffectedTiles = new();
         public IReadOnlyList<NewTile> CurrentAffectedTiles => currentAffectedTiles;
         private Dictionary<NewTile,List<NewTile>> affectedTilesDict = new();
+        private readonly List<EffectsOnTarget<EffectSO>> additionnalEffects = new();
         
         public NewUnit CurrentCaster { get; private set; }
         public event Action<AbilityInstance> OnCurrentSelectedTilesUpdated;
@@ -44,9 +47,11 @@ namespace Battle
             Origin = origin;
             
             CurrentCooldown = 0;
+            CurrentCaster = null;
             currentAffectedTiles.Clear();
             currentSelectedTiles.Clear();
             affectedTilesDict.Clear();
+            additionnalEffects.Clear();
         }
 
         public override string ToString()
@@ -68,6 +73,32 @@ namespace Battle
         public void EnterCooldown()
         {
             CurrentCooldown = SO.Cooldown;
+        }
+        
+        public void AddEffect(EffectsOnTarget<EffectSO> effect)
+        {
+            additionnalEffects.Add(effect);
+        }
+
+        public void RemoveEffect(EffectsOnTarget<EffectSO> effect)
+        {
+            if(additionnalEffects.Contains(effect)) additionnalEffects.Remove(effect);
+        }
+
+        public void ClearEffects()
+        {
+            additionnalEffects.Clear();
+        }
+        
+        public IReadOnlyList<EffectsOnTarget<EffectSO>> GetEffects(NewUnit caster,NewTile[] targetTiles)
+        {
+            var returnList = new List<EffectsOnTarget<EffectSO>>();
+            var soConditionalEffects = SO.GetConditionalEffects(caster,targetTiles);
+            
+            returnList.AddRange(soConditionalEffects);
+            returnList.AddRange(additionnalEffects);
+
+            return returnList;
         }
 
         public void ClearSelection()
@@ -91,7 +122,7 @@ namespace Battle
         
         public void EndTileSelection()
         {
-            CurrentCaster = null;
+            ClearSelection();
             
             OnCurrentSelectedTilesUpdated?.Invoke(this);
         }
@@ -99,8 +130,6 @@ namespace Battle
         //TODO - rework to update affected tiles (also visual), probably add overrides in the so
         public void TryAddTileToSelection(NewTile tile, bool force = false)
         {
-            Debug.Log($"Adding {tile} to selection");
-            
             if (force)
             {
                 AddTileToSelection(tile);
@@ -194,27 +223,6 @@ namespace Battle
             OnCurrentSelectedTilesUpdated?.Invoke(this);
         }
         
-        public void CastAbility(Unit caster)
-        {
-            /*
-            EventManager.Trigger(new StartAbilityCastEvent(this, caster, currentAffectedTiles));
-
-            caster.StartCoroutine(AbilityCast());
-            return;
-
-            IEnumerator AbilityCast()
-            {
-                yield return caster.StartCoroutine(SO.CastAbility(caster, currentAffectedTiles.Distinct().ToArray()));
-
-                OnCurrentSelectedTilesUpdated?.Invoke(CurrentSelectionCount);
-                currentSelectedTiles.Clear();
-                currentAffectedTiles.Clear();
-                
-                EventManager.Trigger(new EndAbilityCastEvent(SO,caster));
-            }
-            */
-        }
-
         public void ResetCost()
         {
             costModifier = 0;

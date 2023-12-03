@@ -22,6 +22,7 @@ public class NewUIBattleManager : MonoBehaviour
     [Header("Battle State")]
     [SerializeField] private RectTransform battleRoundIndicatorTr;
     [SerializeField] private TextMeshProUGUI battleRoundIndicatorText;
+    [SerializeField] private TextMeshProUGUI battleRoundIndicatorText2;
     [SerializeField] private RectTransform battleStartIndicatorTr;
 
     public void AddCallbacks()
@@ -101,7 +102,8 @@ public class NewUIBattleManager : MonoBehaviour
     private void PlayRoundStartAnimation(NewBattleManager.RoundAction action)
     {
         battleRoundIndicatorText.text = $"Round {action.CurrentRound}";
-
+        battleRoundIndicatorText2.text = $"Round {action.CurrentRound}";
+        
         var sequence = DOTween.Sequence();
         sequence.Append(battleRoundIndicatorTr.DOMoveX(0,action.TransitionDuration.x));
         sequence.AppendInterval(action.TransitionDuration.y);

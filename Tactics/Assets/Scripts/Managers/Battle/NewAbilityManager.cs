@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Battle;
 using Battle.InputEvent;
 using UnityEngine;
@@ -46,8 +48,6 @@ public class NewAbilityManager : MonoBehaviour
         currentAbilityInstance = abilityInstance;
         currentCaster = caster;
         
-        Debug.Log("Starting");
-        
         EventManager.Trigger(new StartAbilityTargetSelectionEvent(currentAbilityInstance, currentCaster));
         
         currentAbilityInstance.ClearSelection();
@@ -80,21 +80,67 @@ public class NewAbilityManager : MonoBehaviour
     {
         var ability = currentAbilityInstance;
         var caster = currentCaster;
+        var selectedTiles = ability.CurrentSelectedTiles.ToList();
         
         currentAbilityInstance = null;
         currentCaster = null;
         
         if(ability == null || caster == null) return;
         
-        Debug.Log($"Ending {(canceled ? "(canceled)" : "")} ");
+        Debug.Log($"Ending Ability Selection {(canceled ? "(canceled)" : "")} ");
         
         ability.EndTileSelection();
+        
+        if(!canceled)
+        {
+            var castAbilityAction = new CastAbilityAction(ability,caster,selectedTiles);
+            castAbilityAction.TryStack();
+        }
         
         EventManager.Trigger(new EndAbilityTargetSelectionEvent(ability,caster,canceled));
     }
     
     public static void RequestStartAbilityTargetSelection(AbilityInstance abilityInstance, NewUnit caster) => OnStartAbilityTargetSelection?.Invoke(abilityInstance,caster);
     public static void RequestEndAbilityTargetSelection(bool canceled) => OnEndAbilityTargetSelection?.Invoke(canceled);
+}
+
+public class CastAbilityAction : SimpleStackableAction
+{
+    protected override YieldInstruction YieldInstruction => new WaitForSeconds(1f);
+    protected override CustomYieldInstruction CustomYieldInstruction { get; }
+    
+    public AbilityInstance AbilityInstance { get; }
+    public NewUnit Caster { get; }
+    public List<NewTile> TargetTiles { get; }
+    
+    public CastAbilityAction(AbilityInstance abilityInstance,NewUnit caster,List<NewTile> targetTiles)
+    {
+        AbilityInstance = abilityInstance;
+        Caster = caster;
+        TargetTiles = targetTiles;
+    }
+    
+    protected override void Main()
+    {
+        Debug.Log($"Casting Main");
+        
+        // add so effects
+        // add additionnal effects
+        
+        //add yielded actions
+    }
+
+    protected override void PostWaitAction()
+    {
+        var effects = AbilityInstance.GetEffects(Caster, TargetTiles.ToArray());
+        
+        foreach (var effect in effects)
+        {
+            effect.ApplyEffects(Caster, TargetTiles.ToArray());
+        }
+        
+        Debug.Log($"{Caster} is casting {AbilityInstance.SO.Name}({effects.Count}) on {TargetTiles.Count}");
+    }
 }
 
 public class StartAbilityTargetSelectionEvent

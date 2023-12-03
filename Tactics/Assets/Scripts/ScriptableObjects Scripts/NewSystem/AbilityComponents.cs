@@ -6,10 +6,26 @@ using UnityEngine;
 namespace Battle.ScriptableObjects.Ability.Components
 {
     [Serializable]
-    public struct ConditionalEffects<T> where T : AbilityEffectSO
+    public struct ConditionalEffects<T> where T : EffectSO
     {
         [SerializeField] private BranchedConditionalEffect<T>[] conditionalEffects;
         public IReadOnlyCollection<BranchedConditionalEffect<T>> ConditionalEffectsCollection => conditionalEffects;
+        
+        public List<ConditionalEffect<T>> GetConditionalEffects(NewUnit caster, NewTile[] targetTiles)
+        {
+            var returnList = new List<ConditionalEffect<T>>();
+            
+            // TODO - if else logic goes here
+
+            foreach (var branchedConditionalEffect in ConditionalEffectsCollection)
+            {
+                var conditionalEffect = branchedConditionalEffect.ConditionalEffect;
+                
+                returnList.Add(conditionalEffect);
+            }
+
+            return returnList;
+        }
     }
     
     [Serializable]
@@ -28,11 +44,28 @@ namespace Battle.ScriptableObjects.Ability.Components
         [SerializeField] private EffectsOnTarget<T>[] effects;
         public IReadOnlyCollection<EffectsOnTarget<T>> EffectsOnTarget => effects;
 
-        public bool CanCastEffect(NewUnit caster, NewTile[] targetTiles)
+        public bool CanCastEffect(NewUnit caster, IEnumerable<NewTile> targetTiles)
         {
-            if (!Condition.DoesTileMatchConditionFullParameters(caster.Tile, caster.Tile)) return false;
+            foreach (var target in targetTiles)
+            {
+                if (!Condition.DoesTileMatchConditionFullParameters(caster.Tile, target)) return false;
+            }
+
+            return true;
+        }
+        
+        public void ApplyEffects(NewUnit caster, IEnumerable<NewTile> targetTiles)
+        {
+            if(EffectsOnTarget.Count <= 0) return;
             
-            return Condition.DoesTileMatchConditionFullParameters(caster.Tile,caster.Tile);
+            var targetTilesArray = targetTiles.ToArray();
+            
+            if (!CanCastEffect(caster, targetTilesArray)) return;
+            
+            foreach (var effectsOnTarget in EffectsOnTarget)
+            {
+                effectsOnTarget.ApplyEffects(caster, targetTilesArray);
+            }
         }
 
         public string Text(NewTile referenceTile)
@@ -72,6 +105,12 @@ namespace Battle.ScriptableObjects.Ability.Components
         [SerializeField] private T[] effects;
         //[field: SerializeField] public AffectorSO Affector { get; private set; }
         public IReadOnlyList<T> Effects => effects;
+        
+        public EffectsOnTarget(string parameters, T[] effects)
+        {
+            Parameters = parameters;
+            this.effects = effects;
+        }
         
         public void ApplyEffects(NewUnit caster, NewTile[] targetTiles)
         {

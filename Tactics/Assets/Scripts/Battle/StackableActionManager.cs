@@ -115,9 +115,14 @@ public abstract class StackableAction
         currentState = State.Started;
     }
     
-    protected void EnqueueYieldedActions(YieldedAction yieldedAction)
+    protected void EnqueueYieldedAction(YieldedAction yieldedAction)
     {
         yieldedActions.Enqueue(yieldedAction);
+    }
+    
+    protected void EnqueueYieldedAction(Action action)
+    {
+        yieldedActions.Enqueue(new YieldedAction(action));
     }
     
     protected int GetYieldedActionsCount()
@@ -127,7 +132,7 @@ public abstract class StackableAction
 
     private void SetupYieldedActions()
     {
-        EnqueueYieldedActions(MainYieldedAction());
+        EnqueueYieldedAction(MainYieldedAction());
         
         currentState = State.Invoking;
     }

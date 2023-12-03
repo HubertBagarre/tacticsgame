@@ -183,13 +183,12 @@ namespace Battle
     {
         protected override YieldInstruction YieldInstruction { get; }
         protected override CustomYieldInstruction CustomYieldInstruction { get; }
-        protected override bool AutoAdvance => !IsPlayerTurn && advance;
+        protected override bool AutoAdvance => advance;
         private bool advance = true;
         
         public NewUnit Unit { get; }
         public UnitStatsInstance Stats => Unit.Stats;
         public bool IsPlayerTurn => Stats.Behaviour == null || Unit.UsePlayerBehaviour;
-        
         public event Action OnRequestEndTurn;
         
         public UnitTurnBattleAction(NewUnit unit)
@@ -202,18 +201,25 @@ namespace Battle
         {
             advance = true;
             
-            if (IsPlayerTurn) return;
+            Debug.Log($"{Unit}'s turn");
+
+            if (IsPlayerTurn)
+            {
+                var playerAction = new PlayerBattleAction(this);
+                playerAction.TryStack();
+                return;
+            }
             
-            var enumerable = Stats.Behaviour.UnitTurnBehaviourActions(Unit,EnqueueYieldedActions);
+            var enumerable = Stats.Behaviour.UnitTurnBehaviourActions(Unit,EnqueueYieldedAction);
             
             if (enumerable == null) return;
             
             foreach (var behaviourAction in enumerable)
             {
-                EnqueueYieldedActions(behaviourAction);
+                EnqueueYieldedAction(behaviourAction);
             }
             
-            if(!IsPlayerTurn) EnqueueYieldedActions(TryEndTurnYieldedAction());
+            if(!IsPlayerTurn) EnqueueYieldedAction(TryEndTurnYieldedAction());
         }
         
         private YieldedAction TryEndTurnYieldedAction()
@@ -233,7 +239,7 @@ namespace Battle
                 if (actionsLeft > 0)
                 {
                     Debug.Log("Unit has more actions, queueing and go next");
-                    EnqueueYieldedActions(TryEndTurnYieldedAction());
+                    EnqueueYieldedAction(TryEndTurnYieldedAction());
                     return;
                 }
                 
@@ -246,6 +252,52 @@ namespace Battle
         public void RequestEndTurn()
         {
             OnRequestEndTurn?.Invoke();
+        }
+        
+        public class PlayerBattleAction : SimpleStackableAction
+        {
+            protected override YieldInstruction YieldInstruction { get; }
+            protected override CustomYieldInstruction CustomYieldInstruction { get; }
+
+            protected override bool AutoAdvance => false;
+            public UnitTurnBattleAction UnitTurnBattleAction { get; }
+
+            private bool doesAdvanceEndTurn = true;
+        
+            public PlayerBattleAction(UnitTurnBattleAction unitTurnBattleAction)
+            {
+                UnitTurnBattleAction = unitTurnBattleAction;
+            }
+        
+            protected override void Main()
+            {
+                ActionEndInvoker<PlayerBattleAction>.OnInvoked += RemoveCallbacks;
+                
+                EnqueueYieldedAction(AddCallbacks);
+                
+                UnitTurnBattleAction.RequestEndTurn();
+            }
+
+            private void AddCallbacks()
+            {
+                EventManager.AddListener<EndAbilityTargetSelectionEvent>(EndBattleActionOnAbilityCast);
+            }
+
+            private void RemoveCallbacks(PlayerBattleAction _)
+            {
+                ActionEndInvoker<PlayerBattleAction>.OnInvoked -= RemoveCallbacks;
+                EventManager.RemoveListener<EndAbilityTargetSelectionEvent>(EndBattleActionOnAbilityCast);
+            }
+            
+            private void EndBattleActionOnAbilityCast(EndAbilityTargetSelectionEvent ctx)
+            {
+                if(ctx.Canceled || ctx.Caster != UnitTurnBattleAction.Unit) return;
+                    
+                EventManager.RemoveListener<EndAbilityTargetSelectionEvent>(EndBattleActionOnAbilityCast);
+                    
+                if(!ctx.AbilityInstance.SO.EndUnitTurnAfterCast) EnqueueYieldedAction(AddCallbacks);
+                UnitTurnBattleAction.RequestEndTurn();
+            }
         }
     }
 }

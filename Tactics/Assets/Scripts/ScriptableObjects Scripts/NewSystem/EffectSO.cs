@@ -6,6 +6,8 @@ namespace Battle.ScriptableObjects.Ability
     {
         public void EffectFullParameters(NewUnit caster, NewTile[] targetTiles, string parameters)
         {
+            // TODO - each effect should be a separate action
+            
             Effect(caster, targetTiles, LocalGetParameterValue);
 
             return;

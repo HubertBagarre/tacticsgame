@@ -120,7 +120,7 @@ namespace Battle.ActionSystem.TimelineActions
                 
             foreach (var behaviourAction in enumerable)
             {
-                EnqueueYieldedActions(behaviourAction);
+                EnqueueYieldedAction(behaviourAction);
             }
         }
     }

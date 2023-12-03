@@ -123,11 +123,7 @@ namespace Battle
         public event Action<UnitStatsInstance> OnCurrentHpModified;
         public int CurrentHp
         {
-            get
-            {
-                if (currentHp > MaxHp) currentHp = MaxHp;
-                return currentHp;
-            }
+            get => currentHp;
             set
             {
                 currentHp = value;

@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Battle.ScriptableObjects
 {
@@ -36,10 +36,11 @@ namespace Battle.ScriptableObjects
         [field: SerializeField] public int ExpectedSelections { get; private set; } = 1;
         [field: SerializeField] public CustomizableAbilityCondition SelectionCondition { get; private set; } = new();
         
+        [FormerlySerializedAs("selectedEffects")]
         [field: Space]
         [Tooltip("Effects that will be applied to the selected tiles when the ability is cast.")]
-        [SerializeField] private ConditionalEffects<AbilityEffectSO> selectedEffects = new ();
-        public ConditionalEffects<AbilityEffectSO> SelectedEffects => selectedEffects;
+        [SerializeField] private ConditionalEffects<EffectSO> conditionalEffects = new ();
+        public ConditionalEffects<EffectSO> ConditionalEffects => conditionalEffects;
         
         public bool MatchesRequirements(NewUnit caster)
         {
@@ -68,13 +69,22 @@ namespace Battle.ScriptableObjects
             return text;
         }
         
-        
-
         public string SelectedEffectsText(NewUnit caster)
         {
-            var firstConditionalEffect = SelectedEffects.ConditionalEffectsCollection.First().ConditionalEffect;
+            var firstConditionalEffect = ConditionalEffects.ConditionalEffectsCollection.First().ConditionalEffect;
             
             return firstConditionalEffect.Text(caster?.Tile);
+        }
+        
+        public List<EffectsOnTarget<EffectSO>> GetConditionalEffects(NewUnit caster, NewTile[] targetTiles)
+        {
+            var effects = new List<EffectsOnTarget<EffectSO>>();
+            foreach (var conditionalEffect in ConditionalEffects.GetConditionalEffects(caster, targetTiles))
+            {
+                effects.AddRange(conditionalEffect.EffectsOnTarget);
+            }
+            
+            return effects;
         }
         
         [ContextMenu("Test Requirement Text")]

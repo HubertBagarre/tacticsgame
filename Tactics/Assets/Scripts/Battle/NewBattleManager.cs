@@ -189,7 +189,7 @@ namespace Battle
             
                 if(BattleManager.maxRounds > 0 && currentRoundAction.CurrentRound > BattleManager.maxRounds) return;
                 
-                EnqueueYieldedActions(new YieldedAction(PostWaitAction));
+                EnqueueYieldedAction(new YieldedAction(PostWaitAction));
             }
         }
         
@@ -219,7 +219,7 @@ namespace Battle
                 
                     var unitCreatedAction = new UnitCreatedAction(unit,tile,SpawnPlacedUnit);
                 
-                    EnqueueYieldedActions(new YieldedAction(unitCreatedAction.TryStack));
+                    EnqueueYieldedAction(new YieldedAction(unitCreatedAction.TryStack));
                     
                     continue;
                     
@@ -263,7 +263,7 @@ namespace Battle
                 
                 if(isEndTurn) return;
                 
-                EnqueueYieldedActions(new YieldedAction(PostWaitAction));
+                EnqueueYieldedAction(new YieldedAction(PostWaitAction));
                 
                 var entityTurnAction = new TimelineEntityTurnAction(currentEntity);
                     

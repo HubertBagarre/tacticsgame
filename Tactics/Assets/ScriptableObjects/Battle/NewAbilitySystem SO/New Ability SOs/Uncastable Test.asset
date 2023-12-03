@@ -30,7 +30,7 @@ MonoBehaviour:
   <SelectionCondition>k__BackingField:
     <Parameters>k__BackingField: 
     conditions: []
-  selectedEffects:
+  conditionalEffects:
     conditionalEffects:
     - <Depth>k__BackingField: 0
       <BranchOperator>k__BackingField: 0
