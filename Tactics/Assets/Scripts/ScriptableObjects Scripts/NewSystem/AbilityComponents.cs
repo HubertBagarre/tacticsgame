@@ -8,6 +8,8 @@ namespace Battle.ScriptableObjects.Ability.Components
     [Serializable]
     public struct ConditionalEffects<T> where T : EffectSO
     {
+        [SerializeField,TextArea(2,20)] private string parameters;
+        
         [SerializeField] private BranchedConditionalEffect<T>[] conditionalEffects;
         public IReadOnlyCollection<BranchedConditionalEffect<T>> ConditionalEffectsCollection => conditionalEffects;
         
@@ -40,6 +42,7 @@ namespace Battle.ScriptableObjects.Ability.Components
     [Serializable]
     public class ConditionalEffect<T> where T : EffectSO
     {
+        [field: SerializeField] public string Id { get; private set; }
         [field: SerializeField] public CustomizableCondition<AbilityConditionSO> Condition { get; private set; }
         [SerializeField] private EffectsOnTarget<T>[] effects;
         public IReadOnlyCollection<EffectsOnTarget<T>> EffectsOnTarget => effects;

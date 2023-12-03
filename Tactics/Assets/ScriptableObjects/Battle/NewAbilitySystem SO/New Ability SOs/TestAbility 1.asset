@@ -33,10 +33,40 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 37f38b78872fadf46ac8ddd33e171e96, type: 2}
     - {fileID: 11400000, guid: 2f7019c9de2adab4c8ec849364f7faed, type: 2}
   conditionalEffects:
+    parameters: '1
+
+      2
+
+      3
+
+      4
+
+      5
+
+      6
+
+      7
+
+      8
+
+      9
+
+      10
+
+      11
+
+      12
+
+      13
+
+      14
+
+      15'
     conditionalEffects:
     - <Depth>k__BackingField: 0
       <BranchOperator>k__BackingField: 0
       conditionalEffect:
+        <Id>k__BackingField: 
         <Condition>k__BackingField:
           <Parameters>k__BackingField: 
           conditions: []
@@ -46,13 +76,25 @@ MonoBehaviour:
             Log:Ceci est un test'
           effects:
           - {fileID: 11400000, guid: 620a8fbde3b348b4bbb3f7b614b8130f, type: 2}
-        - <Parameters>k__BackingField: '//Change Speed
+  availableConditionalEffects:
+  - <Id>k__BackingField: Log
+    <Condition>k__BackingField:
+      <Parameters>k__BackingField: 
+      conditions: []
+    effects:
+    - <Parameters>k__BackingField: '//Debug
 
-            Hp:+6'
-          effects:
-          - {fileID: 11400000, guid: 648ff5a49823f694eb2b4d639d18f88e, type: 2}
-        - <Parameters>k__BackingField: '//Change movement
+        Log:Ceci est un test'
+      effects:
+      - {fileID: 11400000, guid: 620a8fbde3b348b4bbb3f7b614b8130f, type: 2}
+  - <Id>k__BackingField: Buff
+    <Condition>k__BackingField:
+      <Parameters>k__BackingField: 
+      conditions: []
+    effects:
+    - <Parameters>k__BackingField: '//Change Stat
 
-            Movement:+1'
-          effects:
-          - {fileID: 11400000, guid: 648ff5a49823f694eb2b4d639d18f88e, type: 2}
+        Hp:+2'
+      effects:
+      - {fileID: 11400000, guid: 648ff5a49823f694eb2b4d639d18f88e, type: 2}
+  availablePassives: []

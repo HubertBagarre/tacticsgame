@@ -42,6 +42,9 @@ namespace Battle.ScriptableObjects
         [SerializeField] private ConditionalEffects<EffectSO> conditionalEffects = new ();
         public ConditionalEffects<EffectSO> ConditionalEffects => conditionalEffects;
         
+        [SerializeField] private List<ConditionalEffect<EffectSO>> availableConditionalEffects = new ();
+        [SerializeField] private List<PassiveSO> availablePassives = new ();
+        
         public bool MatchesRequirements(NewUnit caster)
         {
             return Requirements.DoesTileMatchConditionFullParameters(caster?.Tile,caster?.Tile);
