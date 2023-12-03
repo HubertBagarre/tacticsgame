@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using MoonSharp.Interpreter;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -82,11 +83,21 @@ namespace Battle.ScriptableObjects
         public string SelectedEffectsText(NewUnit caster)
         {
             //TODO - lua string conversion goes here
+            var text = $"{parameters}";
             
-            return "oof";
+            return text;
+        }
+
+        public string FullDescription(NewUnit caster)
+        {
+            var text = string.Empty;
+
+            text += SelectedEffectsText(caster);
+
+            return text;
         }
         
-        public List<EffectsOnTarget<EffectSO>> GetConditionalEffects(NewUnit caster, NewTile[] targetTiles,string luaScript)
+        public List<EffectsOnTarget<EffectSO>> GetConditionalEffects(NewUnit caster, [CanBeNull] NewTile[] targetTiles,string luaScript)
         {
             var abilityParameterInterpreter = new AbilityParameterInterpreter(caster,targetTiles,availableSelectionConditionalEffects,availableConditions,availableEffects);
             

@@ -82,14 +82,12 @@ namespace Battle.UIComponent
             var cooldown = so.Cooldown;
             abilityCooldownText.text = cooldown > 0 ? $"{so.Cooldown} turn{(cooldown > 1 ? "s":"")}" : "";
             
-            /*
             StartCoroutine(AdjustPanelSizeRoutine());
             return;
             
             IEnumerator AdjustPanelSizeRoutine()
             {
-                
-                var description = so.ConvertedDescription(associatedUnit);
+                var description = so.FullDescription(associatedUnit);
                 abilityDescriptionText.text = $"{description}";
                 
                 abilityDescriptionText.ForceMeshUpdate();
@@ -112,7 +110,7 @@ namespace Battle.UIComponent
 
                 size.y = 40 + sizeIncrease + 5; //cuz the text is at Y = -40
                 descriptionPanelTr.sizeDelta = size;
-            }*/
+            }
         }
         
         public void OnPointerEnter(PointerEventData eventData)

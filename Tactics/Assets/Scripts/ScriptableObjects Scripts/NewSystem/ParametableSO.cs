@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Battle.ScriptableObjects
 {
-    public abstract class ParametableSO : ScriptableObject, IIdHandler
+    public abstract class ParametableSO : ScriptableObject
     {
         [field: SerializeField] public string Id { get; protected set; }
         
