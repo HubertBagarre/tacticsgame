@@ -21,7 +21,7 @@ MonoBehaviour:
   <UltimateCost>k__BackingField: 0
   <SkipTargetSelection>k__BackingField: 0
   <SkipTargetConfirmation>k__BackingField: 0
-  <EndUnitTurnAfterCast>k__BackingField: 0
+  <EndUnitTurnAfterCast>k__BackingField: 1
   <Requirements>k__BackingField:
     <Parameters>k__BackingField: 
     conditions:
@@ -30,8 +30,8 @@ MonoBehaviour:
   <SelectionCondition>k__BackingField:
     <Parameters>k__BackingField: Range:3
     conditions:
-    - {fileID: 11400000, guid: 2f7019c9de2adab4c8ec849364f7faed, type: 2}
     - {fileID: 11400000, guid: 37f38b78872fadf46ac8ddd33e171e96, type: 2}
+    - {fileID: 11400000, guid: 2f7019c9de2adab4c8ec849364f7faed, type: 2}
   conditionalEffects:
     conditionalEffects:
     - <Depth>k__BackingField: 0
@@ -41,6 +41,11 @@ MonoBehaviour:
           <Parameters>k__BackingField: 
           conditions: []
         effects:
+        - <Parameters>k__BackingField: '//Debug
+
+            Log:Ceci est un test'
+          effects:
+          - {fileID: 11400000, guid: 620a8fbde3b348b4bbb3f7b614b8130f, type: 2}
         - <Parameters>k__BackingField: '//Change Speed
 
             Hp:+6'
@@ -48,6 +53,6 @@ MonoBehaviour:
           - {fileID: 11400000, guid: 648ff5a49823f694eb2b4d639d18f88e, type: 2}
         - <Parameters>k__BackingField: '//Change movement
 
-            Movement:-7'
+            Movement:+1'
           effects:
           - {fileID: 11400000, guid: 648ff5a49823f694eb2b4d639d18f88e, type: 2}

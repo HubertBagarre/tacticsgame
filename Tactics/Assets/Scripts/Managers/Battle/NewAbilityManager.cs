@@ -134,12 +134,12 @@ public class CastAbilityAction : SimpleStackableAction
     {
         var effects = AbilityInstance.GetEffects(Caster, TargetTiles.ToArray());
         
+        Debug.Log($"{Caster} is casting {AbilityInstance.SO.Name}({effects.Count}) on {TargetTiles.Count}");
+        
         foreach (var effect in effects)
         {
             effect.ApplyEffects(Caster, TargetTiles.ToArray());
         }
-        
-        Debug.Log($"{Caster} is casting {AbilityInstance.SO.Name}({effects.Count}) on {TargetTiles.Count}");
     }
 }
 
