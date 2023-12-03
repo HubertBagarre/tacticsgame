@@ -32,7 +32,7 @@ MonoBehaviour:
     <Id>k__BackingField: 
     <Parameters>k__BackingField: 
     conditions: []
-  parameters: TryAddEffect("Conditional Effect")
+  parameters: "if TryAddEffect(\"Conditional Effect\") then\n\t\nelse\n\tLog(\"SUUU\")\nend"
   availableSelectionConditionalEffects:
   - <Id>k__BackingField: Conditional Effect
     <Condition>k__BackingField:
