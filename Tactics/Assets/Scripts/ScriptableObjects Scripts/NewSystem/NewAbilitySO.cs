@@ -10,6 +10,11 @@ namespace Battle.ScriptableObjects
     using Ability;
     using Ability.Components;
     
+    public interface IIdHandler
+    {
+        string Id { get; }
+    }
+    
     [CreateAssetMenu(menuName = "Battle Scriptables/New Ability")]
     public class NewAbilitySO : ScriptableObject
     {
@@ -45,7 +50,9 @@ namespace Battle.ScriptableObjects
         public ConditionalEffects<EffectSO> ConditionalEffects => conditionalEffects;
         [Header("Lua")]
         [SerializeField,TextArea(2,20)] private string parameters;        
-        [SerializeField] private List<ConditionalEffect<EffectSO>> availableConditionalEffects = new ();
+        [SerializeField,Tooltip("Will be checked for each Affected Tile")] private List<ConditionalEffect<EffectSO>> availableSelectionConditionalEffects = new ();
+        [SerializeField,Tooltip("Will be checked on caster")] private List<CustomizableCondition<AbilityConditionSO>> availableConditions = new ();
+        [SerializeField] private List<EffectSO> availableEffects = new ();
         [SerializeField] private List<PassiveSO> availablePassives = new ();
         
         public bool MatchesRequirements(NewUnit caster)
@@ -82,58 +89,25 @@ namespace Battle.ScriptableObjects
             return firstConditionalEffect.Text(caster?.Tile);
         }
         
-        public List<EffectsOnTarget<EffectSO>> GetConditionalEffects(NewUnit caster, NewTile[] targetTiles)
+        public List<EffectsOnTarget<EffectSO>> GetConditionalEffects(NewUnit caster, NewTile[] targetTiles,string luaScript)
         {
             var effects = new List<EffectsOnTarget<EffectSO>>();
-
-            const string scriptInit = @"
-                                            function ConvertToIndex(value)
-                                                converted = stringToIndex[value]
-                                                if converted ~= nil then
-                                                    return converted
-                                                end
-	                                                return value
-                                            end
-
-                                            function CanCastEffect(value)
-                                                index = ConvertToIndex(value)
-                                                return outputTable[index]
-                                            end
-
-                                            function AddEffect(value)
-                                                index = ConvertToIndex(value)
-                                                output[index] = true
-                                            end
-
-                                            function RemoveEffect(value)
-                                                index = ConvertToIndex(value)
-                                                output[index] = false
-                                            end
-
-                                            function Log(text)
-                                                output[tostring(text)] = true
-                                            end
-
-                                            function Main()
-                                            %PARAMETERS%
-                                            end
-
-                                            output = {}
-
-                                            Main()
-
-                                            return output
-                                         ";
             
-            //var scriptCode = $"{scriptInit}";
-            var scriptCode = scriptInit.Replace("%PARAMETERS%", parameters);
+            var scriptCode = luaScript.Replace("%PARAMETERS%", parameters);
 
+            var availableSelectionConditionalEffectsConditions =
+                availableSelectionConditionalEffects.Select(cEffect => cEffect.Condition).ToList();
+            
             var script = new Script
             {
                 Globals =
                 {
-                    ["stringToIndex"] = GetStringToIndexTable(), //converts string to bool (canCastEffect)
-                    ["outputTable"] = GetOutputTable() //gives unique index to each effect
+                    ["stringToConditionalIndex"] = GetStringToIndexTable(availableSelectionConditionalEffects),
+                    ["stringToConditionIndex"] = GetStringToIndexTable(availableConditions),
+                    ["stringToEffectIndex"] = GetStringToIndexTable(availableEffects),
+                    
+                    ["canCastConditionalTable"] = GetCanCastSelectionTable(availableSelectionConditionalEffectsConditions,targetTiles),
+                    ["canCastTable"] = GetCanCastSelectionTable(availableConditions,new []{caster?.Tile})
                 }
             };
             
@@ -154,27 +128,38 @@ namespace Battle.ScriptableObjects
             
             return effects;
 
-            Dictionary<string, double> GetStringToIndexTable()
+            Dictionary<string, double> GetStringToIndexTable(IReadOnlyList<IIdHandler> listToIndex)
             {
                 var stringTable = new Dictionary<string, double>();
-                for (var index = 0; index < availableConditionalEffects.Count; index++)
+                for (var index = 0; index < listToIndex.Count; index++)
                 {
-                    var conditionalEffect = availableConditionalEffects[index];
+                    var conditionalEffect = listToIndex[index];
                     stringTable.Add(conditionalEffect.Id, index);
                 }
                 
                 return stringTable;
             }
 
-            Dictionary<int, bool> GetOutputTable()
+            Dictionary<int, bool> GetCanCastSelectionTable(IReadOnlyList<CustomizableCondition<AbilityConditionSO>> conditions,NewTile[] targets)
             {
                 var outputTable = new Dictionary<int, bool>();
-                for (var index = 0; index < availableConditionalEffects.Count; index++)
+                for (var index = 0; index < conditions.Count; index++)
                 {
-                    outputTable.Add(index, CanCastEffect(index));
+                    outputTable.Add(index, CanCastEffect(conditions[index]));
                 }
 
                 return outputTable;
+                
+                bool CanCastEffect(CustomizableCondition<AbilityConditionSO> customizableCondition)
+                {
+                    foreach (var tile in targets)
+                    {
+                        var canCastTile = customizableCondition.DoesTileMatchConditionFullParameters(caster?.Tile, tile);
+                        if(!canCastTile) return false;
+                    }
+                    
+                    return true;
+                }
             }
             
             void AddEffect(DynValue dynValue)
@@ -184,7 +169,7 @@ namespace Battle.ScriptableObjects
                 {
                     case DataType.Number:
                         index = (int) dynValue.Number;
-                        if (index < 0 || index >= availableConditionalEffects.Count) return;
+                        if (index < 0 || index >= availableSelectionConditionalEffects.Count) return;
                         break;
                     case DataType.String:
                         Debug.Log($"Lua : {dynValue.String}");
@@ -193,12 +178,7 @@ namespace Battle.ScriptableObjects
                         return;
                 }
                 
-                effects.AddRange(availableConditionalEffects[index].EffectsOnTarget);
-            }
-            
-            bool CanCastEffect(int index)
-            {
-                return availableConditionalEffects[index].CanCastEffect(caster, targetTiles);
+                effects.AddRange(availableSelectionConditionalEffects[index].EffectsOnTarget);
             }
         }
         

@@ -5,9 +5,10 @@ using UnityEngine;
 
 namespace Battle.ScriptableObjects
 {
-
-    public abstract class ParametableSO : ScriptableObject
+    public abstract class ParametableSO : ScriptableObject, IIdHandler
     {
+        [field: SerializeField] public string Id { get; protected set; }
+        
         public const string ToolTipText = "Parameter name is case sensitive\nSeparate parameters with \\n (don't type \\n just backspace)\nparameter(:value1,value2,...)\nUse'\\\\' for comments\nInvalid values are ignored";
         
         public abstract IEnumerable<string> SpecificParameters { get; }

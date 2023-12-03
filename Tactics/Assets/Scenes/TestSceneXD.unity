@@ -480,6 +480,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0335fb895c210240aac7d5a55c938e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  luaScript: {fileID: 2811297602134710623, guid: 68ad1b1d4be51d34e8cdfe3b68de4174,
+    type: 3}
   currentAbilityPoints: 0
   <MaxAbilityPoints>k__BackingField: 6
 --- !u!114 &107337561

@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class NewAbilityManager : MonoBehaviour
 {
+    [SerializeField] private TextAsset luaScript;
+    
     [SerializeField] private int currentAbilityPoints = 0;
     public int CurrentAbilityPoints
     {
@@ -93,7 +95,7 @@ public class NewAbilityManager : MonoBehaviour
         
         if(!canceled)
         {
-            var castAbilityAction = new CastAbilityAction(ability,caster,selectedTiles);
+            var castAbilityAction = new CastAbilityAction(ability,caster,selectedTiles,luaScript.text);
             castAbilityAction.TryStack();
         }
         
@@ -106,18 +108,20 @@ public class NewAbilityManager : MonoBehaviour
 
 public class CastAbilityAction : SimpleStackableAction
 {
-    protected override YieldInstruction YieldInstruction => new WaitForSeconds(1f);
+    protected override YieldInstruction YieldInstruction { get; } /*=> new WaitForSeconds(1f);*/
     protected override CustomYieldInstruction CustomYieldInstruction { get; }
     
     public AbilityInstance AbilityInstance { get; }
     public NewUnit Caster { get; }
     public List<NewTile> TargetTiles { get; }
+    protected string LuaScript { get; }
     
-    public CastAbilityAction(AbilityInstance abilityInstance,NewUnit caster,List<NewTile> targetTiles)
+    public CastAbilityAction(AbilityInstance abilityInstance,NewUnit caster,List<NewTile> targetTiles,string luaScript)
     {
         AbilityInstance = abilityInstance;
         Caster = caster;
         TargetTiles = targetTiles;
+        LuaScript = luaScript;
     }
     
     protected override void Main()
@@ -132,7 +136,7 @@ public class CastAbilityAction : SimpleStackableAction
 
     protected override void PostWaitAction()
     {
-        var effects = AbilityInstance.GetEffects(Caster, TargetTiles.ToArray());
+        var effects = AbilityInstance.GetEffects(Caster, TargetTiles.ToArray(),LuaScript);
         
         Debug.Log($"{Caster} is casting {AbilityInstance.SO.Name}({effects.Count}) on {TargetTiles.Count}");
         

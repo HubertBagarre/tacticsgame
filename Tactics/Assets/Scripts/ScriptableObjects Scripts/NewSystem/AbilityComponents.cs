@@ -40,14 +40,14 @@ namespace Battle.ScriptableObjects.Ability.Components
     }
     
     [Serializable]
-    public class ConditionalEffect<T> where T : EffectSO
+    public class ConditionalEffect<T> : IIdHandler where T : EffectSO
     {
         [field: SerializeField] public string Id { get; private set; }
         [field: SerializeField] public CustomizableCondition<AbilityConditionSO> Condition { get; private set; }
         [SerializeField] private EffectsOnTarget<T>[] effects;
         public IReadOnlyCollection<EffectsOnTarget<T>> EffectsOnTarget => effects;
 
-        public bool CanCastEffect(NewUnit caster, IEnumerable<NewTile> targetTiles)
+        public bool DoesTileMatchConditionFullParameters(NewUnit caster, IEnumerable<NewTile> targetTiles)
         {
             if (Condition == null) return true;
             
@@ -65,7 +65,7 @@ namespace Battle.ScriptableObjects.Ability.Components
             
             var targetTilesArray = targetTiles.ToArray();
             
-            if (!CanCastEffect(caster, targetTilesArray)) return;
+            if (!DoesTileMatchConditionFullParameters(caster, targetTilesArray)) return;
             
             foreach (var effectsOnTarget in EffectsOnTarget)
             {

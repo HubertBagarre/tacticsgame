@@ -5,8 +5,10 @@ using UnityEngine;
 namespace Battle.ScriptableObjects
 {
     [Serializable]
-    public class CustomizableCondition<T> where T : ConditionSO
+    public class CustomizableCondition<T> : IIdHandler where T : ConditionSO
     {
+        [field: SerializeField] public string Id { get; protected set; }
+        
         [field: TextArea(1,10),Tooltip(ParametableSO.ToolTipText)]
         [field:SerializeField] public string Parameters { get; private set; }
 
