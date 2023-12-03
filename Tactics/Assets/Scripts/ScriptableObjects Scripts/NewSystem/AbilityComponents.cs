@@ -49,6 +49,8 @@ namespace Battle.ScriptableObjects.Ability.Components
 
         public bool CanCastEffect(NewUnit caster, IEnumerable<NewTile> targetTiles)
         {
+            if (Condition == null) return true;
+            
             foreach (var target in targetTiles)
             {
                 if (!Condition.DoesTileMatchConditionFullParameters(caster.Tile, target)) return false;

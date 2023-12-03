@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using MoonSharp.Interpreter;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -41,7 +43,8 @@ namespace Battle.ScriptableObjects
         [Tooltip("Effects that will be applied to the selected tiles when the ability is cast.")]
         [SerializeField] private ConditionalEffects<EffectSO> conditionalEffects = new ();
         public ConditionalEffects<EffectSO> ConditionalEffects => conditionalEffects;
-        
+        [Header("Lua")]
+        [SerializeField,TextArea(2,20)] private string parameters;        
         [SerializeField] private List<ConditionalEffect<EffectSO>> availableConditionalEffects = new ();
         [SerializeField] private List<PassiveSO> availablePassives = new ();
         
@@ -82,12 +85,121 @@ namespace Battle.ScriptableObjects
         public List<EffectsOnTarget<EffectSO>> GetConditionalEffects(NewUnit caster, NewTile[] targetTiles)
         {
             var effects = new List<EffectsOnTarget<EffectSO>>();
-            foreach (var conditionalEffect in ConditionalEffects.GetConditionalEffects(caster, targetTiles))
+
+            const string scriptInit = @"
+                                            function ConvertToIndex(value)
+                                                converted = stringToIndex[value]
+                                                if converted ~= nil then
+                                                    return converted
+                                                end
+	                                                return value
+                                            end
+
+                                            function CanCastEffect(value)
+                                                index = ConvertToIndex(value)
+                                                return outputTable[index]
+                                            end
+
+                                            function AddEffect(value)
+                                                index = ConvertToIndex(value)
+                                                output[index] = true
+                                            end
+
+                                            function RemoveEffect(value)
+                                                index = ConvertToIndex(value)
+                                                output[index] = false
+                                            end
+
+                                            function Log(text)
+                                                output[tostring(text)] = true
+                                            end
+
+                                            function Main()
+                                            %PARAMETERS%
+                                            end
+
+                                            output = {}
+
+                                            Main()
+
+                                            return output
+                                         ";
+            
+            //var scriptCode = $"{scriptInit}";
+            var scriptCode = scriptInit.Replace("%PARAMETERS%", parameters);
+
+            var script = new Script
             {
-                effects.AddRange(conditionalEffect.EffectsOnTarget);
+                Globals =
+                {
+                    ["stringToIndex"] = GetStringToIndexTable(), //converts string to bool (canCastEffect)
+                    ["outputTable"] = GetOutputTable() //gives unique index to each effect
+                }
+            };
+            
+            try
+            {
+                var res = script.DoString(scriptCode);
+                
+                var pairs = res.Table.Pairs;
+                foreach (var pair in pairs)
+                {
+                    if(pair.Value.Boolean) AddEffect(pair.Key);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("Lua error : " + e.Message);
             }
             
             return effects;
+
+            Dictionary<string, double> GetStringToIndexTable()
+            {
+                var stringTable = new Dictionary<string, double>();
+                for (var index = 0; index < availableConditionalEffects.Count; index++)
+                {
+                    var conditionalEffect = availableConditionalEffects[index];
+                    stringTable.Add(conditionalEffect.Id, index);
+                }
+                
+                return stringTable;
+            }
+
+            Dictionary<int, bool> GetOutputTable()
+            {
+                var outputTable = new Dictionary<int, bool>();
+                for (var index = 0; index < availableConditionalEffects.Count; index++)
+                {
+                    outputTable.Add(index, CanCastEffect(index));
+                }
+
+                return outputTable;
+            }
+            
+            void AddEffect(DynValue dynValue)
+            {
+                var index = 0;
+                switch (dynValue.Type)
+                {
+                    case DataType.Number:
+                        index = (int) dynValue.Number;
+                        if (index < 0 || index >= availableConditionalEffects.Count) return;
+                        break;
+                    case DataType.String:
+                        Debug.Log($"Lua : {dynValue.String}");
+                        return;
+                    default:
+                        return;
+                }
+                
+                effects.AddRange(availableConditionalEffects[index].EffectsOnTarget);
+            }
+            
+            bool CanCastEffect(int index)
+            {
+                return availableConditionalEffects[index].CanCastEffect(caster, targetTiles);
+            }
         }
         
         [ContextMenu("Test Requirement Text")]
