@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Battle;
 using Battle.InputEvent;
+using MoonSharp.Interpreter;
 using UnityEngine;
 
 public class NewAbilityManager : MonoBehaviour
@@ -31,6 +32,8 @@ public class NewAbilityManager : MonoBehaviour
     public void Setup(int startingAbilityPoints)
     {
         currentAbilityPoints = startingAbilityPoints;
+        
+        UserData.RegisterAssembly();
     }
 
     public void AddCallbacks()

@@ -6,40 +6,6 @@ using UnityEngine;
 namespace Battle.ScriptableObjects.Ability.Components
 {
     [Serializable]
-    public struct ConditionalEffects<T> where T : EffectSO
-    {
-        [SerializeField,TextArea(2,20)] private string parameters;
-        
-        [SerializeField] private BranchedConditionalEffect<T>[] conditionalEffects;
-        public IReadOnlyCollection<BranchedConditionalEffect<T>> ConditionalEffectsCollection => conditionalEffects;
-        
-        public List<ConditionalEffect<T>> GetConditionalEffects(NewUnit caster, NewTile[] targetTiles)
-        {
-            var returnList = new List<ConditionalEffect<T>>();
-            
-            // TODO - if else logic goes here
-
-            foreach (var branchedConditionalEffect in ConditionalEffectsCollection)
-            {
-                var conditionalEffect = branchedConditionalEffect.ConditionalEffect;
-                
-                returnList.Add(conditionalEffect);
-            }
-
-            return returnList;
-        }
-    }
-    
-    [Serializable]
-    public class BranchedConditionalEffect<T> where T : EffectSO
-    {
-        [field: SerializeField] public int Depth { get; private set; }
-        [field: SerializeField] public BranchOperator BranchOperator { get; private set; }
-        [SerializeField] private ConditionalEffect<T> conditionalEffect;
-        public ConditionalEffect<T> ConditionalEffect => conditionalEffect;
-    }
-    
-    [Serializable]
     public class ConditionalEffect<T> : IIdHandler where T : EffectSO
     {
         [field: SerializeField] public string Id { get; private set; }
@@ -103,8 +69,10 @@ namespace Battle.ScriptableObjects.Ability.Components
     }
     
     [Serializable]
-    public class EffectsOnTarget<T> where T : EffectSO
+    public class EffectsOnTarget<T> : IIdHandler where T : EffectSO
     {
+        [field: SerializeField] public string Id { get; private set; }
+        
         [field: TextArea(1,10),Tooltip(ParametableSO.ToolTipText)]
         [field:SerializeField] public string Parameters { get; private set; }
         [SerializeField] private T[] effects;

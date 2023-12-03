@@ -45,14 +45,11 @@ namespace Battle.ScriptableObjects
         
         [FormerlySerializedAs("selectedEffects")]
         [field: Space]
-        [Tooltip("Effects that will be applied to the selected tiles when the ability is cast.")]
-        [SerializeField] private ConditionalEffects<EffectSO> conditionalEffects = new ();
-        public ConditionalEffects<EffectSO> ConditionalEffects => conditionalEffects;
         [Header("Lua")]
         [SerializeField,TextArea(2,20)] private string parameters;        
-        [SerializeField,Tooltip("Will be checked for each Affected Tile")] private List<ConditionalEffect<EffectSO>> availableSelectionConditionalEffects = new ();
-        [SerializeField,Tooltip("Will be checked on caster")] private List<CustomizableCondition<AbilityConditionSO>> availableConditions = new ();
-        [SerializeField] private List<EffectSO> availableEffects = new ();
+        [SerializeField] private List<ConditionalEffect<EffectSO>> availableSelectionConditionalEffects = new ();
+        [SerializeField] private List<CustomizableCondition<AbilityConditionSO>> availableConditions = new ();
+        [SerializeField] private List<EffectsOnTarget<EffectSO>> availableEffects = new ();
         [SerializeField] private List<PassiveSO> availablePassives = new ();
         
         public bool MatchesRequirements(NewUnit caster)
@@ -84,102 +81,37 @@ namespace Battle.ScriptableObjects
         
         public string SelectedEffectsText(NewUnit caster)
         {
-            var firstConditionalEffect = ConditionalEffects.ConditionalEffectsCollection.First().ConditionalEffect;
+            //TODO - lua string conversion goes here
             
-            return firstConditionalEffect.Text(caster?.Tile);
+            return "oof";
         }
         
         public List<EffectsOnTarget<EffectSO>> GetConditionalEffects(NewUnit caster, NewTile[] targetTiles,string luaScript)
         {
-            var effects = new List<EffectsOnTarget<EffectSO>>();
+            var abilityParameterInterpreter = new AbilityParameterInterpreter(caster,targetTiles,availableSelectionConditionalEffects,availableConditions,availableEffects);
             
             var scriptCode = luaScript.Replace("%PARAMETERS%", parameters);
-
-            var availableSelectionConditionalEffectsConditions =
-                availableSelectionConditionalEffects.Select(cEffect => cEffect.Condition).ToList();
             
             var script = new Script
             {
                 Globals =
                 {
-                    ["stringToConditionalIndex"] = GetStringToIndexTable(availableSelectionConditionalEffects),
-                    ["stringToConditionIndex"] = GetStringToIndexTable(availableConditions),
-                    ["stringToEffectIndex"] = GetStringToIndexTable(availableEffects),
-                    
-                    ["canCastConditionalTable"] = GetCanCastSelectionTable(availableSelectionConditionalEffectsConditions,targetTiles),
-                    ["canCastTable"] = GetCanCastSelectionTable(availableConditions,new []{caster?.Tile})
+                    ["injector"] = abilityParameterInterpreter
                 }
             };
             
             try
             {
-                var res = script.DoString(scriptCode);
+                script.DoString(scriptCode);
                 
-                var pairs = res.Table.Pairs;
-                foreach (var pair in pairs)
-                {
-                    if(pair.Value.Boolean) AddEffect(pair.Key);
-                }
+                return abilityParameterInterpreter.SelectedEffects;
             }
             catch (Exception e)
             {
-                Debug.LogWarning("Lua error : " + e.Message);
+                Debug.LogWarning("Lua error: " + e.Message);
             }
             
-            return effects;
-
-            Dictionary<string, double> GetStringToIndexTable(IReadOnlyList<IIdHandler> listToIndex)
-            {
-                var stringTable = new Dictionary<string, double>();
-                for (var index = 0; index < listToIndex.Count; index++)
-                {
-                    var conditionalEffect = listToIndex[index];
-                    stringTable.Add(conditionalEffect.Id, index);
-                }
-                
-                return stringTable;
-            }
-
-            Dictionary<int, bool> GetCanCastSelectionTable(IReadOnlyList<CustomizableCondition<AbilityConditionSO>> conditions,NewTile[] targets)
-            {
-                var outputTable = new Dictionary<int, bool>();
-                for (var index = 0; index < conditions.Count; index++)
-                {
-                    outputTable.Add(index, CanCastEffect(conditions[index]));
-                }
-
-                return outputTable;
-                
-                bool CanCastEffect(CustomizableCondition<AbilityConditionSO> customizableCondition)
-                {
-                    foreach (var tile in targets)
-                    {
-                        var canCastTile = customizableCondition.DoesTileMatchConditionFullParameters(caster?.Tile, tile);
-                        if(!canCastTile) return false;
-                    }
-                    
-                    return true;
-                }
-            }
-            
-            void AddEffect(DynValue dynValue)
-            {
-                var index = 0;
-                switch (dynValue.Type)
-                {
-                    case DataType.Number:
-                        index = (int) dynValue.Number;
-                        if (index < 0 || index >= availableSelectionConditionalEffects.Count) return;
-                        break;
-                    case DataType.String:
-                        Debug.Log($"Lua : {dynValue.String}");
-                        return;
-                    default:
-                        return;
-                }
-                
-                effects.AddRange(availableSelectionConditionalEffects[index].EffectsOnTarget);
-            }
+            return new List<EffectsOnTarget<EffectSO>>();
         }
         
         [ContextMenu("Test Requirement Text")]
