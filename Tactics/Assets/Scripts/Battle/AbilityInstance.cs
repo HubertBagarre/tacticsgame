@@ -86,10 +86,10 @@ namespace Battle
             additionnalEffects.Clear();
         }
         
-        public IReadOnlyList<EffectsOnTarget<EffectSO>> GetEffects(NewUnit caster,NewTile[] targetTiles,string luaScript)
+        public IReadOnlyList<EffectsOnTarget<EffectSO>> GetEffects(NewUnit caster,NewTile[] targetTiles)
         {
             var returnList = new List<EffectsOnTarget<EffectSO>>();
-            var soConditionalEffects = SO.GetConditionalEffects(caster,targetTiles,luaScript);
+            var soConditionalEffects = SO.GetConditionalEffects(caster,targetTiles);
             
             returnList.AddRange(soConditionalEffects);
             returnList.AddRange(additionnalEffects);

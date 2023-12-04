@@ -9,7 +9,7 @@ namespace Battle.ScriptableObjects.Ability.Components
     public class ConditionalEffect<T> : IIdHandler where T : EffectSO
     {
         [field: SerializeField] public string Id { get; private set; }
-        [field: SerializeField] public CustomizableCondition<AbilityConditionSO> Condition { get; private set; }
+        [field: SerializeField] public CustomizableAbilityCondition Condition { get; private set; }
         [SerializeField] private EffectsOnTarget<T>[] effects;
         public IReadOnlyCollection<EffectsOnTarget<T>> EffectsOnTarget => effects;
 
@@ -39,32 +39,44 @@ namespace Battle.ScriptableObjects.Ability.Components
             }
         }
 
-        public string Text(NewTile referenceTile)
+        public (string conditionText,string effectText) Text(NewTile referenceTile,int count)
         {
-            var effectsOnTargetTexts = new List<string>();
-
-            if(EffectsOnTarget.Count <= 0) return string.Empty;
+            return (ConditionText(), EffectText());
             
-            foreach (var effectsOnTarget in EffectsOnTarget)
+            string ConditionText()
             {
-                effectsOnTargetTexts.AddRange(effectsOnTarget.GetEffectsOnTargetTexts(referenceTile));
-            }
-            
-            if(effectsOnTargetTexts.Count <= 0) return string.Empty;
-
-            var text = effectsOnTargetTexts[0];
-
-            if (effectsOnTargetTexts.Count == 1) return text;
-
-            for (int i = 1; i < effectsOnTargetTexts.Count; i++)
-            {
-                var effectText = effectsOnTargetTexts[i];
+                if (Condition == null) return string.Empty;
                 
-                text += "\n";
-                text += effectText;
+                return Condition.ConditionText(referenceTile,count);
             }
+
+            string EffectText()
+            {
+                var effectsOnTargetTexts = new List<string>();
+
+                if(EffectsOnTarget.Count <= 0) return string.Empty;
+                
+                foreach (var effectsOnTarget in EffectsOnTarget)
+                {
+                    effectsOnTargetTexts.AddRange(effectsOnTarget.GetEffectsOnTargetTexts(referenceTile));
+                }
             
-            return text;
+                if(effectsOnTargetTexts.Count <= 0) return string.Empty;
+
+                var text = effectsOnTargetTexts[0];
+
+                if (effectsOnTargetTexts.Count == 1) return text;
+
+                for (int i = 1; i < effectsOnTargetTexts.Count; i++)
+                {
+                    var effectText = effectsOnTargetTexts[i];
+                
+                    text += "\n";
+                    text += effectText;
+                }
+            
+                return text;
+            }
         }
     }
     
@@ -97,18 +109,14 @@ namespace Battle.ScriptableObjects.Ability.Components
         
         public IReadOnlyList<string> GetEffectsOnTargetTexts(NewTile referenceTile)
         {
-            const string defaultText = "<i>do something</i>";
-
-            if (typeof(T).IsSubclassOf(typeof(AbilityEffectSO))) return new List<string>(){defaultText};
-            
             var count = Effects.Count;
-            
-            if(count <= 0) return new List<string>(){defaultText};
-
             var returnList = new List<string>();
-            var effectList = Effects.Cast<AbilityEffectSO>().ToList();
             
-            foreach (var effect in effectList)
+            if(count <= 0) return returnList;
+            
+            var effectsList = Effects.Where(effect => effect is AbilityEffectSO).Cast<AbilityEffectSO>().ToList();
+            
+            foreach (var effect in effectsList)
             {
                 var effectText = $"{effect.TextFullParameters(referenceTile, Parameters)}.";
                 effectText = char.ToUpper(effectText[0]) + effectText[1..];
@@ -117,6 +125,29 @@ namespace Battle.ScriptableObjects.Ability.Components
             }
 
             return returnList;
+        }
+        
+        public string Text(NewTile referenceTile)
+        {
+            if(Effects.Count <= 0) return string.Empty;
+            
+            var effectsOnTargetTexts = GetEffectsOnTargetTexts(referenceTile);
+            
+            if(effectsOnTargetTexts.Count <= 0) return string.Empty;
+
+            var text = effectsOnTargetTexts[0];
+
+            if (effectsOnTargetTexts.Count == 1) return text;
+
+            for (int i = 1; i < effectsOnTargetTexts.Count; i++)
+            {
+                var effectText = effectsOnTargetTexts[i];
+                
+                text += "\n";
+                text += effectText;
+            }
+            
+            return text;
         }
     }
 }

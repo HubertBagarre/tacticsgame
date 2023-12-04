@@ -33,18 +33,15 @@ namespace Battle.ScriptableObjects
     {
         public string ConditionText(NewTile referenceTile,int count)
         {
-            if(count <= 0) return string.Empty;
-            
-            var text = "%COUNT% %TARGET%";
-            
-            if(Conditions.Count <= 0) return OverrideTargetText(text,count);
-            
+            if(count <= 0 || Conditions.Count <= 0) return string.Empty;
+
+            var text = string.Empty;
             foreach (var requirement in Conditions)
             {
                 text += requirement.TextFullParameters(referenceTile,Parameters);
             }
             
-            return OverrideTargetText(text,count);
+            return text;
         }
 
         /// <summary>
@@ -54,7 +51,7 @@ namespace Battle.ScriptableObjects
         {
             (string targetText, string countText) texts = (string.Empty,$"{count}");
             
-            if (Conditions.Count <= 0)  return Replace();
+            if (Conditions.Count <= 0) return Replace();
             
             foreach (var requirement in Conditions)
             {
@@ -125,7 +122,7 @@ namespace Battle.ScriptableObjects
         }
         
         /// <summary>
-        /// text should be used in this context : "Select %TARGET%{Text()}" or "Requires %TARGET%{Text()}"
+        /// text should be used in this context : "Select %TARGET% {Text()}" or "Requires %TARGET% {Text()} DON'T PUT SPACES AT START OR END"
         /// </summary>
         protected abstract string Text(NewTile referenceTile,Func<string,dynamic> parameterGetter);
         

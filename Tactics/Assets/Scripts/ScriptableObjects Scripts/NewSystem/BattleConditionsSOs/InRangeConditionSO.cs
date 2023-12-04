@@ -35,10 +35,10 @@ namespace Battle.ScriptableObjects.Conditions
             
             if (minDistance == 0)
             {
-                return $" within {RingText(maxDistance)}";
+                return $"within {RingText(maxDistance)}";
             }
             
-            return  $" between {RingText(minDistance)} and {RingText(maxDistance)}";
+            return  $"between {RingText(minDistance)} and {RingText(maxDistance)}";
 
             string RingText(int count)
             {

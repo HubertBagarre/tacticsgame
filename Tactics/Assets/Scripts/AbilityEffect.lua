@@ -21,9 +21,4 @@ function Main()
     %PARAMETERS%
 end
 
-output = {}
-
 Main()
-
-return output
-

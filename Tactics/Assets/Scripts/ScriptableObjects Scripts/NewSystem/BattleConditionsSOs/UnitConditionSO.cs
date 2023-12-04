@@ -20,7 +20,7 @@ namespace Battle.ScriptableObjects.Conditions
         
         protected override string Text(NewTile referenceTile,Func<string,dynamic> parameterGetter)
         {
-            return "";
+            return string.Empty;
         }
         
         protected virtual bool CheckUnit(NewTile referenceTile, NewUnit unit,Func<string,dynamic> parameterGetter)

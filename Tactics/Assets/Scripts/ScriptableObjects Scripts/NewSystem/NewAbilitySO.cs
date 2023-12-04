@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using MoonSharp.Interpreter;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -49,7 +50,7 @@ namespace Battle.ScriptableObjects
         [Header("Lua")]
         [SerializeField,TextArea(2,20)] private string parameters;        
         [SerializeField] private List<ConditionalEffect<EffectSO>> availableSelectionConditionalEffects = new ();
-        [SerializeField] private List<CustomizableCondition<AbilityConditionSO>> availableConditions = new ();
+        [SerializeField] private List<CustomizableAbilityCondition> availableConditions = new ();
         [SerializeField] private List<EffectsOnTarget<EffectSO>> availableEffects = new ();
         [SerializeField] private List<PassiveSO> availablePassives = new ();
         
@@ -65,8 +66,14 @@ namespace Battle.ScriptableObjects
         
         public string RequirementText(NewUnit caster)
         {
-            var text = $"Requires {Requirements.ConditionText(caster?.Tile, 1)}.";
+            var requirementText = Requirements.ConditionText(caster?.Tile, 1);
+            
+            if(requirementText == string.Empty) return string.Empty;
+            
+            var text = $"Requires %COUNT% %TARGET% {Requirements.ConditionText(caster?.Tile, 1)}.";
 
+            text = Requirements.OverrideTargetText(text,1);
+            
             return text;
         }
         
@@ -76,7 +83,9 @@ namespace Battle.ScriptableObjects
             
             if(selectionConditionText == string.Empty) return string.Empty;
             
-            var text = $"Select {selectionConditionText}.";
+            var text = $"Select %COUNT% %TARGET% {selectionConditionText}.";
+            
+            text = SelectionCondition.OverrideTargetText(text,ExpectedSelections);
 
             return text;
         }
@@ -84,9 +93,50 @@ namespace Battle.ScriptableObjects
         public string SelectedEffectsText(NewUnit caster)
         {
             //TODO - lua string conversion goes here
-            var text = $"{parameters}";
+            var keyWords = NewAbilityManager.GetLuaKeywords();
             
-            return text;
+            var functions = parameters.Split(' ','\n','\t').Where(split => keyWords.Any(split.Contains)).ToList();
+            
+            var trimmedScript = string.Empty;
+            foreach (var function in functions)
+            {
+                trimmedScript += $"{function}\n";
+            }
+            
+            var scriptCode = NewAbilityManager.LuaScriptText.Replace("%PARAMETERS%", trimmedScript);
+            
+            var abilityParameterInterpreter = new AbilityParameterInterpreterText(caster,availableSelectionConditionalEffects,availableConditions,availableEffects,ExpectedSelections,scriptCode);
+            
+            var script = new Script
+            {
+                Globals =
+                {
+                    ["injector"] = abilityParameterInterpreter
+                }
+            };
+            
+            try
+            {
+                script.DoString(scriptCode);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Lua {e}: {e.Message})");
+            }
+            
+            var texts = abilityParameterInterpreter.ReplacedTexts;
+
+
+            var text = parameters;
+            for (int i = 0; i < functions.Count; i++)
+            {
+                text = text.Replace(functions[i],texts[i]);
+            }
+
+            text = text.Replace("end","");
+            text = text.Replace("\n","");
+            
+            return $"{text}";
         }
 
         public string FullDescription(NewUnit caster)
@@ -103,11 +153,11 @@ namespace Battle.ScriptableObjects
             return text;
         }
         
-        public List<EffectsOnTarget<EffectSO>> GetConditionalEffects(NewUnit caster, [CanBeNull] NewTile[] targetTiles,string luaScript)
+        public List<EffectsOnTarget<EffectSO>> GetConditionalEffects(NewUnit caster,NewTile[] targetTiles)
         {
             var abilityParameterInterpreter = new AbilityParameterInterpreter(caster,targetTiles,availableSelectionConditionalEffects,availableConditions,availableEffects);
             
-            var scriptCode = luaScript.Replace("%PARAMETERS%", parameters);
+            var scriptCode = NewAbilityManager.LuaScriptText.Replace("%PARAMETERS%", parameters);
             
             var script = new Script
             {
@@ -141,12 +191,6 @@ namespace Battle.ScriptableObjects
         private void TestSelectionText()
         {
             Debug.Log(SelectionText(null));
-        }
-
-        [ContextMenu("Test Effect Text")]
-        private void TestEffectText()
-        {
-            Debug.Log(SelectedEffectsText(null));
         }
     }
 }

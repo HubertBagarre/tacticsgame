@@ -53,7 +53,7 @@ namespace Battle.ScriptableObjects.Conditions
         
         protected override string Text(NewTile referenceTile,Func<string,dynamic> parameterGetter)
         {
-            return GenerateListOfParametersText<ComparisonData>(parameterGetter, GenerateComparisonText," with ");
+            return GenerateListOfParametersText<ComparisonData>(parameterGetter, GenerateComparisonText,"with ");
             
             (bool,string) GenerateComparisonText(ComparisonData comparisonData)
             {

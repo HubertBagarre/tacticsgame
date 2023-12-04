@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Battle;
 using Battle.InputEvent;
-using Battle.ScriptableObjects;
 using MoonSharp.Interpreter;
 using UnityEngine;
 
 public class NewAbilityManager : MonoBehaviour
 {
     [SerializeField] private TextAsset luaScript;
+    private static TextAsset LuaScript;
+    public static string LuaScriptText => LuaScript.text;
     
     [SerializeField] private int currentAbilityPoints = 0;
     public int CurrentAbilityPoints
@@ -33,6 +34,8 @@ public class NewAbilityManager : MonoBehaviour
     public void Setup(int startingAbilityPoints)
     {
         currentAbilityPoints = startingAbilityPoints;
+        
+        LuaScript = luaScript;
         
         UserData.RegisterAssembly();
     }
@@ -99,7 +102,7 @@ public class NewAbilityManager : MonoBehaviour
         
         if(!canceled)
         {
-            var castAbilityAction = new CastAbilityAction(ability,caster,selectedTiles,luaScript.text);
+            var castAbilityAction = new CastAbilityAction(ability,caster,selectedTiles);
             castAbilityAction.TryStack();
         }
         
@@ -108,6 +111,21 @@ public class NewAbilityManager : MonoBehaviour
     
     public static void RequestStartAbilityTargetSelection(AbilityInstance abilityInstance, NewUnit caster) => OnStartAbilityTargetSelection?.Invoke(abilityInstance,caster);
     public static void RequestEndAbilityTargetSelection(bool canceled) => OnEndAbilityTargetSelection?.Invoke(canceled);
+
+    public static IEnumerable<string> GetLuaKeywords()
+    {
+        var luaScript = LuaScriptText;
+
+        var split = luaScript.Split(' ','\n');
+        
+        var functions = new List<string>();
+        for (int i = 0; i < split.Length; i++)
+        {
+            if(split[i] == "function" && i+1 < split.Length) functions.Add(split[i + 1]);
+        }
+
+        return functions.Select(function => function.Split('(')).Select(text => text[0]);
+    }
 }
 
 public class CastAbilityAction : SimpleStackableAction
@@ -118,14 +136,12 @@ public class CastAbilityAction : SimpleStackableAction
     public AbilityInstance AbilityInstance { get; }
     public NewUnit Caster { get; }
     public List<NewTile> TargetTiles { get; }
-    protected string LuaScript { get; }
     
-    public CastAbilityAction(AbilityInstance abilityInstance,NewUnit caster,List<NewTile> targetTiles,string luaScript)
+    public CastAbilityAction(AbilityInstance abilityInstance,NewUnit caster,List<NewTile> targetTiles)
     {
         AbilityInstance = abilityInstance;
         Caster = caster;
         TargetTiles = targetTiles;
-        LuaScript = luaScript;
     }
     
     protected override void Main()
@@ -140,7 +156,7 @@ public class CastAbilityAction : SimpleStackableAction
 
     protected override void PostWaitAction()
     {
-        var effects = AbilityInstance.GetEffects(Caster, TargetTiles.ToArray(),LuaScript);
+        var effects = AbilityInstance.GetEffects(Caster, TargetTiles.ToArray());
         
         Debug.Log($"{Caster} is casting {AbilityInstance.SO.Name}({effects.Count}) on {TargetTiles.Count}");
         
