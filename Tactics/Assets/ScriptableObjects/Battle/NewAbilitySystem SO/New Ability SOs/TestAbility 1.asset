@@ -44,9 +44,12 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 2f7019c9de2adab4c8ec849364f7faed, type: 2}
     effects:
     - <Id>k__BackingField: Conditional Effect Text
-      <Parameters>k__BackingField: Log:Conditional Effect
+      <Parameters>k__BackingField: 'Log:Conditional Effect
+
+        Hp:+6'
       effects:
       - {fileID: 11400000, guid: 620a8fbde3b348b4bbb3f7b614b8130f, type: 2}
+      - {fileID: 11400000, guid: 648ff5a49823f694eb2b4d639d18f88e, type: 2}
   availableConditions:
   - <Id>k__BackingField: IsUnit
     <Parameters>k__BackingField: 
@@ -56,7 +59,7 @@ MonoBehaviour:
   - <Id>k__BackingField: NormalEffect
     <Parameters>k__BackingField: 'Log:Normal Effect
 
-      Hp:+6'
+      Hp:+8'
     effects:
     - {fileID: 11400000, guid: 648ff5a49823f694eb2b4d639d18f88e, type: 2}
   availablePassives: []
