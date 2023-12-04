@@ -33,9 +33,11 @@ namespace Battle.ScriptableObjects
     {
         public string ConditionText(NewTile referenceTile,int count)
         {
-            if(Conditions.Count <= 0) return string.Empty;
+            if(count <= 0) return string.Empty;
             
             var text = "%COUNT% %TARGET%";
+            
+            if(Conditions.Count <= 0) return OverrideTargetText(text,count);
             
             foreach (var requirement in Conditions)
             {
@@ -50,22 +52,25 @@ namespace Battle.ScriptableObjects
         /// </summary>
         public string OverrideTargetText(string inputText,int count)
         {
-            if(Conditions.Count <= 0) return inputText;
-            
             (string targetText, string countText) texts = (string.Empty,$"{count}");
+            
+            if (Conditions.Count <= 0)  return Replace();
             
             foreach (var requirement in Conditions)
             {
                 var req = requirement.TargetOverrideFullParameters(count, Parameters);
                 if (req.targetText != string.Empty && texts.targetText == string.Empty) texts = req;
             }
+            
+            return Replace();
 
-            if (texts.targetText == string.Empty) texts.targetText = count > 1 ? "tiles" : "tile";
-            
-            inputText = inputText.Replace("%TARGET%",texts.targetText);
-            inputText = inputText.Replace("%COUNT%",texts.countText);
-            
-            return inputText;
+            string Replace()
+            {
+                if (texts.targetText == string.Empty) texts.targetText = count > 1 ? "tiles" : "tile";
+                inputText = inputText.Replace("%TARGET%",texts.targetText);
+                inputText = inputText.Replace("%COUNT%",texts.countText);
+                return inputText;
+            }
         }
     }
     
