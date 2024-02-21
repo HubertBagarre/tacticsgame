@@ -452,7 +452,7 @@ MonoBehaviour:
   battleStartTransitionDuration: {x: 0.1, y: 0.1, z: 0.1}
   roundStartTransitionDuration: {x: 0.1, y: 0.1, z: 0.1}
   maxIterations: 1000
-  showLog: 0
+  showLog: 1
   maxRounds: 10
 --- !u!114 &107337559
 MonoBehaviour:
