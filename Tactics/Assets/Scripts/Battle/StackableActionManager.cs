@@ -25,7 +25,7 @@ namespace Battle
 		public Action PreWaitAction { get; } = null;
 		public Action PostWaitAction { get; } = null;
 		
-		private bool HasCustomInstruction => CustomYieldInstruction != null;
+		public bool HasCustomInstruction => CustomYieldInstruction != null;
 
 		public YieldedAction(Action action) // When an action doesn't have a delay or a wait
 		{
