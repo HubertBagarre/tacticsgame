@@ -13,8 +13,6 @@ namespace Battle
 	/// Contains a yield instruction, and two actions, one to be invoked before the yield instruction, and one after
 	/// Usually the yield instruction is a WaitForSeconds or WaitForEndOfFrame, and the first action launches an animation and the second one does the interesting stuff
 	/// WaitForSeconds is a YieldInstruction, WaitUntil and WaitWhile are CustomYieldInstructions, they don't derive from the same class :(
-	///
-	/// This class will change 
 	/// </summary>
 	public class YieldedAction
 	{
@@ -150,7 +148,7 @@ namespace Battle
 		// Dequeues the yielded actions and starts its Coroutine
 		private void InvokeActions()
 		{
-			if (!yieldedActions.TryDequeue(out var yieldedAction))
+			if (!yieldedActions.TryDequeue(out var yieldedAction)) // checks if there are any yielded actions, if not, advances to the next state
 			{
 				CurrentState = State.Invoked;
 				Advance();
@@ -167,7 +165,7 @@ namespace Battle
 			{
 				Log("Ended invoke actions");
 
-				if (AutoAdvance) Advance(); // Player turn isn't AutoAdvaning,
+				if (AutoAdvance) Advance(); // Player turn isn't AutoAdvancing,
 			}
 		}
 
@@ -366,21 +364,21 @@ namespace Battle
 	#endregion
 	
 	// Simple stackable action, most SimpleStackableActions actually derived from this instead of StackableAction directly
-	// using "Generate Missing Members" on Rider generate YieldInstruction, CustomYieldInstruction and Main
+	// StackableAction only requires a MainYieldedAction, which means constructing a YieldedAction.
+	// This class automatically constructs the YieldedAction
+	//
+	// using "Generate Missing Members" on Rider generate YieldInstruction, CustomYieldInstruction and Main method
 	public abstract class SimpleStackableAction : StackableAction
 	{
 		protected abstract YieldInstruction YieldInstruction { get; }
 		protected abstract CustomYieldInstruction CustomYieldInstruction { get; }
-
 		protected override YieldedAction MainYieldedAction()
 		{
 			return CustomYieldInstruction != null 
 				? new YieldedAction(Main, CustomYieldInstruction, PostWaitAction) 
 				: new YieldedAction(Main, YieldInstruction, PostWaitAction);
 		}
-
 		protected abstract void Main();
-
 		protected virtual void PostWaitAction() { }
 	}
 }
