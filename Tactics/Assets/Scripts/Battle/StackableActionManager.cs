@@ -182,19 +182,7 @@ namespace Battle
 
 			CurrentState = State.Ended;
 		}
-
-		// Called when there is an opportunity to invoke subactions.
-		// If there are any subactions, dequeue and put on the stack
-		private bool CanInvokeSubActions()
-		{
-			if (CurrentAction.subActions.Count <= 0) return false;
-
-			var subAction = CurrentAction.subActions.Dequeue();
-			
-			subAction.Stack();
-			return true;
-		}
-
+		
 		// Advances the action to the next state, see enum State
 		private static void Advance()
 		{
@@ -255,6 +243,18 @@ namespace Battle
 			Advance();
 		}
 
+		// Called when there is an opportunity to invoke subactions.
+		// If there are any subactions, dequeue and put on the stack
+		private bool CanInvokeSubActions()
+		{
+			if (CurrentAction.subActions.Count <= 0) return false;
+
+			var subAction = CurrentAction.subActions.Dequeue();
+			
+			subAction.Stack();
+			return true;
+		}
+		
 		#region AutoInvokeStartAndEndEvents
 		private void InvokeStart()
 		{
@@ -274,6 +274,7 @@ namespace Battle
 			var invokable = generic.MakeGenericType(type); // Creates a generic type of the derived class (so ActionStartInvoker<DerivedClass> or ActionEndInvoker<DerivedClass>)
 			Activator.CreateInstance(invokable, this); // Creates an instance of the generic type, this will call the constructor of the generic type, which will invoke the event
 		}
+		
 		#endregion
 
 		#region YieldedActions
@@ -301,10 +302,11 @@ namespace Battle
 		#endregion
 
 		#region Manager
-		
-		// Manages the stack, and advances the actions
-		// Also sets the coroutineInvoker and maxIterationsSafety
-		// It's defined here so it can use the private members of the StackableAction class
+		/// <summary>
+		/// Manages the stack, and advances the actions
+		/// Also sets the coroutineInvoker and maxIterationsSafety
+		/// It's defined here so it can use the private members of the StackableAction class 
+		/// </summary>
 		public static class Manager
 		{
 			public static void Init(MonoBehaviour monoBehaviour, int maxIterations = 0)
@@ -339,9 +341,11 @@ namespace Battle
 	}
 	
 	#region AutoInvokers
-	
 	/// When constructed, will invoke the event with the action as parameter and T as the type of the action
 	/// They are static, so you can subscribe to the event from anywhere
+	/// They are generic, so you don't have to cast the action to the derived class
+	/// I don't have to write the same code over and over again, and I can subscribe to the events from anywhere
+
 	public class ActionStartInvoker<T> where T : StackableAction
 	{
 		public static event Action<T> OnInvoked;
@@ -361,13 +365,28 @@ namespace Battle
 			OnInvoked?.Invoke(stackableAction);
 		}
 	}
+	
+	/*
+		They should be used like this (NewBattleManager.cs, l.99-106):
+
+		ActionStartInvoker<RoundAction>.OnInvoked += action => Debug.Log($"Starting round {action.CurrentRound}");
+        ActionStartInvoker<MainBattleAction>.OnInvoked += SpawnStartingUnits;
+        ActionEndInvoker<SpawnStartingUnitsAction>.OnInvoked += ResetTimelineAfterEntitySpawn;
+
+        ActionStartInvoker<UnitTurnBattleAction>.OnInvoked += SetCurrentUnitTurnBattleAction;
+		ActionEndInvoker<UnitTurnBattleAction>.OnInvoked += ClearCurrentUnitTurnBattleAction;
+
+		ActionEndInvoker<UnitCreatedAction>.OnInvoked += AddCreatedUnitToTimeline;
+	*/
 	#endregion
 	
-	// Simple stackable action, most SimpleStackableActions actually derived from this instead of StackableAction directly
-	// StackableAction only requires a MainYieldedAction, which means constructing a YieldedAction.
-	// This class automatically constructs the YieldedAction
-	//
-	// using "Generate Missing Members" on Rider generate YieldInstruction, CustomYieldInstruction and Main method
+	/// <summary>
+	/// Simple stackable action, most SimpleStackableActions actually derived from this instead of StackableAction directly
+	/// StackableAction only requires a MainYieldedAction, which means constructing a YieldedAction.
+	/// This class automatically constructs the YieldedAction
+	///
+	/// using "Generate Missing Members" on Rider generate YieldInstruction, CustomYieldInstruction and Main method
+	/// </summary>
 	public abstract class SimpleStackableAction : StackableAction
 	{
 		protected abstract YieldInstruction YieldInstruction { get; }
