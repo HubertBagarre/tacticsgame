@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Battle.ScriptableObjects;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Battle
 {
@@ -309,7 +307,7 @@ namespace Battle
         [Serializable]
         private class TestEntity : TimelineEntity
         {
-            public override IEnumerable<StackableAction.YieldedAction> EntityTurnYieldedActions => null;
+            public override IEnumerable<YieldedAction> EntityTurnYieldedActions => null;
             public TestEntity(int speed, int initiative, string name = "Test Entity") : base(speed, initiative, name)
             {
             }

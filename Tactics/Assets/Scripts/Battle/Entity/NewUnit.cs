@@ -171,7 +171,7 @@ namespace Battle
             return passiveInstances.Count(condition);
         }
 
-        public override IEnumerable<StackableAction.YieldedAction> EntityTurnYieldedActions => new[] { new StackableAction.YieldedAction(new UnitTurnBattleAction(this).TryStack)};
+        public override IEnumerable<YieldedAction> EntityTurnYieldedActions => new[] { new YieldedAction(new UnitTurnBattleAction(this).TryStack)};
 
         public override string ToString()
         {

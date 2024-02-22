@@ -18,9 +18,9 @@ namespace Battle.ScriptableObjects.UnitBehaviour
             
         }
         
-        public override IEnumerable<StackableAction.YieldedAction> UnitTurnBehaviourActions(NewUnit unit,Action<StackableAction.YieldedAction> enqueueActionMethod)
+        public override IEnumerable<YieldedAction> UnitTurnBehaviourActions(NewUnit unit,Action<YieldedAction> enqueueActionMethod)
         {
-            return new[] { new StackableAction.YieldedAction(Log,new WaitForSeconds(3f)) };
+            return new[] { new YieldedAction(Log,new WaitForSeconds(3f)) };
                 
             void Log()
             {

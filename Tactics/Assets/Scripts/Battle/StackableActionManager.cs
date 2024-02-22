@@ -5,6 +5,40 @@ using UnityEngine;
 
 namespace Battle
 {
+	
+	
+	// Simple class that invokes two actions, one before waiting and one after waiting
+	public class YieldedAction
+	{
+		public YieldInstruction YieldInstruction { get; } = null; // Usually WaitForSeconds or WaitForEndOfFrame
+
+		public CustomYieldInstruction CustomYieldInstruction { get; } = null; // Wait Until or Wait While, or Another Coroutine, use to wait for player input, for example
+
+		public Action PreWaitAction { get; } = null;
+		public Action PostWaitAction { get; } = null;
+
+		public YieldedAction(Action action) // When an action doesn't have a delay or a wait
+		{
+			PreWaitAction = action;
+		}
+
+		// You can use either a YieldInstruction or a CustomYieldInstruction, they are not derived from the same class :(
+		public YieldedAction(Action preWaitAction, YieldInstruction yieldInstruction, Action postWaitAction = null)
+		{
+			PreWaitAction = preWaitAction;
+			YieldInstruction = yieldInstruction;
+			PostWaitAction = postWaitAction;
+		}
+
+		public YieldedAction(Action preWaitAction, CustomYieldInstruction yieldInstruction,
+			Action postWaitAction = null)
+		{
+			PreWaitAction = preWaitAction;
+			CustomYieldInstruction = yieldInstruction;
+			PostWaitAction = postWaitAction;
+		}
+	}
+	
 	public abstract class StackableAction
 	{
 		private static bool showLog = false;				// Toggle Debug.Log
@@ -17,23 +51,23 @@ namespace Battle
 			Created,	// Constructed
 			Stacked,	// When added to stack
 			Starting,	// Call starting event here
-			Started,	// Put subactions that where added during starting on the stack
-			Invoking,	// Put subactions that where added during started on the stack, if none, invoke main action
-			Invoked,	// Put subactions that where added during invoking on the stack, if none, end
+			Started,	// Put subactions that where added during Starting on the stack
+			Invoking,	// Put subactions that where added during Started on the stack, if none, invoke main action
+			Invoked,	// Put subactions that where added during Invoking on the stack, if none, end
 			Ending,	// Call ending event here
-			Ended,		// Put subactions that where added during ending on the stack, if none, pop from stack
+			Ended,		// Put subactions that where added during Ending on the stack, if none, pop from stack
 		}
 		protected State CurrentState { get; private set; } = State.Created;
-
-
-		private static Stack<StackableAction> stack; // Stack of actions, the top one is the current one
+		
+		private static Stack<StackableAction> stack; // Stack of actions, the top one is the one that will advance (Advancing a Stackable action means changing its state, and reacting accordingly)
 		private static StackableAction CurrentAction => stack.TryPeek(out var action) ? action : null;
 
 		private readonly Queue<StackableAction> subActions = new(); // Actions that where added during the current action. They are pushed to the stack during certain states (see enum State)
-		private readonly Queue<YieldedAction> yieldedActions = new(); // A yielded action is an action that has a delay, or waits for a condition, or waits for player input. They are invoked in the Invoking state
+		
+		private readonly Queue<YieldedAction> yieldedActions = new(); 
 		protected abstract YieldedAction MainYieldedAction(); // Mandatory, gets automatically added to the queue of yielded actions
 		protected virtual bool AutoAdvance => true; // If true, the action will advance to the next state after the yielded actions are done (player input does not AutoAdvance, for example)
-		public event Action<StackableAction> OnStarted; // Called when the action starts (Starting state), found out having itself as a parameter is generally useful
+		public event Action<StackableAction> OnStarted; // Called when the action starts (Starting state), found out having itself as a parameter is generally useful, but it needs to be casted to the derived class
 		public event Action<StackableAction> OnEnded; // Called when the action ends (Ending state)
 
 		// The only public method, called when you want to start the action
@@ -221,17 +255,17 @@ namespace Battle
 		}
 
 		#region AutoInvokeStartAndEndEvents
-
+		
 		private void InvokeStart()
 		{
 			OnStarted?.Invoke(this);
-			CreateGenericInstance(typeof(ActionStartInvoker<>));
+			CreateGenericInstance(typeof(ActionStartInvoker<>)); //This will call ActionStartInvoker<T>.OnInvoked, with T being the derived class (so no need to cast it, unlike OnStarted)
 		}
 
 		private void InvokeEnd()
 		{
 			OnEnded?.Invoke(this);
-			CreateGenericInstance(typeof(ActionEndInvoker<>));
+			CreateGenericInstance(typeof(ActionEndInvoker<>)); //This will call ActionEndInvoker<T>.OnInvoked, with T being the derived class (so no need to cast it, unlike OnStarted)
 		}
 		
 		private void CreateGenericInstance(Type generic)
@@ -244,15 +278,12 @@ namespace Battle
 		#endregion
 
 		#region YieldedActions
-		// Handles timed Actions
-		// Has a prewait action and a post wait action
-		
 		protected void EnqueueYieldedAction(YieldedAction yieldedAction)
 		{
 			yieldedActions.Enqueue(yieldedAction);
 		}
 
-		protected void EnqueueYieldedAction(Action action)
+		protected void EnqueueYieldedAction(Action action) // Overload for when you only want to invoke an action
 		{
 			yieldedActions.Enqueue(new YieldedAction(action));
 		}
@@ -267,38 +298,6 @@ namespace Battle
 			EnqueueYieldedAction(MainYieldedAction());
 
 			CurrentState = State.Invoking;
-		}
-		
-		// Simple class that invokes two actions, one before waiting and one after waiting
-		public class YieldedAction
-		{
-			public YieldInstruction YieldInstruction { get; } = null; // Usually WaitForSeconds or WaitForEndOfFrame
-
-			public CustomYieldInstruction CustomYieldInstruction { get; } = null; // Wait Until or Wait While, or Another Coroutine, use to wait for player input, for example
-
-			public Action PreWaitAction { get; } = null;
-			public Action PostWaitAction { get; } = null;
-
-			public YieldedAction(Action action)
-			{
-				PreWaitAction = action;
-			}
-
-			// You can use either a YieldInstruction or a CustomYieldInstruction, they are not derived from the same class :(
-			public YieldedAction(Action preWaitAction, YieldInstruction yieldInstruction, Action postWaitAction = null)
-			{
-				PreWaitAction = preWaitAction;
-				YieldInstruction = yieldInstruction;
-				PostWaitAction = postWaitAction;
-			}
-
-			public YieldedAction(Action preWaitAction, CustomYieldInstruction yieldInstruction,
-				Action postWaitAction = null)
-			{
-				PreWaitAction = preWaitAction;
-				CustomYieldInstruction = yieldInstruction;
-				PostWaitAction = postWaitAction;
-			}
 		}
 		#endregion
 
@@ -330,7 +329,7 @@ namespace Battle
 
 		#endregion
 		
-		private static void Log(string text)
+		private static void Log(string text) //There is a lot of StackableActions (basically every action in the game), so this is useful to toggle Debug.Log
 		{
 			if (!showLog) return;
 			Debug.Log(text);

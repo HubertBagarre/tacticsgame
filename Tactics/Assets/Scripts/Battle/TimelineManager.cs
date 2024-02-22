@@ -180,7 +180,7 @@ namespace Battle
 
         private class RoundEndEntity : TimelineEntity
         {
-            public override IEnumerable<StackableAction.YieldedAction> EntityTurnYieldedActions { get; }
+            public override IEnumerable<YieldedAction> EntityTurnYieldedActions { get; }
         
             public RoundEndEntity(int speed, int initiative, string name) : base(speed, initiative, name)
             {

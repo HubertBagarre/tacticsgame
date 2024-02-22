@@ -92,7 +92,7 @@ namespace Battle
             return JoinedIndex.CompareTo(other.JoinedIndex);
         }
         
-        public abstract IEnumerable<StackableAction.YieldedAction> EntityTurnYieldedActions { get; }
+        public abstract IEnumerable<YieldedAction> EntityTurnYieldedActions { get; }
     }
 }
 
