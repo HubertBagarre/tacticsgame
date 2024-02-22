@@ -1,3 +1,7 @@
+// This file contains the classes that manage the flow of actions in the game.
+// The class YieldedAction handles time delays
+// The class StackableAction handles the order and execution of YieldedActions
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,9 +9,13 @@ using UnityEngine;
 
 namespace Battle
 {
-	
-	
-	// Simple class that invokes two actions, one before waiting and one after waiting
+	/// <summary>
+	/// Contains a yield instruction, and two actions, one to be invoked before the yield instruction, and one after
+	/// Usually the yield instruction is a WaitForSeconds or WaitForEndOfFrame, and the first action launches an animation and the second one does the interesting stuff
+	/// WaitForSeconds is a YieldInstruction, WaitUntil and WaitWhile are CustomYieldInstructions, they don't derive from the same class :(
+	///
+	/// This class will change 
+	/// </summary>
 	public class YieldedAction
 	{
 		public YieldInstruction YieldInstruction { get; } = null; // Usually WaitForSeconds or WaitForEndOfFrame
@@ -16,13 +24,15 @@ namespace Battle
 
 		public Action PreWaitAction { get; } = null;
 		public Action PostWaitAction { get; } = null;
+		
+		private bool HasCustomInstruction => CustomYieldInstruction != null;
 
 		public YieldedAction(Action action) // When an action doesn't have a delay or a wait
 		{
 			PreWaitAction = action;
 		}
 
-		// You can use either a YieldInstruction or a CustomYieldInstruction, they are not derived from the same class :(
+		// You can use either a YieldInstruction or a CustomYieldInstruction
 		public YieldedAction(Action preWaitAction, YieldInstruction yieldInstruction, Action postWaitAction = null)
 		{
 			PreWaitAction = preWaitAction;
@@ -30,43 +40,69 @@ namespace Battle
 			PostWaitAction = postWaitAction;
 		}
 
-		public YieldedAction(Action preWaitAction, CustomYieldInstruction yieldInstruction,
-			Action postWaitAction = null)
+		public YieldedAction(Action preWaitAction, CustomYieldInstruction yieldInstruction, Action postWaitAction = null)
 		{
 			PreWaitAction = preWaitAction;
 			CustomYieldInstruction = yieldInstruction;
 			PostWaitAction = postWaitAction;
 		}
+
+		// Coroutine that waits for the yield instruction, and invokes the pre and post wait actions (has a callback as parameter)
+		public IEnumerator RunCoroutine(Action onCompleted)
+		{
+			PreWaitAction?.Invoke();
+
+			yield return HasCustomInstruction ? CustomYieldInstruction : YieldInstruction;
+
+			PostWaitAction?.Invoke();
+
+			onCompleted?.Invoke();
+		}
 	}
 	
+	/// <summary> 
+	/// Contains a queue of YieldedActions, since there can only be 1 wait per YieldedAction, you need multiple ones to handle multiple waits (for example a 3 hit strike)
+	///
+	/// StackableActions are put on a stack and the top one is advanced, when it ends, it pops from the stack and the next one advances
+	/// A StackableAction has multiple states, advancing means changing the state, and reacting accordingly
+	/// 
+	/// They invoke events when they start and end, so you can subscribe to them and react accordingly
+	/// These events have the derived class as a parameter, so you don't have to recast it.
+	/// 
+	/// If something puts a new StackableAction on the stack, it will be added to the subActions queue of the current action instead
+	/// StackableActions can put their own subActions on the stack, this means that StackableActions can be nested
+	/// SubActions are put on the stack during certain states (see enum State)
+	/// </summary>
 	public abstract class StackableAction
 	{
 		private static bool showLog = false;				// Toggle Debug.Log
 		private static int maxIterationsSafety;			// Safety for infinite loops (if Action doesn't have any delay, they will run in a while(true) loop)
-		private static MonoBehaviour coroutineInvoker; // Only monoBehaviour can start coroutines
+		private static MonoBehaviour coroutineInvoker; // Only MonoBehaviours can start coroutines
 		
-		//global
 		protected enum State
 		{
 			Created,	// Constructed
-			Stacked,	// When added to stack
-			Starting,	// Call starting event here
-			Started,	// Put subactions that where added during Starting on the stack
-			Invoking,	// Put subactions that where added during Started on the stack, if none, invoke main action
-			Invoked,	// Put subactions that where added during Invoking on the stack, if none, end
-			Ending,	// Call ending event here
-			Ended,		// Put subactions that where added during Ending on the stack, if none, pop from stack
+			Stacked,	// Just added to stack, call Start event
+			Starting,	
+			Started,	// Put subactions that where added by the Start event on the stack
+			Invoking,	// Dequeue and invoke yielded actions, if there are any subactions, put them on the sack instead
+			Invoked,	// Put subactions that where added during Invoking on the stack, if none, call End event
+			Ending,	
+			Ended,		// Put subactions that where added by the End event on the stack, if none, pop from stack
 		}
-		protected State CurrentState { get; private set; } = State.Created;
+		// Any StackableAction that tries to go on the stack during a Starting, Invoking or Ending state will be put on the subActions queue instead
 		
-		private static Stack<StackableAction> stack; // Stack of actions, the top one is the one that will advance (Advancing a Stackable action means changing its state, and reacting accordingly)
+		protected State CurrentState { get; private set; } = State.Created; // Default state is Created
+		
+		private static Stack<StackableAction> stack;
 		private static StackableAction CurrentAction => stack.TryPeek(out var action) ? action : null;
-
-		private readonly Queue<StackableAction> subActions = new(); // Actions that where added during the current action. They are pushed to the stack during certain states (see enum State)
+		
+		private readonly Queue<StackableAction> subActions = new();
 		
 		private readonly Queue<YieldedAction> yieldedActions = new(); 
-		protected abstract YieldedAction MainYieldedAction(); // Mandatory, gets automatically added to the queue of yielded actions
-		protected virtual bool AutoAdvance => true; // If true, the action will advance to the next state after the yielded actions are done (player input does not AutoAdvance, for example)
+		protected abstract YieldedAction MainYieldedAction(); // A stackableAction has at least 1 YieldedAction
+		
+		protected virtual bool AutoAdvance => true; // Automatically advances to the next state after the yielded actions are done (the player turn doesn't auto advance)
 		public event Action<StackableAction> OnStarted; // Called when the action starts (Starting state), found out having itself as a parameter is generally useful, but it needs to be casted to the derived class
 		public event Action<StackableAction> OnEnded; // Called when the action ends (Ending state)
 
@@ -90,7 +126,7 @@ namespace Battle
 		}
 		
 		// Adds the action to the stack
-		protected void Stack()
+		private void Stack()
 		{
 			CurrentState = State.Stacked;
 
@@ -111,7 +147,7 @@ namespace Battle
 			CurrentState = State.Started;
 		}
 		
-		// Dequeues the yielded actions and invokes them
+		// Dequeues the yielded actions and starts its Coroutine
 		private void InvokeActions()
 		{
 			if (!yieldedActions.TryDequeue(out var yieldedAction))
@@ -122,47 +158,16 @@ namespace Battle
 			}
 
 			Log("Invoking actions, auto advance is " + AutoAdvance);
-
-			var hasInstruction = yieldedAction.YieldInstruction != null;
-			var hasCustomInstruction = yieldedAction.CustomYieldInstruction != null;
-
-			// If there is no instruction, just invoke the pre and post wait actions
-			if (!hasInstruction && !hasCustomInstruction)
-			{
-				Log("No instructions to wait for");
-
-				yieldedAction.PreWaitAction?.Invoke();
-				yieldedAction.PostWaitAction?.Invoke();
-
-				EndInvoking();
-				return;
-			}
-
-			Log($"Waiting for {(hasCustomInstruction ? "custom " : "")}instruction ");
-
-			// If there is an instruction, starts a coroutine to handle it.
-			coroutineInvoker.StartCoroutine(RunCoroutine());
+			
+			coroutineInvoker.StartCoroutine(yieldedAction.RunCoroutine(EndInvoking));
 
 			return;
-
-			IEnumerator RunCoroutine()
-			{
-				yieldedAction.PreWaitAction?.Invoke();
-
-				yield return hasCustomInstruction
-					? yieldedAction.CustomYieldInstruction
-					: yieldedAction.YieldInstruction;
-
-				yieldedAction.PostWaitAction?.Invoke();
-
-				EndInvoking();
-			}
-
+			
 			void EndInvoking()
 			{
 				Log("Ended invoke actions");
 
-				if (AutoAdvance) Advance();
+				if (AutoAdvance) Advance(); // Player turn isn't AutoAdvaning,
 			}
 		}
 
@@ -192,13 +197,11 @@ namespace Battle
 			return true;
 		}
 
-		// Advances the action to the next state
+		// Advances the action to the next state, see enum State
 		private static void Advance()
 		{
 			var iterations = 0; // safety
 			
-			// The while loop exits when a yielded action has a delay or when it needs to wait, if it doesn't have any, this is essentially a while(true) loop
-			// It can be patched by waiting for end of frame between the PreWaitAction and the PostWaitAction of each yielded action
 			while (iterations < maxIterationsSafety)
 			{
 				iterations++;
@@ -215,20 +218,20 @@ namespace Battle
 
 				switch (state)
 				{
-					case State.Created:
+					case State.Created: // StackableAction trying to stack here get added to the subActions queue instead
 						CurrentAction.CurrentState = State.Stacked;
 						break;
 					case State.Stacked:
 						CurrentAction.Start();
 						break;
-					case State.Starting:
+					case State.Starting: // StackableAction trying to stack here get added to the subActions queue instead
 						CurrentAction.CurrentState = State.Started;
 						break;
 					case State.Started:
 						if (!CurrentAction.CanInvokeSubActions()) CurrentAction.SetupYieldedActions();
 						break;
-					case State.Invoking:
-						if (!CurrentAction.CanInvokeSubActions())
+					case State.Invoking: // StackableAction trying to stack here get added to the subActions queue instead
+						if (!CurrentAction.CanInvokeSubActions()) // Player Actions can be added here
 						{
 							CurrentAction.InvokeActions();
 							return;
@@ -237,7 +240,7 @@ namespace Battle
 					case State.Invoked:
 						if (!CurrentAction.CanInvokeSubActions()) CurrentAction.End();
 						break;
-					case State.Ending:
+					case State.Ending: // StackableAction trying to stack here get added to the subActions queue instead
 						CurrentAction.CurrentState = State.Ended;
 						break;
 					case State.Ended:
@@ -248,14 +251,13 @@ namespace Battle
 				}
 			}
 
-			// If the while loop reaches the maxIterationsSafety, it will pop the stack and advance
-			Debug.LogWarning($"Max iterations reached ({maxIterationsSafety}), popping stack)");
+			// If the while loop reaches the maxIterationsSafety, it will pop the stack and advance (it shouldn't reach this point, but it's a safety measure)
+			Debug.LogWarning($"Max iterations reached ({maxIterationsSafety}),	popping stack)");
 			stack.Pop();
 			Advance();
 		}
 
 		#region AutoInvokeStartAndEndEvents
-		
 		private void InvokeStart()
 		{
 			OnStarted?.Invoke(this);
@@ -265,16 +267,15 @@ namespace Battle
 		private void InvokeEnd()
 		{
 			OnEnded?.Invoke(this);
-			CreateGenericInstance(typeof(ActionEndInvoker<>)); //This will call ActionEndInvoker<T>.OnInvoked, with T being the derived class (so no need to cast it, unlike OnStarted)
+			CreateGenericInstance(typeof(ActionEndInvoker<>)); //This will call ActionEndInvoker<T>.OnInvoked, with T being the derived class
 		}
 		
 		private void CreateGenericInstance(Type generic)
 		{
-			var type = GetType(); // Gets the type of the derived class;
-			var invokable = generic.MakeGenericType(type); // Creates a generic type of the derived class, so ActionStartInvoker<DerivedClass> or ActionEndInvoker<DerivedClass>;
-			Activator.CreateInstance(invokable, this); // Creates an instance of the generic type, this will call the constructor of the generic type, which will invoke the event;
+			var type = GetType(); // Gets the type of the derived class
+			var invokable = generic.MakeGenericType(type); // Creates a generic type of the derived class (so ActionStartInvoker<DerivedClass> or ActionEndInvoker<DerivedClass>)
+			Activator.CreateInstance(invokable, this); // Creates an instance of the generic type, this will call the constructor of the generic type, which will invoke the event
 		}
-
 		#endregion
 
 		#region YieldedActions
@@ -302,6 +303,7 @@ namespace Battle
 		#endregion
 
 		#region Manager
+		
 		// Manages the stack, and advances the actions
 		// Also sets the coroutineInvoker and maxIterationsSafety
 		// It's defined here so it can use the private members of the StackableAction class
@@ -329,7 +331,9 @@ namespace Battle
 
 		#endregion
 		
-		private static void Log(string text) //There is a lot of StackableActions (basically every action in the game), so this is useful to toggle Debug.Log
+		//There are a lot of StackableActions (basically every action in the game)
+		//They can quickly fill the console with logs, so you can toggle StackableActions logs on and off
+		private static void Log(string text) 
 		{
 			if (!showLog) return;
 			Debug.Log(text);
@@ -337,9 +341,9 @@ namespace Battle
 	}
 	
 	#region AutoInvokers
+	
 	/// When constructed, will invoke the event with the action as parameter and T as the type of the action
 	/// They are static, so you can subscribe to the event from anywhere
-	
 	public class ActionStartInvoker<T> where T : StackableAction
 	{
 		public static event Action<T> OnInvoked;
@@ -362,7 +366,7 @@ namespace Battle
 	#endregion
 	
 	// Simple stackable action, most SimpleStackableActions actually derived from this instead of StackableAction directly
-	// It only has the most basic members and methods, so using "Generate Missing Members" on Rider will not generate a lot of code
+	// using "Generate Missing Members" on Rider generate YieldInstruction, CustomYieldInstruction and Main
 	public abstract class SimpleStackableAction : StackableAction
 	{
 		protected abstract YieldInstruction YieldInstruction { get; }
@@ -370,14 +374,13 @@ namespace Battle
 
 		protected override YieldedAction MainYieldedAction()
 		{
-			if (CustomYieldInstruction != null) return new YieldedAction(Main, CustomYieldInstruction, PostWaitAction);
-			return new YieldedAction(Main, YieldInstruction, PostWaitAction);
+			return CustomYieldInstruction != null 
+				? new YieldedAction(Main, CustomYieldInstruction, PostWaitAction) 
+				: new YieldedAction(Main, YieldInstruction, PostWaitAction);
 		}
 
 		protected abstract void Main();
 
-		protected virtual void PostWaitAction()
-		{
-		}
+		protected virtual void PostWaitAction() { }
 	}
 }
